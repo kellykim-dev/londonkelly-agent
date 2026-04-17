@@ -2,7 +2,7 @@ name: LondonKelly Collection Sorter
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 每日 UTC 2am = 香港時間 10am
+    - cron: '0 22 * * *'  # 每日 UTC 10pm = 香港時間 06am
   workflow_dispatch:      # 可以手動觸發
 
 jobs:
