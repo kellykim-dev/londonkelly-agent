@@ -16,7 +16,7 @@ from google.analytics.data_v1beta.types import RunReportRequest, Dimension, Metr
 
 # ─── 設定 ───────────────────────────────────────────────
 SHOPIFY_STORE = "londonkelly.myshopify.com"
-SHOPIFY_TOKEN = "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"
+SHOPIFY_TOKEN = os.environ.get("SHOPIFY_TOKEN", "")
 GA4_PROPERTY  = "357906508"
 GA4_KEY_FILE  = "ga4_key.json"
 HOT_TAG       = "hot"
