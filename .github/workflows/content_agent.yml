@@ -1,0 +1,39 @@
+name: LondonKelly Content Agent
+
+on:
+  workflow_dispatch:
+
+jobs:
+  content:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: pip install anthropic requests
+
+    - name: Run content agent
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: python content_agent.py
+
+    - name: Update status.json
+      run: python update_status.py content_agent
+
+    - name: Commit files
+      run: |
+        git config user.name "LondonKelly Bot"
+        git config user.email "bot@londonkelly.com"
+        git add content.html status.json
+        git diff --staged --quiet || git commit -m "Update content [skip ci]"
+        git push
