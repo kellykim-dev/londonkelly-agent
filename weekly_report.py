@@ -86,7 +86,7 @@ ROAS: {ads.get('roas',0)}x
 
 用emoji，簡潔，適合手機睇。"""
     message = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}]
     )
