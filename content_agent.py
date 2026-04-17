@@ -30,7 +30,12 @@ def get_sale_products():
             for v in p.get("variants", []):
                 cap = v.get("compare_at_price")
                 price = v.get("price")
-                if cap and price and float(price) > 0 and float(cap) > float(price):
+                inventory = v.get("inventory_quantity", 0)
+                # price > 0, compare_at_price > price, inventory > 0
+                if (cap and price and
+                    float(price) > 0 and
+                    float(cap) > float(price) and
+                    inventory > 0):
                     discount = round((1 - float(price)/float(cap)) * 100)
                     sale_products.append({
                         "title": p["title"],
@@ -39,6 +44,7 @@ def get_sale_products():
                         "compare_at_price": float(cap),
                         "discount": discount,
                         "handle": p["handle"],
+                        "inventory": inventory,
                     })
                     break
         link = resp.headers.get("Link", "")
@@ -48,11 +54,9 @@ def get_sale_products():
                 if 'rel="next"' in part:
                     url = part.split(";")[0].strip().strip("<>"); break
         time.sleep(0.3)
-    # 計算每個 vendor 出現次數，排序：vendor 出現最多先，再按折扣
     vendor_counts = Counter(p["vendor"] for p in sale_products)
     sale_products.sort(key=lambda x: (vendor_counts[x["vendor"]], x["discount"]), reverse=True)
-    print(f"  搵到 {len(sale_products)} 件特價產品")
-    # 印出 top vendors
+    print(f"  搵到 {len(sale_products)} 件有貨特價產品")
     for v, c in vendor_counts.most_common(5):
         print(f"  {v}: {c} 件")
     return sale_products[:20]
@@ -175,7 +179,7 @@ body{{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}}
 <div class="wrap">
   <a href="index.html" class="back">← 返回辦公室</a>
   <div class="title">★ 本週社群內容 {today} ★</div>
-  <div class="section-title">&gt;_ 本週特價產品</div>
+  <div class="section-title">&gt;_ 本週特價產品（有貨）</div>
   <div class="products">{product_cards}</div>
   <div class="section-title">&gt;_ 7日內容計劃</div>
   {post_cards}
@@ -204,7 +208,7 @@ function copyPost(i) {{
 if __name__ == "__main__":
     products = get_sale_products()
     if not products:
-        print("⚠️ 冇搵到特價產品")
+        print("⚠️ 冇搵到有貨特價產品")
     posts = generate_content(products)
     generate_html(products, posts)
     print("✅ 完成！")
