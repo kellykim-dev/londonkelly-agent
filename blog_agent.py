@@ -70,7 +70,7 @@ BLOG_SCHEDULE = [
 
 WHATSAPP_LINK = "https://wa.me/85296996990"
 WEBSITE = "https://londonkelly.com.hk"
-BLOG_ID = "78071889984"  # LondonKelly Shopify blog ID
+BLOG_ID = "56143962176"  # LondonKelly Shopify blog ID
 
 def get_current_blog_index():
     """追蹤輪到邊個品牌"""
@@ -331,9 +331,9 @@ if __name__ == "__main__":
     }]
 
     html = generate_html_report(blogs_drafted)
-    with open("content.html", "w", encoding="utf-8") as f:
+    with open("blog_draft.html", "w", encoding="utf-8") as f:
         f.write(html)
-    print("  ✅ content.html 更新完成")
+    print("  ✅ blog_draft.html 更新完成")
 
     # 儲存下次輪到邊個
     save_blog_index(next_idx)
