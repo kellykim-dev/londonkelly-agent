@@ -33,7 +33,6 @@ jobs:
         GA4_KEY_FILE: ga4_key.json
       run: |
         python sort_collections.py 2>&1 | tee sort_output.txt
-        echo "exit_code=$?" >> $GITHUB_ENV
 
     - name: Run update hot items
       env:
@@ -70,6 +69,7 @@ jobs:
       run: |
         git config user.name "LondonKelly Bot"
         git config user.email "bot@londonkelly.com"
+        git pull --rebase origin main
         git add status.json last_run.txt || true
         git diff --staged --quiet || git commit -m "Update status [skip ci]"
         git push
