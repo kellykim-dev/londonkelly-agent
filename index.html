@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LondonKelly AI 辦公室</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #2C2416; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; font-family: 'Press Start 2P', monospace; }
+.office { background: #8B7355; border: 4px solid #5C4A2A; border-radius: 4px; padding: 12px; position: relative; width: 100%; max-width: 600px; }
+.office-title { text-align: center; background: #5C4A2A; color: #FFD700; font-size: 7px; padding: 6px; margin-bottom: 12px; border: 2px solid #FFD700; letter-spacing: 1px; }
+.floor { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.desk { background: #6B5B3E; border: 2px solid #4A3728; border-radius: 2px; padding: 6px 4px; text-align: center; position: relative; cursor: pointer; transition: transform 0.1s; }
+.desk:hover { transform: scale(1.05); }
+.desk.active { border-color: #00FF88; box-shadow: 0 0 0 1px #00FF88; }
+.desk.idle { border-color: #888; }
+.desk.success { border-color: #00FF88; }
+.monitor { width: 28px; height: 20px; background: #1a1a2e; border: 2px solid #333; margin: 0 auto 4px; position: relative; border-radius: 1px; }
+.monitor.on { background: #0a2a1a; }
+.monitor.on::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; background: #00FF88; opacity: 0.4; animation: blink 1.5s infinite; }
+.monitor.idle::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; background: #444; }
+@keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+.agent-sprite { font-size: 16px; display: block; margin-bottom: 2px; }
+.agent-name { color: #FFD700; font-size: 5px; display: block; margin-bottom: 2px; }
+.agent-status { font-size: 4px; display: block; line-height: 1.4; }
+.status-running { color: #00FF88; }
+.status-idle { color: #888; }
+.status-done { color: #88DDFF; }
+.status-error { color: #FF4444; }
+.bottom-row { display: flex; gap: 8px; margin-top: 8px; }
+.breakroom { background: #5C4A2A; border: 2px solid #4A3728; border-radius: 2px; padding: 6px; flex: 1; text-align: center; }
+.breakroom-title { color: #FFD700; font-size: 5px; margin-bottom: 6px; display: block; }
+.appliances { display: flex; gap: 4px; justify-content: center; }
+.appliance { font-size: 14px; }
+.log-panel { background: #1a1a2e; border: 2px solid #333; border-radius: 2px; padding: 6px; flex: 2; }
+.log-title { color: #00FF88; font-size: 5px; margin-bottom: 4px; display: block; }
+.log-entry { font-size: 4px; line-height: 1.8; color: #88FF88; font-family: monospace; }
+.log-entry.error { color: #FF4444; }
+.log-entry.info { color: #88DDFF; }
+.status-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #5C4A2A; border: 2px solid #4A3728; padding: 4px 8px; }
+.next-run { color: #FFD700; font-size: 5px; }
+.last-run { color: #88DDFF; font-size: 5px; }
+.pulse { display: inline-block; width: 6px; height: 6px; background: #00FF88; border-radius: 50%; animation: pulse 1s infinite; margin-right: 4px; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+.walking { animation: walk 3s infinite; display: inline-block; }
+@keyframes walk { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(2px); } 75% { transform: translateX(-2px); } }
+.tooltip { display: none; position: absolute; background: #1a1a2e; border: 1px solid #00FF88; color: #00FF88; font-size: 5px; padding: 4px 6px; z-index: 10; top: -44px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 2px; line-height: 1.6; pointer-events: none; }
+.desk:hover .tooltip { display: block; }
+.last-updated { color: #888; font-size: 5px; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="office">
+  <div class="office-title">LondonKelly AI 辦公室</div>
+  <div class="floor">
+    <div class="desk active">
+      <div class="tooltip">指揮中心</div>
+      <div class="monitor on"></div>
+      <span class="agent-sprite"><span class="walking">🤖</span></span>
+      <span class="agent-name">蜜醬</span>
+      <span class="agent-status status-done">指揮中心</span>
+    </div>
+    <div class="desk success">
+      <div class="tooltip">sort_collections.py<br>成功:48 搵唔到:0</div>
+      <div class="monitor on"></div>
+      <span class="agent-sprite">👩‍💻</span>
+      <span class="agent-name">花花</span>
+      <span class="agent-status status-done">✓ 排序完成</span>
+    </div>
+    <div class="desk success">
+      <div class="tooltip">update_hot_items.py<br>Hot collection 更新</div>
+      <div class="monitor on"></div>
+      <span class="agent-sprite">🔥</span>
+      <span class="agent-name">阿鼻</span>
+      <span class="agent-status status-done">✓ Tags 更新</span>
+    </div>
+    <div class="desk idle">
+      <div class="tooltip">GA4 + Shopify 數據<br>等待下次排程</div>
+      <div class="monitor idle"></div>
+      <span class="agent-sprite">📊</span>
+      <span class="agent-name">豆芽</span>
+      <span class="agent-status status-idle">待機中</span>
+    </div>
+  </div>
+  <div class="floor">
+    <div class="desk idle">
+      <div class="tooltip">SEO Blog 生成</div>
+      <div class="monitor idle"></div>
+      <span class="agent-sprite">✍️</span>
+      <span class="agent-name">啾皮</span>
+      <span class="agent-status status-idle">待機中</span>
+    </div>
+    <div class="desk idle">
+      <div class="tooltip">社群內容規劃</div>
+      <div class="monitor idle"></div>
+      <span class="agent-sprite">📱</span>
+      <span class="agent-name">彩彩</span>
+      <span class="agent-status status-idle">待機中</span>
+    </div>
+    <div class="desk idle">
+      <div class="tooltip">競品分析</div>
+      <div class="monitor idle"></div>
+      <span class="agent-sprite">🔍</span>
+      <span class="agent-name">咕嚕</span>
+      <span class="agent-status status-idle">待機中</span>
+    </div>
+    <div class="desk idle">
+      <div class="tooltip">廣告策略</div>
+      <div class="monitor idle"></div>
+      <span class="agent-sprite">📣</span>
+      <span class="agent-name">咕噹</span>
+      <span class="agent-status status-idle">待機中</span>
+    </div>
+  </div>
+  <div class="bottom-row">
+    <div class="breakroom">
+      <span class="breakroom-title">休息室</span>
+      <div class="appliances">
+        <span class="appliance">☕</span>
+        <span class="appliance">📺</span>
+        <span class="appliance">🕹️</span>
+        <span class="appliance">🎰</span>
+      </div>
+    </div>
+    <div class="log-panel">
+      <span class="log-title">&gt; 最新 log</span>
+      <div class="log-entry info" id="log1">[06:00] GitHub Actions 啟動</div>
+      <div class="log-entry" id="log2">[06:01] 安裝 dependencies...</div>
+      <div class="log-entry" id="log3">[06:02] GA4 key 已載入</div>
+      <div class="log-entry" id="log4">[06:03] sort_collections.py 跑緊...</div>
+      <div class="log-entry" id="log5">[06:04] 成功:48 | 搵唔到:0</div>
+      <div class="log-entry" id="log6">[06:05] update_hot_items.py 跑緊...</div>
+      <div class="log-entry" id="log7">[06:06] ✓ Hot collection 自動更新</div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <span class="last-run">上次: 今日 06:06 ✓</span>
+    <span class="next-run"><span class="pulse"></span>下次: 明日 06:00 HKT</span>
+  </div>
+  <div class="last-updated" id="lastUpdated"></div>
+</div>
+<script>
+document.getElementById('lastUpdated').textContent = 'Page loaded: ' + new Date().toLocaleString('zh-HK');
+</script>
+</body>
+</html>
