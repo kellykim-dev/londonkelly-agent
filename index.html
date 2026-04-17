@@ -15,13 +15,13 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
 #logbox{flex:1;}
 #logtitle{color:#00FF88;font-size:6px;margin-bottom:4px;}
 #loglines div{font-size:6px;line-height:2;font-family:monospace;}
-.lk-ok{color:#00FF88;}.lk-info{color:#88DDFF;}.lk-warn{color:#FFD700;}
-#agentlist{width:140px;}
+.lk-ok{color:#00FF88;}.lk-info{color:#88DDFF;}.lk-warn{color:#FFD700;}.lk-err{color:#FF4444;}
+#agentlist{width:150px;}
 #alisttitle{color:#FFD700;font-size:6px;margin-bottom:4px;}
 .alist-row{font-size:5px;line-height:2.2;display:flex;gap:4px;align-items:center;}
 .alist-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .alist-name{color:#ccc;}
-#sbar{background:#3a2810;display:flex;justify-content:space-between;padding:7px 12px;border-top:2px solid #5C4A2A;}
+#sbar{background:#3a2810;display:flex;justify-content:space-between;padding:7px 12px;border-top:2px solid #5C4A2A;flex-wrap:wrap;gap:4px;}
 .st{font-size:6px;color:#FFD700;}
 .dot{display:inline-block;width:7px;height:7px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:5px;vertical-align:middle;}
 @keyframes dp{0%,100%{opacity:1;}50%{opacity:.2;}}
@@ -36,7 +36,7 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
 <canvas id="canvas" width="720" height="420"></canvas>
 <div id="bottom">
   <div id="logbox">
-    <div id="logtitle">&gt;_ log</div>
+    <div id="logtitle">&gt;_ 實時 log</div>
     <div id="loglines"></div>
   </div>
   <div id="agentlist">
@@ -45,14 +45,77 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
   </div>
 </div>
 <div id="sbar">
-  <span class="st">上次: 今日 06:06 ✓</span>
-  <span class="st"><span class="dot"></span>下次: 明日 06:00 HKT</span>
+  <span class="st" id="lastrun">載入中...</span>
+  <span class="st"><span class="dot"></span>每日 06:00 HKT 自動跑</span>
 </div>
 </div>
 <script>
 const C=document.getElementById('canvas'),ctx=C.getContext('2d');
 const W=720,H=420;
 
+// ── Status from GitHub ────────────────────────────────
+let realStatus = null;
+async function fetchStatus(){
+  try {
+    const r = await fetch('status.json?t='+Date.now());
+    realStatus = await r.json();
+    updateFromStatus();
+  } catch(e){ console.log('status.json not ready'); }
+}
+
+function updateFromStatus(){
+  if(!realStatus) return;
+  // Update last run
+  const dt = new Date(realStatus.last_run);
+  const hkt = new Date(dt.getTime()+8*3600000);
+  const timeStr = hkt.toISOString().slice(0,19).replace('T',' ')+' HKT';
+  document.getElementById('lastrun').textContent = '上次: '+timeStr+' ✓';
+
+  // Update log
+  const logEl = document.getElementById('loglines');
+  logEl.innerHTML = '';
+  const sa = realStatus.agents;
+  if(sa){
+    addRealLog('lk-info', '[系統] 上次執行: '+timeStr);
+    if(sa.sort_collections){
+      const s = sa.sort_collections.status;
+      const log = sa.sort_collections.log || '';
+      const match = log.match(/總:(\d+)/);
+      const total = match ? match[1] : '?';
+      const solmatch = log.match(/Sold Out:(\d+)/);
+      const sold = solmatch ? solmatch[1] : '?';
+      addRealLog(s==='done'?'lk-ok':'lk-warn',
+        '[花花] sort_collections '+(s==='done'?'✓':'跳過')+' 總:'+total+' SoldOut:'+sold);
+    }
+    if(sa.update_hot_items){
+      const s = sa.update_hot_items.status;
+      addRealLog(s==='done'?'lk-ok':'lk-warn',
+        '[阿鼻] update_hot_items '+(s==='done'?'✓':'跳過'));
+    }
+    addRealLog('lk-warn', '[系統] 下次: 明日 06:00 HKT');
+  }
+
+  // Update agent states
+  if(sa && sa.sort_collections){
+    const s = sa.sort_collections.status;
+    agents[1].baseStatus = s==='done'?'done':'idle';
+    agents[2].baseStatus = sa.update_hot_items.status==='done'?'done':'idle';
+  }
+}
+
+function addRealLog(cls, txt){
+  const logEl = document.getElementById('loglines');
+  const div = document.createElement('div');
+  div.className = cls; div.textContent = txt;
+  logEl.appendChild(div);
+  while(logEl.children.length>6) logEl.removeChild(logEl.firstChild);
+}
+
+// Fetch on load + every 5 mins
+fetchStatus();
+setInterval(fetchStatus, 300000);
+
+// ── Draw functions ────────────────────────────────────
 function drawFloor(){
   for(let tx=0;tx<16;tx++)for(let ty=0;ty<13;ty++){
     ctx.fillStyle=(tx+ty)%2===0?'#9B8365':'#8B7355';
@@ -61,20 +124,20 @@ function drawFloor(){
     ctx.strokeRect(tx*32,ty*32,32,32);
   }
   ctx.fillStyle='#4a3820';ctx.fillRect(512,0,208,210);
-  for(let tx=0;tx<6;tx++)for(let ty=0;ty<6;ty++){
+  for(let tx=0;tx<7;tx++)for(let ty=0;ty<7;ty++){
     ctx.fillStyle=(tx+ty)%2===0?'#4a3828':'#3a2818';
-    ctx.fillRect(512+tx*34,ty*34,34,34);
+    ctx.fillRect(512+tx*30,ty*30,30,30);
   }
   ctx.fillStyle='#5a7a5a';ctx.fillRect(512,210,208,210);
-  for(let tx=0;tx<6;tx++)for(let ty=0;ty<6;ty++){
+  for(let tx=0;tx<7;tx++)for(let ty=0;ty<7;ty++){
     ctx.fillStyle=(tx+ty)%2===0?'#5a7a5a':'#4a6a4a';
-    ctx.fillRect(512+tx*34,210+ty*34,34,34);
+    ctx.fillRect(512+tx*30,210+ty*30,30,30);
   }
   ctx.fillStyle='#3a2810';ctx.fillRect(508,0,6,H);
   ctx.fillStyle='#2a1a08';ctx.fillRect(0,0,W,4);
   ctx.fillStyle='#FFD700';ctx.font='7px "Press Start 2P",monospace';
-  ctx.fillText('休息室',530,20);
-  ctx.fillStyle='#ccffcc';ctx.fillText('洗手間',530,228);
+  ctx.fillText('休息室',528,18);
+  ctx.fillStyle='#ccffcc';ctx.fillText('洗手間',528,226);
   ctx.fillStyle='#6B4A2A';ctx.fillRect(506,95,8,48);ctx.fillRect(506,280,8,48);
   ctx.fillStyle='#FFD700';ctx.fillRect(507,117,5,5);ctx.fillRect(507,300,5,5);
 }
@@ -89,7 +152,7 @@ function drawDesk(x,y,glowing,label){
     ctx.fillStyle=`rgba(0,255,136,${0.25+0.2*Math.sin(Date.now()/600)})`;
     ctx.fillRect(x+21,y+9,34,22);
     ctx.fillStyle='rgba(0,255,136,0.5)';
-    for(let i=0;i<3;i++)ctx.fillRect(x+24,y+12+i*6,24,2);
+    for(let i=0;i<3;i++)ctx.fillRect(x+24,y+12+i*6,20+Math.random()*10,2);
   }
   ctx.fillStyle='#333';ctx.fillRect(x+35,y+34,6,8);ctx.fillRect(x+28,y+41,20,3);
   ctx.fillStyle='#2a2a2a';ctx.fillRect(x+10,y+43,56,7);
@@ -101,35 +164,40 @@ function drawDesk(x,y,glowing,label){
 }
 
 function drawFurniture(){
-  ctx.fillStyle='#1a1a1a';ctx.fillRect(520,30,55,65);
-  ctx.fillStyle='#cc2200';ctx.fillRect(524,34,47,22);
-  ctx.fillStyle='#ff4400';ctx.fillRect(526,36,43,18);
-  ctx.fillStyle='#00ff88';ctx.fillRect(530,39,8,8);ctx.fillRect(542,39,8,8);
-  ctx.fillStyle='#888';ctx.fillRect(534,72,22,18);ctx.fillRect(538,68,14,6);
-  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('COFFEE',522,60);
-  ctx.fillStyle='#111';ctx.fillRect(518,100,80,22);
-  ctx.fillStyle='#0a1a2a';ctx.fillRect(521,102,74,18);
-  ctx.fillStyle='#0066ff';ctx.font='6px monospace';ctx.fillText('TV',548,115);
-  ctx.fillStyle='#8B3A0A';ctx.fillRect(514,130,95,40);
-  ctx.fillStyle='#A04515';ctx.fillRect(514,130,95,12);ctx.fillRect(514,130,12,40);ctx.fillRect(597,130,12,40);
-  ctx.fillStyle='#C05A20';ctx.fillRect(528,142,25,24);ctx.fillRect(558,142,25,24);
-  ctx.fillStyle='#5a3a18';ctx.fillRect(520,170,180,55);
-  ctx.fillStyle='#6a4a28';ctx.fillRect(522,172,176,51);
-  ctx.fillStyle='rgba(255,220,150,0.08)';ctx.fillRect(522,172,176,20);
+  // Coffee machine
+  ctx.fillStyle='#1a1a1a';ctx.fillRect(520,28,55,65);
+  ctx.fillStyle='#cc2200';ctx.fillRect(524,32,47,22);
+  ctx.fillStyle='#ff4400';ctx.fillRect(526,34,43,18);
+  ctx.fillStyle='#00ff88';ctx.fillRect(530,37,8,8);ctx.fillRect(542,37,8,8);
+  ctx.fillStyle='#888';ctx.fillRect(534,70,22,18);ctx.fillRect(538,66,14,6);
+  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('COFFEE',521,58);
+  // TV
+  ctx.fillStyle='#111';ctx.fillRect(518,98,80,22);
+  ctx.fillStyle='#0a1a2a';ctx.fillRect(521,100,74,18);
+  ctx.fillStyle='#0066ff';ctx.font='6px monospace';ctx.fillText('TV',548,113);
+  // Sofa
+  ctx.fillStyle='#8B3A0A';ctx.fillRect(514,128,95,40);
+  ctx.fillStyle='#A04515';ctx.fillRect(514,128,95,12);ctx.fillRect(514,128,12,40);ctx.fillRect(597,128,12,40);
+  ctx.fillStyle='#C05A20';ctx.fillRect(528,140,25,24);ctx.fillRect(558,140,25,24);
+  // Meeting table
+  ctx.fillStyle='#5a3a18';ctx.fillRect(520,170,175,52);
+  ctx.fillStyle='#6a4a28';ctx.fillRect(522,172,171,48);
+  ctx.fillStyle='rgba(255,220,150,0.08)';ctx.fillRect(522,172,171,18);
   ctx.fillStyle='#3a2810';
-  for(let i=0;i<4;i++){ctx.fillRect(528+i*44,165,32,8);ctx.fillRect(528+i*44,223,32,8);}
-  ctx.fillStyle='#1a1aaa';ctx.fillRect(625,20,85,105);
-  ctx.fillStyle='#5555ff';ctx.fillRect(629,24,77,65);
-  ctx.fillStyle='rgba(150,200,255,0.2)';ctx.fillRect(629,24,77,65);
+  for(let i=0;i<4;i++){ctx.fillRect(526+i*42,163,30,10);ctx.fillRect(526+i*42,220,30,10);}
+  // Claw machine
+  ctx.fillStyle='#1a1aaa';ctx.fillRect(624,18,88,108);
+  ctx.fillStyle='#5555ff';ctx.fillRect(628,22,80,68);
+  ctx.fillStyle='rgba(150,200,255,0.15)';ctx.fillRect(628,22,80,68);
   const tc=['#ff66aa','#ffaa00','#66ffaa','#ff4444','#aaaaff'];
-  for(let i=0;i<5;i++){ctx.fillStyle=tc[i];ctx.beginPath();ctx.arc(638+i*14,70,7,0,Math.PI*2);ctx.fill();}
-  ctx.fillStyle='#3333cc';ctx.fillRect(648,89,24,10);
-  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('夾娃娃',627,105);
-  ctx.fillStyle='#eee';ctx.fillRect(520,245,32,42);ctx.fillStyle='#ddd';ctx.fillRect(520,245,32,10);
-  ctx.fillStyle='#bbb';ctx.fillRect(523,255,26,28);
-  ctx.fillStyle='#ddd';ctx.fillRect(575,238,38,28);ctx.fillStyle='#ccc';ctx.fillRect(578,241,32,22);
-  ctx.fillStyle='#888';ctx.fillRect(590,237,6,6);ctx.fillStyle='#aaa';ctx.fillRect(580,263,28,4);
-  ctx.fillStyle='#99bbcc';ctx.fillRect(575,215,38,20);ctx.strokeStyle='#888';ctx.lineWidth=2;ctx.strokeRect(575,215,38,20);
+  for(let i=0;i<5;i++){ctx.fillStyle=tc[i];ctx.beginPath();ctx.arc(637+i*15,72,7,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('夾娃娃',628,105);
+  // Toilet
+  ctx.fillStyle='#eee';ctx.fillRect(520,242,32,44);ctx.fillStyle='#ddd';ctx.fillRect(520,242,32,10);
+  ctx.fillStyle='#bbb';ctx.fillRect(523,252,26,30);
+  ctx.fillStyle='#ddd';ctx.fillRect(574,236,38,28);ctx.fillStyle='#ccc';ctx.fillRect(577,239,32,22);
+  ctx.fillStyle='#888';ctx.fillRect(589,235,6,6);
+  ctx.fillStyle='#99bbcc';ctx.fillRect(574,213,38,20);ctx.strokeStyle='#888';ctx.lineWidth=2;ctx.strokeRect(574,213,38,20);
 }
 
 function drawPerson(x,y,col,frame,dir,sitting){
@@ -137,14 +205,14 @@ function drawPerson(x,y,col,frame,dir,sitting){
   ctx.save();ctx.translate(Math.round(x),Math.round(y));
   if(dir<0)ctx.scale(-1,1);
   function p(px,py,c){ctx.fillStyle=c;ctx.fillRect(px*S,py*S,S,S);}
-  function row(px1,px2,py,c){for(let i=px1;i<=px2;i++)p(i,py,c);}
-  function col2(py1,py2,px,c){for(let i=py1;i<=py2;i++)p(px,i,c);}
+  function row(a,b,py,c){for(let i=a;i<=b;i++)p(i,py,c);}
+  function col2(a,b,px,c){for(let i=a;i<=b;i++)p(px,i,c);}
   const wf=frame%4;
   const la=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.2);
   const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.2);
   const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
   const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
-  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(S*3,S*16,S*3,S,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.15)';ctx.beginPath();ctx.ellipse(S*3,S*16,S*3,S,0,0,Math.PI*2);ctx.fill();
   row(1,4,0,col.hair);row(1,4,1,col.hair);p(0,1,col.hair);p(5,1,col.hair);
   row(1,4,2,col.skin);row(1,4,3,col.skin);
   p(2,2,'#1a1a1a');p(3,2,'#1a1a1a');p(2,3,'#cc4444');
@@ -156,10 +224,10 @@ function drawPerson(x,y,col,frame,dir,sitting){
   if(sitting){
     row(1,2,9,col.pants);row(1,2,10,col.pants);row(3,4,9,col.pants);row(3,4,10,col.pants);
     p(0,10,col.pants);p(5,10,col.pants);
-    row(0,2,11,col.shoe||'#2a1a00');row(3,5,11,col.shoe||'#2a1a00');
+    row(0,2,11,col.shoe);row(3,5,11,col.shoe);
   } else {
-    col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe||'#2a1a00');p(2,12+ll,col.shoe||'#2a1a00');
-    col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe||'#2a1a00');p(4,12+rl,col.shoe||'#2a1a00');
+    col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe);p(2,12+ll,col.shoe);
+    col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe);p(4,12+rl,col.shoe);
   }
   ctx.restore();
 }
@@ -169,12 +237,13 @@ function drawBubble(x,y,text,color){
   ctx.font='6px "Press Start 2P",monospace';
   const tw=ctx.measureText(text).width,bw=tw+12,bh=16;
   const bx=x-bw/2,by=y-bh-8;
-  ctx.fillStyle='rgba(8,8,20,0.92)';
+  ctx.fillStyle='rgba(8,8,20,0.93)';
+  ctx.beginPath();
   if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,3);else ctx.rect(bx,by,bw,bh);
-  ctx.fill();ctx.strokeStyle=color||'#00FF88';ctx.lineWidth=1.5;ctx.stroke();
-  ctx.fillStyle='rgba(8,8,20,0.92)';ctx.beginPath();
+  ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(8,8,20,0.93)';ctx.beginPath();
   ctx.moveTo(x-4,by+bh);ctx.lineTo(x,by+bh+7);ctx.lineTo(x+4,by+bh);ctx.fill();
-  ctx.strokeStyle=color||'#00FF88';ctx.lineWidth=1;ctx.beginPath();
+  ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();
   ctx.moveTo(x-4,by+bh);ctx.lineTo(x,by+bh+7);ctx.lineTo(x+4,by+bh);ctx.stroke();
   ctx.fillStyle='#fff';ctx.font='6px "Press Start 2P",monospace';ctx.fillText(text,bx+6,by+11);
 }
@@ -196,7 +265,7 @@ const AINFO=[
   {name:'啾皮',status:'idle'},{name:'彩彩',status:'idle'},
   {name:'咕嚕',status:'idle'},{name:'咕噹',status:'idle'},
 ];
-const WB=['排序中...','拉GA4數據','計算分數','更新tags','分析緊...'];
+const WB=['排序中...','拉GA4數據','計算分數','更新tags'];
 const IB=['zzz','等指令','發呆中','無野做'];
 const CB=['好香☕','補充能量','喝完返工'];
 const TB=['去一去','解決咗','返黎啦'];
@@ -212,11 +281,11 @@ const agents=AINFO.map((a,i)=>({
   walkFrame:0,walkTimer:0,dir:1,moving:false,sitting:false,speed:0.9+Math.random()*0.4,
 }));
 
-function pb(state){
-  if(state==='working')return WB[Math.floor(Math.random()*WB.length)];
-  if(state==='coffee')return CB[Math.floor(Math.random()*CB.length)];
-  if(state==='toilet')return TB[Math.floor(Math.random()*TB.length)];
-  if(state==='done')return DB[Math.floor(Math.random()*DB.length)];
+function pb(s){
+  if(s==='working')return WB[Math.floor(Math.random()*WB.length)];
+  if(s==='coffee')return CB[Math.floor(Math.random()*CB.length)];
+  if(s==='toilet')return TB[Math.floor(Math.random()*TB.length)];
+  if(s==='done')return DB[Math.floor(Math.random()*DB.length)];
   return IB[Math.floor(Math.random()*IB.length)];
 }
 
@@ -228,13 +297,13 @@ function agentTick(a){
       a.state='working';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('working');a.bubbleTimer=120;a.actionTimer=160;
     } else if(a.baseStatus==='done'){
       if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done');a.bubbleTimer=90;a.actionTimer=200;}
-      else if(r<0.7){a.state='coffee';a.tx=530+Math.random()*30;a.ty=80+Math.random()*40;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=190;}
-      else{a.state='done';a.tx=40+Math.random()*420;a.ty=40+Math.random()*310;a.bubble='';a.actionTimer=130;}
+      else if(r<0.7){a.state='coffee';a.tx=525+Math.random()*30;a.ty=75+Math.random()*45;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=190;}
+      else{a.state='done';a.tx=40+Math.random()*420;a.ty=40+Math.random()*300;a.bubble='';a.actionTimer=130;}
     } else {
       if(r<0.35){a.state='idle';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('idle');a.bubbleTimer=100;a.actionTimer=230;}
-      else if(r<0.55){a.state='coffee';a.tx=525+Math.random()*35;a.ty=75+Math.random()*50;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=210;}
-      else if(r<0.7){a.state='toilet';a.tx=525+Math.random()*30;a.ty=255+Math.random()*40;a.bubble=pb('toilet');a.bubbleTimer=100;a.actionTimer=220;}
-      else{a.state='idle';a.tx=40+Math.random()*430;a.ty=40+Math.random()*310;a.bubble='';a.actionTimer=160;}
+      else if(r<0.55){a.state='coffee';a.tx=520+Math.random()*35;a.ty=70+Math.random()*50;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=210;}
+      else if(r<0.7){a.state='toilet';a.tx=520+Math.random()*30;a.ty=252+Math.random()*35;a.bubble=pb('toilet');a.bubbleTimer=100;a.actionTimer=220;}
+      else{a.state='idle';a.tx=40+Math.random()*430;a.ty=40+Math.random()*300;a.bubble='';a.actionTimer=160;}
     }
   }
   const dx=a.tx-a.x,dy=a.ty-a.y,dist=Math.sqrt(dx*dx+dy*dy);
@@ -245,23 +314,6 @@ function agentTick(a){
   } else {a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
   a.sitting=!a.moving;
 }
-
-const logEl=document.getElementById('loglines');
-const LOGS=[
-  {c:'lk-info',t:'[06:00] GitHub Actions 啟動'},
-  {c:'lk-ok',t:'[06:02] GA4 key 載入 ✓'},
-  {c:'lk-ok',t:'[06:04] sort_collections 成功:48 ✓'},
-  {c:'lk-ok',t:'[06:06] Hot collection 更新 ✓'},
-  {c:'lk-warn',t:'[06:06] 下次: 明日 06:00 HKT'},
-];
-let li=0;
-function addLog(){
-  const d=LOGS[li%LOGS.length];li++;
-  const div=document.createElement('div');div.className=d.c;div.textContent=d.t;
-  logEl.appendChild(div);while(logEl.children.length>5)logEl.removeChild(logEl.firstChild);
-  setTimeout(addLog,2800);
-}
-setTimeout(addLog,600);
 
 const alistEl=document.getElementById('alistrows');
 function updateAlist(){
