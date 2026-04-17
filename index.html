@@ -8,36 +8,33 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0d0a06;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px;}
-#wrap{font-family:'Press Start 2P',monospace;max-width:900px;width:100%;}
-#topbar{background:#1a0e05;color:#FFD700;font-size:12px;padding:12px 16px;display:flex;justify-content:space-between;border-bottom:3px solid #3a2010;}
+#wrap{font-family:'Press Start 2P',monospace;max-width:720px;width:100%;}
+#topbar{background:#1a0e05;color:#FFD700;font-size:10px;padding:10px 14px;display:flex;justify-content:space-between;border-bottom:3px solid #3a2010;}
 canvas{display:block;width:100%;image-rendering:pixelated;}
-#bottom{background:#080510;border-top:3px solid #1a1a3e;padding:14px 16px;display:flex;gap:16px;}
+#bottom{background:#080510;border-top:3px solid #1a1a3e;padding:12px 14px;display:flex;gap:12px;}
 #logbox{flex:1;}
-#logtitle{color:#00FF88;font-size:11px;margin-bottom:8px;}
-#loglines div{font-size:10px;line-height:2.4;font-family:monospace;}
+#logtitle{color:#00FF88;font-size:10px;margin-bottom:6px;}
+#loglines div{font-size:9px;line-height:2.2;font-family:monospace;}
 .lk-ok{color:#00FF88;}.lk-info{color:#88DDFF;}.lk-warn{color:#FFD700;}
-#agentlist{width:200px;}
-#alisttitle{color:#FFD700;font-size:11px;margin-bottom:8px;}
-.alist-row{font-size:10px;line-height:2.4;display:flex;gap:8px;align-items:center;}
-.alist-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+#agentlist{width:170px;}
+#alisttitle{color:#FFD700;font-size:10px;margin-bottom:6px;}
+.alist-row{font-size:9px;line-height:2.2;display:flex;gap:6px;align-items:center;}
+.alist-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .alist-name{color:#ddd;}
-#links{background:#080510;border-top:1px solid #1a1a3e;padding:10px 16px;display:flex;gap:10px;flex-wrap:wrap;}
-.link-btn{flex:1;min-width:140px;text-align:center;background:#0a0a20;border:1px solid #333;color:#88DDFF;font-size:10px;padding:12px 8px;text-decoration:none;border-radius:3px;}
+#links{background:#080510;border-top:1px solid #1a1a3e;padding:8px 14px;display:flex;gap:8px;flex-wrap:wrap;}
+.link-btn{flex:1;min-width:120px;text-align:center;background:#0a0a20;border:1px solid #333;color:#88DDFF;font-size:9px;padding:10px 6px;text-decoration:none;border-radius:3px;}
 .link-btn:hover{border-color:#00FF88;color:#00FF88;}
 .link-btn.gold{color:#FFD700;}
-#statusbar{background:#1a0e05;border-top:3px solid #3a2010;padding:10px 16px;display:flex;justify-content:space-between;}
-.st{font-size:10px;color:#FFD700;}
-.dot{display:inline-block;width:10px;height:10px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:6px;vertical-align:middle;}
+#sbar{background:#1a0e05;border-top:3px solid #3a2010;padding:8px 14px;display:flex;justify-content:space-between;}
+.st{font-size:9px;color:#FFD700;}
+.dot{display:inline-block;width:9px;height:9px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:5px;vertical-align:middle;}
 @keyframes dp{0%,100%{opacity:1;}50%{opacity:.2;}}
 </style>
 </head>
 <body>
 <div id="wrap">
-  <div id="topbar">
-    <span>★ LondonKelly AI 辦公室</span>
-    <span id="clock"></span>
-  </div>
-  <canvas id="C" width="720" height="420"></canvas>
+  <div id="topbar"><span>★ LondonKelly AI 辦公室</span><span id="clock"></span></div>
+  <canvas id="C" width="720" height="440"></canvas>
   <div id="bottom">
     <div id="logbox">
       <div id="logtitle">&gt;_ 實時 log</div>
@@ -53,197 +50,164 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
     <a href="report_kr.html" class="link-btn gold">🇰🇷 週報 한국어</a>
     <a href="content.html" class="link-btn">✍️ 本週內容</a>
   </div>
-  <div id="statusbar">
+  <div id="sbar">
     <span class="st" id="lastrun">載入中...</span>
     <span class="st"><span class="dot"></span>每日 06:00 HKT</span>
   </div>
 </div>
 <script>
-const canvas=document.getElementById('C'),ctx=canvas.getContext('2d');
-const W=720,H=420,S=3;
+const C=document.getElementById('C'),ctx=C.getContext('2d');
+const W=720,H=440,P=3;
 
-function drawWoodTile(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#C4955A';ctx.fillRect(x,y,16*S,16*S);
+function woodTile(x,y,w,h){
+  ctx.fillStyle='#C4955A';ctx.fillRect(x,y,w,h);
   const g=['#A87A40','#B8894F','#A07038','#BF9156'];
-  for(let i=0;i<4;i++){ctx.fillStyle=g[i%4];ctx.fillRect(x,y+(3+i*4)*S,16*S,S);}
-  ctx.fillStyle='#8B6030';ctx.fillRect(x,y,16*S,S);ctx.fillRect(x,y,S,16*S);
-  ctx.fillStyle='#D4A566';ctx.fillRect(x+S,y+S,14*S,S);
+  for(let i=0;i<4;i++){ctx.fillStyle=g[i%4];ctx.fillRect(x,y+Math.floor(h*(0.2+i*0.2)),w,P);}
+  ctx.fillStyle='#8B6030';ctx.fillRect(x,y,w,P);ctx.fillRect(x,y,P,h);
+  ctx.fillStyle='#D4A566';ctx.fillRect(x+P,y+P,w-P*2,P);
 }
-function drawBrickTile(tx,ty,off){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#5C3A1E';ctx.fillRect(x,y,16*S,16*S);
-  ctx.fillStyle='#7A5535';ctx.fillRect(x,y+6*S,16*S,2*S);ctx.fillRect(x,y+14*S,16*S,2*S);
-  if(off===0){
-    ctx.fillStyle='#8B4513';ctx.fillRect(x+S,y+S,6*S,4*S);ctx.fillRect(x+9*S,y+S,6*S,4*S);
-    ctx.fillStyle='#7A3A10';ctx.fillRect(x+S,y+S,6*S,S);
-    ctx.fillStyle='#8B4513';ctx.fillRect(x+S,y+8*S,14*S,5*S);
-    ctx.fillStyle='#7A3A10';ctx.fillRect(x+S,y+8*S,14*S,S);
-  }else{
-    ctx.fillStyle='#8B4513';ctx.fillRect(x,y+S,4*S,4*S);ctx.fillRect(x+6*S,y+S,8*S,4*S);
-    ctx.fillStyle='#7A3A10';ctx.fillRect(x+6*S,y+S,8*S,S);
-    ctx.fillStyle='#8B4513';ctx.fillRect(x+4*S,y+8*S,10*S,5*S);
-    ctx.fillStyle='#7A3A10';ctx.fillRect(x+4*S,y+8*S,10*S,S);
+function brickWall(x,y,w,h){
+  ctx.fillStyle='#5C3A1E';ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#7A5535';
+  for(let ry=P*6;ry<h;ry+=P*8)ctx.fillRect(x,y+ry,w,P*2);
+  let row=0;
+  for(let ry=0;ry<h;ry+=P*8,row++){
+    const off=row%2===0?0:P*8;
+    for(let rx=off;rx<w+P*16;rx+=P*16){
+      ctx.fillStyle=row%3===0?'#8B4513':'#7A3C10';
+      ctx.fillRect(x+rx,y+ry+P,Math.min(P*14,w-(rx-x)),P*5);
+      ctx.fillStyle='rgba(0,0,0,0.15)';
+      ctx.fillRect(x+rx,y+ry+P,Math.min(P*14,w-(rx-x)),P);
+    }
   }
 }
-function drawCarpetTile(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle=(tx+ty)%2===0?'#3D2B5E':'#342558';ctx.fillRect(x,y,16*S,16*S);
-  ctx.fillStyle='#4A3570';ctx.fillRect(x+3*S,y+3*S,10*S,10*S);
-  ctx.fillStyle='#5A4580';ctx.fillRect(x+6*S,y+6*S,4*S,4*S);
+function carpetTile(x,y,w,h,dark){
+  ctx.fillStyle=dark?'#2D1B4E':'#342558';ctx.fillRect(x,y,w,h);
+  ctx.fillStyle=dark?'#3D2B5E':'#4A3570';ctx.fillRect(x+P*2,y+P*2,w-P*4,h-P*4);
 }
-function drawGreenTile(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle=(tx+ty)%2===0?'#2A4A2A':'#234023';ctx.fillRect(x,y,16*S,16*S);
-  ctx.fillStyle='#1a3a1a';ctx.fillRect(x,y,16*S,S);ctx.fillRect(x,y,S,16*S);
-}
+
 function drawScene(){
-  for(let tx=0;tx<32;tx++)for(let ty=0;ty<20;ty++)drawWoodTile(tx,ty);
-  for(let tx=32;tx<45;tx++)for(let ty=0;ty<14;ty++)drawCarpetTile(tx,ty);
-  for(let tx=32;tx<45;tx++)for(let ty=14;ty<28;ty++)drawGreenTile(tx,ty);
-  for(let tx=0;tx<32;tx++)for(let ty=0;ty<2;ty++)drawBrickTile(tx,ty,tx%2);
-  ctx.fillStyle='#3a2010';ctx.fillRect(32*16*S,0,S*3,H);
-  ctx.fillStyle='#5a3020';ctx.fillRect(32*16*S+S,0,S,H);
-  drawDesk(1,3,'花花',agents[0].state);drawDesk(7,3,'阿鼻',agents[1].state);
-  drawDesk(13,3,'豆芽',agents[2].state);drawDesk(19,3,'啾皮',agents[3].state);
-  drawDesk(1,11,'咕嚕',agents[4].state);drawDesk(7,11,'彩彩',agents[5].state);
-  drawDesk(13,11,'咕噹',agents[6].state);drawDesk(19,11,'蜜醬',agents[7].state);
-  drawCoffeeMachine(33,2);drawTV(33,9);drawSofa(33,13);
-  drawMeetingTable(33,19);drawClawMachine(39,2);
-  drawToilet(33,15);drawSink(37,15);
-  drawPlant(29,2);drawPlant(29,11);
-  ctx.fillStyle='#FFD700';ctx.font=`${S*3}px "Press Start 2P",monospace`;
-  ctx.fillText('休息室',34*16*S,S*12);
-  ctx.fillStyle='#88FFAA';ctx.fillText('洗手間',34*16*S,15*16*S+S*6);
-  ctx.fillStyle='#6B4A2A';ctx.fillRect(32*16*S-S,6*16*S,S*4,4*16*S);ctx.fillRect(32*16*S-S,18*16*S,S*4,4*16*S);
-  ctx.fillStyle='#FFD700';ctx.fillRect(32*16*S+S,8*16*S,S*2,S*2);ctx.fillRect(32*16*S+S,20*16*S,S*2,S*2);
-}
-function drawDesk(tx,ty,name,status){
-  const x=tx*16*S,y=ty*16*S;
-  const g=status==='done'||status==='working';
-  ctx.fillStyle='#8B6A40';ctx.fillRect(x,y,8*16*S,5*16*S);
-  ctx.fillStyle='#7A5930';ctx.fillRect(x+S,y+S,(8*16-2)*S,(5*16-2)*S);
-  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fillRect(x,y+5*16*S,8*16*S,S*2);
-  ctx.fillStyle='#222';ctx.fillRect(x+2*16*S,y+S*4,4*16*S,3*16*S);
-  ctx.fillStyle=g?'#0a2a1a':'#111';ctx.fillRect(x+2*16*S+S*2,y+S*6,(4*16-4)*S,(3*16-4)*S);
-  if(g){
-    const p=0.3+0.2*Math.sin(Date.now()/500);
-    ctx.fillStyle=`rgba(0,255,136,${p})`;ctx.fillRect(x+2*16*S+S*2,y+S*6,(4*16-4)*S,(3*16-4)*S);
-    ctx.fillStyle='rgba(0,255,136,0.6)';
-    ctx.fillRect(x+2*16*S+S*3,y+S*8,(4*16-8)*S,S);
-    ctx.fillRect(x+2*16*S+S*3,y+S*10,(4*16-10)*S,S);
-    ctx.fillRect(x+2*16*S+S*3,y+S*12,(4*16-6)*S,S);
+  const offW=Math.floor(W*0.68);
+  for(let tx=0;tx<offW;tx+=P*16)for(let ty=32;ty<H;ty+=P*16)woodTile(tx,ty,P*16,P*16);
+  const brX=offW+P*2,brH=Math.floor(H*0.52);
+  for(let tx=brX;tx<W;tx+=P*16)for(let ty=32;ty<32+brH;ty+=P*16)carpetTile(tx,ty,P*16,P*16,(tx+ty)%2===0);
+  const toY=32+brH;
+  ctx.fillStyle='#2A4A2A';ctx.fillRect(brX,toY,W-brX,H-toY);
+  for(let tx=brX;tx<W;tx+=P*12)for(let ty=toY;ty<H;ty+=P*12){
+    ctx.fillStyle=(Math.floor(tx/P/12)+Math.floor(ty/P/12))%2===0?'#2A4A2A':'#234023';
+    ctx.fillRect(tx,ty,P*12,P*12);
+    ctx.fillStyle='#1a3a1a';ctx.fillRect(tx,ty,P*12,P);ctx.fillRect(tx,ty,P,P*12);
   }
-  ctx.fillStyle='#333';ctx.fillRect(x+4*16*S-S,y+4*16*S-S*2,S*2,S*4);ctx.fillRect(x+3*16*S,y+4*16*S+S*2,4*S*4,S*2);
-  ctx.fillStyle='#2a2a2a';ctx.fillRect(x+S*4,y+4*16*S,7*16*S-S*8,S*6);
-  ctx.fillStyle='#3a3a3a';for(let k=0;k<10;k++)ctx.fillRect(x+S*5+k*(S*5),y+4*16*S+S,S*4,S*4);
-  const dc=status==='working'?'#FFD700':status==='done'?'#00FF88':'#444';
-  ctx.fillStyle=dc;ctx.beginPath();ctx.arc(x+S*3,y+S*3,S*1.5,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(x,y+5*16*S-S*8,8*16*S,S*8);
-  ctx.fillStyle='#FFD700';ctx.font=`${S*2}px "Press Start 2P",monospace`;ctx.fillText(name,x+S*3,y+5*16*S-S*2);
+  brickWall(0,0,W,32);
+  ctx.fillStyle='#3a2010';ctx.fillRect(offW,32,P*3,H-32);
+  ctx.fillStyle='#5a3020';ctx.fillRect(offW+P,32,P,H-32);
+  ctx.fillStyle='#FFD700';ctx.font=`${P*3}px "Press Start 2P",monospace`;ctx.fillText('休息室',brX+P*4,32+P*8);
+  ctx.fillStyle='#88FFAA';ctx.fillText('洗手間',brX+P*4,toY+P*8);
+  ctx.fillStyle='#6B4A2A';ctx.fillRect(offW-P*2,100,P*5,50);ctx.fillRect(offW-P*2,260,P*5,50);
+  ctx.fillStyle='#FFD700';ctx.fillRect(offW,123,P*2,P*2);ctx.fillRect(offW,283,P*2,P*2);
+
+  const dW=P*28,dH=P*20,gX=P*6,sX=P*8;
+  const r1Y=50,r2Y=230;
+  for(let i=0;i<8;i++){
+    const col=i%4,row2=Math.floor(i/4);
+    const dx=sX+col*(dW+gX),dy=row2===0?r1Y:r2Y;
+    drawDesk(dx,dy,dW,dH,AINFO[i].name,agents[i].state);
+  }
+  drawCoffee(brX+P*3,50);drawTV(brX+P*3,140);drawSofa(brX+P*3,185);
+  ctx.fillStyle='#eee';ctx.fillRect(brX+P*3,toY+P*6,P*18,P*24);
+  ctx.fillStyle='#ddd';ctx.fillRect(brX+P*3,toY+P*6,P*18,P*5);
+  ctx.fillStyle='#bbb';ctx.fillRect(brX+P*6,toY+P*11,P*12,P*15);
+  ctx.fillStyle='#99bbcc';ctx.fillRect(brX+P*22,toY+P*4,P*16,P*12);
+  ctx.strokeStyle='#888';ctx.lineWidth=P;ctx.strokeRect(brX+P*22,toY+P*4,P*16,P*12);
+  drawPlant(offW-P*18,50);drawPlant(offW-P*18,230);
 }
-function drawCoffeeMachine(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#1a1a1a';ctx.fillRect(x,y,5*16*S,7*16*S);
-  ctx.fillStyle='#cc2200';ctx.fillRect(x+S*2,y+S*3,5*16*S-S*4,3*16*S);
-  ctx.fillStyle='#ff4400';ctx.fillRect(x+S*3,y+S*4,5*16*S-S*6,3*16*S-S*2);
-  ctx.fillStyle='#00ff88';ctx.fillRect(x+S*4,y+S*5,S*3,S*3);
-  ctx.fillStyle='#ffaa00';ctx.fillRect(x+S*8,y+S*5,S*3,S*3);
-  ctx.fillStyle='#888';ctx.fillRect(x+S*4,y+6*16*S-S*4,S*14,S*6);
-  ctx.fillStyle='rgba(200,200,200,0.4)';
-  ctx.beginPath();ctx.arc(x+S*8,y+S*2,S*2,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(x+S*11,y+S,S*1.5,0,Math.PI*2);ctx.fill();
+
+function drawDesk(x,y,w,h,name,status){
+  const g=status==='done'||status==='working';
+  ctx.fillStyle='#8B6A40';ctx.fillRect(x,y,w,h);
+  ctx.fillStyle='#7A5930';ctx.fillRect(x+P,y+P,w-P*2,h-P*2);
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(x,y+h,w,P*2);
+  const mw=w-P*8,mh=h-P*8,mx=x+P*4,my=y+P*2;
+  ctx.fillStyle='#222';ctx.fillRect(mx,my,mw,mh);
+  ctx.fillStyle=g?'#0a2a1a':'#111';ctx.fillRect(mx+P,my+P,mw-P*2,mh-P*2);
+  if(g){
+    ctx.fillStyle=`rgba(0,255,136,${0.25+0.2*Math.sin(Date.now()/500+x)})`;ctx.fillRect(mx+P,my+P,mw-P*2,mh-P*2);
+    ctx.fillStyle='rgba(0,255,136,0.55)';ctx.fillRect(mx+P*2,my+P*2,mw-P*5,P);ctx.fillRect(mx+P*2,my+P*4,mw-P*7,P);
+  }
+  ctx.fillStyle='#333';ctx.fillRect(x+w/2-P,y+h-P*5,P*2,P*4);ctx.fillRect(x+w/2-P*4,y+h-P*2,P*8,P*2);
+  ctx.fillStyle='#2a2a2a';ctx.fillRect(x+P*3,y+h-P*6,w-P*6,P*4);
+  ctx.fillStyle='#3a3a3a';for(let k=0;k<5;k++)ctx.fillRect(x+P*4+k*P*4,y+h-P*5,P*3,P*2);
+  ctx.fillStyle=status==='working'?'#FFD700':status==='done'?'#00FF88':'#444';
+  ctx.beginPath();ctx.arc(x+P*2,y+P*2,P*1.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.75)';ctx.fillRect(x,y+h,w,P*7);
+  ctx.fillStyle='#FFD700';ctx.font=`${P*2}px "Press Start 2P",monospace`;ctx.fillText(name,x+P*2,y+h+P*5);
 }
-function drawTV(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#111';ctx.fillRect(x,y,8*16*S,4*16*S);
-  ctx.fillStyle='#0a1a2a';ctx.fillRect(x+S*2,y+S*2,8*16*S-S*4,4*16*S-S*4);
-  ctx.fillStyle='#0044aa';ctx.fillRect(x+S*4,y+S*4,8*16*S-S*8,4*16*S-S*8);
+function drawCoffee(x,y){
+  ctx.fillStyle='#1a1a1a';ctx.fillRect(x,y,P*22,P*28);
+  ctx.fillStyle='#cc2200';ctx.fillRect(x+P*2,y+P*3,P*18,P*10);
+  ctx.fillStyle='#ff4400';ctx.fillRect(x+P*3,y+P*4,P*16,P*8);
+  ctx.fillStyle='#00ff88';ctx.fillRect(x+P*4,y+P*5,P*4,P*4);
+  ctx.fillStyle='#ffaa00';ctx.fillRect(x+P*10,y+P*5,P*4,P*4);
+  ctx.fillStyle='#888';ctx.fillRect(x+P*5,y+P*20,P*12,P*6);
+  ctx.fillStyle='rgba(220,220,220,0.4)';ctx.beginPath();ctx.arc(x+P*8,y+P*2,P*3,0,Math.PI*2);ctx.fill();
 }
-function drawSofa(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#8B3A0A';ctx.fillRect(x,y,9*16*S,4*16*S);
-  ctx.fillStyle='#A04515';ctx.fillRect(x,y,9*16*S,S*8);ctx.fillRect(x,y,S*8,4*16*S);ctx.fillRect(x+9*16*S-S*8,y,S*8,4*16*S);
-  ctx.fillStyle='#C05A20';ctx.fillRect(x+S*8,y+S*8,3*16*S,2*16*S);ctx.fillRect(x+5*16*S,y+S*8,3*16*S,2*16*S);
+function drawTV(x,y){
+  ctx.fillStyle='#111';ctx.fillRect(x,y,P*36,P*18);
+  ctx.fillStyle='#0a1a2a';ctx.fillRect(x+P,y+P,P*34,P*16);
+  ctx.fillStyle='#003388';ctx.fillRect(x+P*2,y+P*2,P*32,P*14);
 }
-function drawMeetingTable(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#5a3a18';ctx.fillRect(x,y,12*16*S,4*16*S);
-  ctx.fillStyle='#6a4a28';ctx.fillRect(x+S*2,y+S*2,12*16*S-S*4,4*16*S-S*4);
-  ctx.fillStyle='#3a2810';
-  for(let i=0;i<4;i++){ctx.fillRect(x+i*3*16*S+S*4,y-S*6,2*16*S,S*6);ctx.fillRect(x+i*3*16*S+S*4,y+4*16*S,2*16*S,S*6);}
+function drawSofa(x,y){
+  ctx.fillStyle='#8B3A0A';ctx.fillRect(x,y,P*36,P*18);
+  ctx.fillStyle='#A04515';ctx.fillRect(x,y,P*36,P*5);ctx.fillRect(x,y,P*5,P*18);ctx.fillRect(x+P*31,y,P*5,P*18);
+  ctx.fillStyle='#C05A20';ctx.fillRect(x+P*5,y+P*5,P*12,P*10);ctx.fillRect(x+P*19,y+P*5,P*12,P*10);
 }
-function drawClawMachine(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#1a1aaa';ctx.fillRect(x,y,6*16*S,8*16*S);
-  ctx.fillStyle='#5555ff';ctx.fillRect(x+S*2,y+S*4,6*16*S-S*4,5*16*S);
-  ctx.fillStyle='rgba(150,200,255,0.2)';ctx.fillRect(x+S*2,y+S*4,6*16*S-S*4,5*16*S);
-  const tc=['#ff66aa','#ffaa00','#66ffaa','#ff4444','#aaaaff','#ffff44'];
-  for(let i=0;i<6;i++){ctx.fillStyle=tc[i];ctx.beginPath();ctx.arc(x+S*4+i*S*8,y+4*16*S+S*12,S*4,0,Math.PI*2);ctx.fill();}
-}
-function drawToilet(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#eee';ctx.fillRect(x,y,3*16*S,5*16*S);
-  ctx.fillStyle='#ddd';ctx.fillRect(x,y,3*16*S,S*6);
-  ctx.fillStyle='#bbb';ctx.fillRect(x+S*3,y+S*6,3*16*S-S*6,5*16*S-S*6);
-}
-function drawSink(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#ddd';ctx.fillRect(x,y,3*16*S,2*16*S);
-  ctx.fillStyle='#ccc';ctx.fillRect(x+S*2,y+S*2,3*16*S-S*4,2*16*S-S*4);
-  ctx.fillStyle='#888';ctx.fillRect(x+S*10,y-S*2,S*3,S*4);
-  ctx.fillStyle='#99bbcc';ctx.fillRect(x,y-3*16*S,3*16*S,2*16*S);
-  ctx.strokeStyle='#888';ctx.lineWidth=S;ctx.strokeRect(x,y-3*16*S,3*16*S,2*16*S);
-}
-function drawPlant(tx,ty){
-  const x=tx*16*S,y=ty*16*S;
-  ctx.fillStyle='#4a3010';ctx.fillRect(x+S*4,y+3*16*S-S*4,S*8,S*8);
-  ctx.fillStyle='#2a5a10';ctx.beginPath();ctx.arc(x+S*8,y+2*16*S,S*8,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#3a7a18';ctx.beginPath();ctx.arc(x+S*5,y+2*16*S+S*3,S*6,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(x+S*11,y+2*16*S+S*3,S*6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#4a9020';ctx.beginPath();ctx.arc(x+S*8,y+16*S,S*7,0,Math.PI*2);ctx.fill();
+function drawPlant(x,y){
+  ctx.fillStyle='#4a3010';ctx.fillRect(x+P*3,y+P*14,P*6,P*6);
+  ctx.fillStyle='#2a5a10';ctx.beginPath();ctx.arc(x+P*6,y+P*10,P*6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#3a7a18';ctx.beginPath();ctx.arc(x+P*3,y+P*12,P*4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(x+P*9,y+P*12,P*4,0,Math.PI*2);ctx.fill();
 }
 function drawPerson(x,y,col,frame,dir,sitting){
   ctx.save();ctx.translate(Math.round(x),Math.round(y));
   if(dir<0)ctx.scale(-1,1);
-  function p(px,py,c){ctx.fillStyle=c;ctx.fillRect(px*S,py*S,S,S);}
+  function p(px,py,c){ctx.fillStyle=c;ctx.fillRect(px*P,py*P,P,P);}
   function row(a,b,py,c){for(let i=a;i<=b;i++)p(i,py,c);}
   function col2(a,b,px,c){for(let i=a;i<=b;i++)p(px,i,c);}
   const wf=frame%4;
-  const la=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
-  const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
-  const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*2);
-  const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*2);
-  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(S*3,S*18,S*4,S*1.5,0,0,Math.PI*2);ctx.fill();
-  row(1,5,0,col.hair);row(1,5,1,col.hair);p(0,1,col.hair);p(6,1,col.hair);
-  row(1,5,2,col.skin);row(1,5,3,col.skin);row(1,5,4,col.skin);
-  p(2,3,'#1a1a1a');p(3,3,'#1a1a1a');p(4,4,'#cc4444');
-  p(0,3,col.skin);p(6,3,col.skin);p(2,5,col.skin);p(3,5,col.skin);p(4,5,col.skin);
-  row(1,5,6,col.shirt);row(1,5,7,col.shirt);row(1,5,8,col.shirt);row(1,5,9,col.shirt);row(1,5,10,col.shirt);
-  col2(6+la,10+la,0,col.skin);p(0,11+la,col.skin);
-  col2(6+ra,10+ra,6,col.skin);p(6,11+ra,col.skin);
+  const la=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.2);
+  const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.2);
+  const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
+  const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(P*3,P*17,P*3,P,0,0,Math.PI*2);ctx.fill();
+  row(1,4,0,col.hair);row(1,4,1,col.hair);p(0,1,col.hair);p(5,1,col.hair);
+  row(1,4,2,col.skin);row(1,4,3,col.skin);
+  p(2,2,'#1a1a1a');p(3,2,'#1a1a1a');p(2,3,'#cc4444');
+  p(0,2,col.skin);p(5,2,col.skin);p(2,4,col.skin);p(3,4,col.skin);
+  row(1,4,5,col.shirt);row(1,4,6,col.shirt);row(1,4,7,col.shirt);row(1,4,8,col.shirt);
+  col2(5+la,8+la,0,col.skin);p(0,9+la,col.skin);
+  col2(5+ra,8+ra,5,col.skin);p(5,9+ra,col.skin);
   if(sitting){
-    row(2,3,11,col.pants);row(2,3,12,col.pants);row(4,5,11,col.pants);row(4,5,12,col.pants);
-    row(0,3,13,col.shoe);row(3,6,13,col.shoe);
+    row(1,2,9,col.pants);row(1,2,10,col.pants);row(3,4,9,col.pants);row(3,4,10,col.pants);
+    row(0,2,11,col.shoe);row(3,5,11,col.shoe);
   }else{
-    col2(11,14+ll,1,col.pants);col2(11,14+ll,2,col.pants);p(2,15+ll,col.shoe);p(1,15+ll,col.shoe);
-    col2(11,14+rl,4,col.pants);col2(11,14+rl,5,col.pants);p(4,15+rl,col.shoe);p(5,15+rl,col.shoe);
+    col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe);p(2,12+ll,col.shoe);
+    col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe);p(4,12+rl,col.shoe);
   }
   ctx.restore();
 }
 function drawBubble(x,y,text,color){
   if(!text)return;
-  ctx.font=`${S*2}px "Press Start 2P",monospace`;
-  const tw=ctx.measureText(text).width,bw=tw+S*4,bh=S*6;
-  const bx=x-bw/2,by=y-bh-S*4;
-  ctx.fillStyle='rgba(5,5,15,0.95)';
-  if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,S);else ctx.rect(bx,by,bw,bh);
-  ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
-  ctx.fillStyle='rgba(5,5,15,0.95)';ctx.beginPath();
-  ctx.moveTo(x-S*2,by+bh);ctx.lineTo(x,by+bh+S*4);ctx.lineTo(x+S*2,by+bh);ctx.fill();
+  ctx.font=`${P*2}px "Press Start 2P",monospace`;
+  const tw=ctx.measureText(text).width,bw=tw+P*4,bh=P*6;
+  const bx=x-bw/2,by=y-bh-P*3;
+  ctx.fillStyle='rgba(5,5,15,0.94)';
+  if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,P);else ctx.rect(bx,by,bw,bh);
+  ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(5,5,15,0.94)';ctx.beginPath();
+  ctx.moveTo(x-P*2,by+bh);ctx.lineTo(x,by+bh+P*3);ctx.lineTo(x+P*2,by+bh);ctx.fill();
   ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();
-  ctx.moveTo(x-S*2,by+bh);ctx.lineTo(x,by+bh+S*4);ctx.lineTo(x+S*2,by+bh);ctx.stroke();
-  ctx.fillStyle='#fff';ctx.font=`${S*2}px "Press Start 2P",monospace`;ctx.fillText(text,bx+S*2,by+bh-S);
+  ctx.moveTo(x-P*2,by+bh);ctx.lineTo(x,by+bh+P*3);ctx.lineTo(x+P*2,by+bh);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font=`${P*2}px "Press Start 2P",monospace`;ctx.fillText(text,bx+P*2,by+bh-P);
 }
 
 const PCOLS=[
@@ -256,11 +220,12 @@ const PCOLS=[
   {skin:'#FFCC99',hair:'#002a2a',shirt:'#009999',pants:'#001a1a',shoe:'#002222'},
   {skin:'#FFD0AA',hair:'#1a1a00',shirt:'#ddcc00',pants:'#1a1a00',shoe:'#0a0a00'},
 ];
-const DP=[
-  {ax:1*16*S+4*S,ay:3*16*S+5*16*S},{ax:7*16*S+4*S,ay:3*16*S+5*16*S},
-  {ax:13*16*S+4*S,ay:3*16*S+5*16*S},{ax:19*16*S+4*S,ay:3*16*S+5*16*S},
-  {ax:1*16*S+4*S,ay:11*16*S+5*16*S},{ax:7*16*S+4*S,ay:11*16*S+5*16*S},
-  {ax:13*16*S+4*S,ay:11*16*S+5*16*S},{ax:19*16*S+4*S,ay:11*16*S+5*16*S},
+const dW=P*28,dH=P*20,gX=P*6,sX=P*8,r1Y=50,r2Y=230;
+const DESK_PX=[
+  {ax:sX+0*(dW+gX)+P*4,ay:r1Y+dH+P*3},{ax:sX+1*(dW+gX)+P*4,ay:r1Y+dH+P*3},
+  {ax:sX+2*(dW+gX)+P*4,ay:r1Y+dH+P*3},{ax:sX+3*(dW+gX)+P*4,ay:r1Y+dH+P*3},
+  {ax:sX+0*(dW+gX)+P*4,ay:r2Y+dH+P*3},{ax:sX+1*(dW+gX)+P*4,ay:r2Y+dH+P*3},
+  {ax:sX+2*(dW+gX)+P*4,ay:r2Y+dH+P*3},{ax:sX+3*(dW+gX)+P*4,ay:r2Y+dH+P*3},
 ];
 const AINFO=[
   {name:'花花',status:'done'},{name:'阿鼻',status:'done'},
@@ -268,22 +233,25 @@ const AINFO=[
   {name:'咕嚕',status:'done'},{name:'彩彩',status:'idle'},
   {name:'咕噹',status:'idle'},{name:'蜜醬',status:'working'},
 ];
-const WB=['排序中...','拉GA4','計算分數','更新tags'];
-const IB=['zzz','等指令','發呆中','無野做'];
-const CB=['好香☕','補充能量','喝完返工'];
-const TB=['去一去','解決咗','返黎啦'];
-const DB=['✓完成','搞掂!','去休息'];
-const RB=['出週報!','ROAS35x','分析中'];
-const CB2=['寫文案!','7日內容','IG post!'];
-const IXB=['提交URL!','200個/日','索引中!'];
+const WB=['排序中','拉GA4','計算分數'];
+const IB=['zzz','等指令','發呆'];
+const CB=['好香☕','去飲咖啡'];
+const TB=['去廁所','返黎啦'];
+const DB=['✓完成','搞掂!'];
+const RB=['出週報!','ROAS35x'];
+const CB2=['寫文案!','IG post!'];
+const IXB=['提交URL!','200個/日'];
 const SC={working:'#FFD700',done:'#00FF88',idle:'#555',coffee:'#FF8800',toilet:'#88DDFF'};
+const offW2=Math.floor(W*0.68);
+const CZ={x:offW2+P*10,y:80},TZ={x:offW2+P*10,y:H-80};
 
 const agents=AINFO.map((a,i)=>({
   id:i,name:a.name,baseStatus:a.status,col:PCOLS[i],
-  deskX:DP[i].ax,deskY:DP[i].ay,x:DP[i].ax,y:DP[i].ay,tx:DP[i].ax,ty:DP[i].ay,
+  deskX:DESK_PX[i].ax,deskY:DESK_PX[i].ay,
+  x:DESK_PX[i].ax,y:DESK_PX[i].ay,tx:DESK_PX[i].ax,ty:DESK_PX[i].ay,
   state:a.status,bubble:'',bubbleTimer:0,
-  actionTimer:60+Math.floor(Math.random()*200),
-  walkFrame:0,walkTimer:0,dir:1,moving:false,sitting:false,speed:1.2+Math.random()*0.6,
+  actionTimer:60+Math.floor(Math.random()*180),
+  walkFrame:0,walkTimer:0,dir:1,moving:false,sitting:false,speed:1+Math.random()*0.5,
 }));
 
 let realStatus=null;
@@ -294,37 +262,29 @@ async function fetchStatus(){
     updateFromStatus();
   }catch(e){}
 }
-function toHKT(s){
-  const dt=new Date(s),hk=new Date(dt.getTime()+8*3600000);
-  return hk.toISOString().slice(0,16).replace('T',' ')+' HKT';
-}
+function toHKT(s){const dt=new Date(s),hk=new Date(dt.getTime()+8*3600000);return hk.toISOString().slice(0,16).replace('T',' ')+' HKT';}
 function updateFromStatus(){
   if(!realStatus)return;
-  const sa=realStatus.agents||{};
-  const wr=realStatus.weekly_report||{};
-  const ca=realStatus.content_agent||{};
-  const ix=realStatus.indexing||{};
+  const sa=realStatus.agents||{},wr=realStatus.weekly_report||{},ca=realStatus.content_agent||{},ix=realStatus.indexing||{};
   if(realStatus.last_run)document.getElementById('lastrun').textContent='上次: '+toHKT(realStatus.last_run)+' ✓';
   if(sa.sort_collections)agents[0].baseStatus=sa.sort_collections.status==='done'?'done':'idle';
   if(sa.update_hot_items)agents[1].baseStatus=sa.update_hot_items.status==='done'?'done':'idle';
   if(wr.status==='done')agents[2].baseStatus='done';
   if(ca.status==='done')agents[3].baseStatus='done';
   if(ix.status==='done')agents[4].baseStatus='done';
-  const logEl=document.getElementById('loglines');
-  logEl.innerHTML='';
+  const logEl=document.getElementById('loglines');logEl.innerHTML='';
   if(realStatus.last_run)addLog('lk-info','[系統] '+toHKT(realStatus.last_run));
   if(sa.sort_collections)addLog('lk-ok','[花花] 排序 ✓');
   if(sa.update_hot_items)addLog('lk-ok','[阿鼻] Hot items ✓');
-  if(wr.last_run)addLog('lk-ok','[豆芽] 週報: '+toHKT(wr.last_run)+' ✓');
-  if(ca.last_run)addLog('lk-ok','[啾皮] 內容: '+toHKT(ca.last_run)+' ✓');
-  if(ix.last_run)addLog('lk-ok','[咕嚕] Indexing: '+toHKT(ix.last_run)+' ✓');
-  addLog('lk-warn','[系統] 下次: 明日 06:00 HKT');
+  if(wr.last_run)addLog('lk-ok','[豆芽] 週報 ✓');
+  if(ca.last_run)addLog('lk-ok','[啾皮] 內容 ✓');
+  if(ix.last_run)addLog('lk-ok','[咕嚕] Indexing ✓');
+  addLog('lk-warn','[系統] 下次: 明日 06:00');
 }
 function addLog(cls,txt){
   const logEl=document.getElementById('loglines');
   const div=document.createElement('div');div.className=cls;div.textContent=txt;
-  logEl.appendChild(div);
-  while(logEl.children.length>7)logEl.removeChild(logEl.firstChild);
+  logEl.appendChild(div);while(logEl.children.length>6)logEl.removeChild(logEl.firstChild);
 }
 fetchStatus();setInterval(fetchStatus,300000);
 
@@ -338,51 +298,49 @@ function pb(s,id){
   if(s==='done')return DB[Math.floor(Math.random()*DB.length)];
   return IB[Math.floor(Math.random()*IB.length)];
 }
-const CZ={x:34*16*S,y:4*16*S},TZ={x:34*16*S,y:17*16*S};
 function agentTick(a){
   a.actionTimer--;if(a.bubbleTimer>0)a.bubbleTimer--;
   if(a.actionTimer<=0){
     const r=Math.random();
     if(a.baseStatus==='working'){
-      a.state='working';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('working');a.bubbleTimer=140;a.actionTimer=180;
+      a.state='working';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('working');a.bubbleTimer=130;a.actionTimer=170;
     }else if(a.baseStatus==='done'){
-      if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done',a.id);a.bubbleTimer=100;a.actionTimer=220;}
-      else if(r<0.7){a.state='coffee';a.tx=CZ.x+Math.random()*40;a.ty=CZ.y+Math.random()*40;a.bubble=pb('coffee');a.bubbleTimer=120;a.actionTimer=200;}
-      else{a.state='done';a.tx=30+Math.random()*28*16*S;a.ty=30+Math.random()*17*16*S;a.bubble='';a.actionTimer=150;}
+      if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done',a.id);a.bubbleTimer=90;a.actionTimer=210;}
+      else if(r<0.7){a.state='coffee';a.tx=CZ.x+Math.random()*20;a.ty=CZ.y+Math.random()*20;a.bubble=pb('coffee');a.bubbleTimer=100;a.actionTimer=190;}
+      else{a.state='done';a.tx=P*10+Math.random()*(offW2-P*20);a.ty=50+Math.random()*350;a.bubble='';a.actionTimer=140;}
     }else{
-      if(r<0.35){a.state='idle';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('idle');a.bubbleTimer=110;a.actionTimer=250;}
-      else if(r<0.55){a.state='coffee';a.tx=CZ.x+Math.random()*40;a.ty=CZ.y+Math.random()*40;a.bubble=pb('coffee');a.bubbleTimer=120;a.actionTimer=220;}
-      else if(r<0.7){a.state='toilet';a.tx=TZ.x+Math.random()*30;a.ty=TZ.y+Math.random()*30;a.bubble=pb('toilet');a.bubbleTimer=110;a.actionTimer=240;}
-      else{a.state='idle';a.tx=30+Math.random()*28*16*S;a.ty=30+Math.random()*17*16*S;a.bubble='';a.actionTimer=180;}
+      if(r<0.35){a.state='idle';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('idle');a.bubbleTimer=100;a.actionTimer=240;}
+      else if(r<0.55){a.state='coffee';a.tx=CZ.x+Math.random()*20;a.ty=CZ.y+Math.random()*20;a.bubble=pb('coffee');a.bubbleTimer=100;a.actionTimer=210;}
+      else if(r<0.7){a.state='toilet';a.tx=TZ.x+Math.random()*20;a.ty=TZ.y+Math.random()*20;a.bubble=pb('toilet');a.bubbleTimer=100;a.actionTimer=230;}
+      else{a.state='idle';a.tx=P*10+Math.random()*(offW2-P*20);a.ty=50+Math.random()*350;a.bubble='';a.actionTimer=170;}
     }
   }
   const dx=a.tx-a.x,dy=a.ty-a.y,dist=Math.sqrt(dx*dx+dy*dy);
-  if(dist>3){
+  if(dist>2){
     a.x+=dx/dist*a.speed;a.y+=dy/dist*a.speed;a.moving=true;
     if(dx!==0)a.dir=dx>0?1:-1;
-    a.walkTimer++;if(a.walkTimer%10===0)a.walkFrame=(a.walkFrame+1)%4;
+    a.walkTimer++;if(a.walkTimer%9===0)a.walkFrame=(a.walkFrame+1)%4;
   }else{a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
   a.sitting=!a.moving;
 }
-const logEl2=document.getElementById('loglines');
+
+const logFake=document.getElementById('loglines');
 const LOGS=[
   {c:'lk-info',t:'[06:00] GitHub Actions 啟動'},
-  {c:'lk-ok',t:'[06:02] GA4 key 載入 ✓'},
-  {c:'lk-ok',t:'[06:04] sort_collections 成功 ✓'},
-  {c:'lk-ok',t:'[06:06] Hot collection 更新 ✓'},
-  {c:'lk-ok',t:'[09:00] Indexing 200個URL ✓'},
-  {c:'lk-warn',t:'[系統] 下次: 明日 06:00 HKT'},
+  {c:'lk-ok',t:'[06:04] sort_collections ✓'},
+  {c:'lk-ok',t:'[06:06] Hot items 更新 ✓'},
+  {c:'lk-ok',t:'[09:00] Indexing 200URL ✓'},
+  {c:'lk-warn',t:'[系統] 下次: 明日 06:00'},
 ];
 let li=0;
 function addFakeLog(){
   if(realStatus)return;
   const d=LOGS[li%LOGS.length];li++;
   const div=document.createElement('div');div.className=d.c;div.textContent=d.t;
-  logEl2.appendChild(div);
-  while(logEl2.children.length>6)logEl2.removeChild(logEl2.firstChild);
+  logFake.appendChild(div);while(logFake.children.length>5)logFake.removeChild(logFake.firstChild);
   setTimeout(addFakeLog,3000);
 }
-setTimeout(addFakeLog,800);
+setTimeout(addFakeLog,600);
 
 const alistEl=document.getElementById('alistrows');
 function updateAlist(){
@@ -400,15 +358,12 @@ function loop(){
   agents.forEach(a=>agentTick(a));
   [...agents].sort((a,b)=>a.y-b.y).forEach(a=>{
     drawPerson(a.x,a.y,a.col,a.walkFrame,a.dir,a.sitting);
-    if(a.bubble&&a.bubbleTimer>0)drawBubble(a.x+S*3,a.y,a.bubble,SC[a.state]||'#00FF88');
+    if(a.bubble&&a.bubbleTimer>0)drawBubble(a.x+P*3,a.y,a.bubble,SC[a.state]||'#00FF88');
   });
   updateAlist();
   requestAnimationFrame(loop);
 }
-function resize(){
-  const w=document.getElementById('wrap').offsetWidth;
-  canvas.style.height=Math.round(H*(w/W))+'px';
-}
+function resize(){const w=document.getElementById('wrap').offsetWidth;C.style.height=Math.round(H*(w/W))+'px';}
 resize();window.addEventListener('resize',resize);
 loop();
 </script>
