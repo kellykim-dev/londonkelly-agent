@@ -1,0 +1,40 @@
+name: LondonKelly Competitor Monitor
+
+on:
+  schedule:
+    - cron: '0 22 * * 0'
+  workflow_dispatch:
+
+jobs:
+  competitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: pip install anthropic requests beautifulsoup4
+
+    - name: Run competitor monitor
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: python competitor_agent.py
+
+    - name: Update status.json
+      run: python update_status.py competitor
+
+    - name: Commit files
+      run: |
+        git config user.name "LondonKelly Bot"
+        git config user.email "bot@londonkelly.com"
+        git add competitor.html status.json
+        git pull --rebase origin main
+        git diff --staged --quiet || git commit -m "Update competitor report [skip ci]"
+        git push
