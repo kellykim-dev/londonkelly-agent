@@ -35,18 +35,14 @@ jobs:
     - name: Update status.json
       run: |
         NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        PREV=$(cat status.json 2>/dev/null || echo '{}')
-        python3 - << PYEOF
-import json, os
+        python3 -c "
+import json
 with open('status.json', 'r') as f:
     data = json.load(f)
-data['weekly_report'] = {
-    'status': 'done',
-    'last_run': '$NOW'
-}
+data['weekly_report'] = {'status': 'done', 'last_run': '$NOW'}
 with open('status.json', 'w') as f:
     json.dump(data, f, indent=2)
-PYEOF
+"
 
     - name: Commit files
       run: |
