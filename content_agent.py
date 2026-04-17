@@ -2,6 +2,7 @@ import os
 import json
 import anthropic
 import requests
+from collections import Counter
 from datetime import datetime
 
 SHOPIFY_STORE = os.environ.get("SHOPIFY_STORE", "londonkelly.myshopify.com")
@@ -14,17 +15,17 @@ HEADERS = {
 }
 
 def get_sale_products():
-    """拉有折扣嘅產品（compare_at_price > price）"""
+    import time
     print("🛍️ 搵緊本週特價產品...")
     url = f"https://{SHOPIFY_STORE}/admin/api/2024-01/products.json"
     params = {"limit": 250, "status": "active"}
-    
     sale_products = []
     while url:
         resp = requests.get(url, headers=HEADERS, params=params)
+        if resp.status_code == 429:
+            time.sleep(10); continue
         resp.raise_for_status()
         products = resp.json().get("products", [])
-        
         for p in products:
             for v in p.get("variants", []):
                 cap = v.get("compare_at_price")
@@ -38,39 +39,32 @@ def get_sale_products():
                         "compare_at_price": float(cap),
                         "discount": discount,
                         "handle": p["handle"],
-                        "image": p["images"][0]["src"] if p.get("images") else ""
                     })
-                    break  # 每個產品只取第一個 variant
-        
-        # Pagination
+                    break
         link = resp.headers.get("Link", "")
-        url = None
-        params = None
+        url = None; params = None
         if 'rel="next"' in link:
             for part in link.split(","):
                 if 'rel="next"' in part:
-                    url = part.split(";")[0].strip().strip("<>")
-                    break
-    
-    # 按折扣排序
-    sale_products.sort(key=lambda x: x["discount"], reverse=True)
+                    url = part.split(";")[0].strip().strip("<>"); break
+        time.sleep(0.3)
+    # 計算每個 vendor 出現次數，排序：vendor 出現最多先，再按折扣
+    vendor_counts = Counter(p["vendor"] for p in sale_products)
+    sale_products.sort(key=lambda x: (vendor_counts[x["vendor"]], x["discount"]), reverse=True)
     print(f"  搵到 {len(sale_products)} 件特價產品")
-    return sale_products[:20]  # 最多20件
+    # 印出 top vendors
+    for v, c in vendor_counts.most_common(5):
+        print(f"  {v}: {c} 件")
+    return sale_products[:20]
 
 def generate_content(products):
-    """用 Claude 生成一週內容"""
     print("🤖 Claude 生成緊一週內容...")
-    
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
-    
-    # 整理產品清單
     product_list = "\n".join([
         f"- {p['vendor']} {p['title']}: HK${p['price']:.0f} (原價 HK${p['compare_at_price']:.0f}, -{p['discount']}%)"
         for p in products[:10]
     ])
-    
     today = datetime.now().strftime("%Y-%m-%d")
-    
     prompt = f"""你係 LondonKelly 嘅社群媒體編輯。LondonKelly 係香港代購服務，主要賣歐洲奢侈品牌。
 
 本週特價產品（{today}）：
@@ -90,7 +84,7 @@ def generate_content(products):
   "posts": [
     {{
       "day": "週一",
-      "date": "日期",
+      "date": "{today}",
       "theme": "主題",
       "title": "標題",
       "content": "內文",
@@ -101,30 +95,23 @@ def generate_content(products):
 }}
 
 只輸出 JSON，唔需要其他文字。"""
-
     message = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=3000,
         messages=[{"role": "user", "content": prompt}]
     )
-    
     text = message.content[0].text.strip()
-    # 清理 markdown
     text = text.replace("```json", "").replace("```", "").strip()
-    
     try:
         data = json.loads(text)
         return data.get("posts", [])
     except:
-        print("⚠️ JSON 解析失敗，返回原始文字")
+        print("⚠️ JSON 解析失敗")
         return []
 
 def generate_html(products, posts):
-    """生成 content.html"""
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     today = datetime.now().strftime("%Y-%m-%d")
-    
-    # 產品卡片
     product_cards = ""
     for p in products[:6]:
         product_cards += f"""
@@ -134,8 +121,6 @@ def generate_html(products, posts):
             <div class="product-price">HK${p['price']:.0f} <span class="original">HK${p['compare_at_price']:.0f}</span></div>
             <div class="discount-badge">-{p['discount']}%</div>
         </div>"""
-    
-    # Post 卡片
     post_cards = ""
     for i, post in enumerate(posts):
         post_cards += f"""
@@ -151,7 +136,6 @@ def generate_html(products, posts):
             <button class="copy-btn" onclick="copyPost({i})">📋 複製</button>
             <div class="copied-msg" id="copied-{i}" style="display:none">✅ 已複製！</div>
         </div>"""
-    
     html = f"""<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -191,13 +175,10 @@ body{{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}}
 <div class="wrap">
   <a href="index.html" class="back">← 返回辦公室</a>
   <div class="title">★ 本週社群內容 {today} ★</div>
-  
   <div class="section-title">&gt;_ 本週特價產品</div>
   <div class="products">{product_cards}</div>
-  
   <div class="section-title">&gt;_ 7日內容計劃</div>
   {post_cards}
-  
   <div class="footer">由 LondonKelly Agent 啾皮 生成 · {now}</div>
 </div>
 <script>
@@ -216,7 +197,6 @@ function copyPost(i) {{
 </script>
 </body>
 </html>"""
-    
     with open("content.html", "w", encoding="utf-8") as f:
         f.write(html)
     print("✅ content.html 生成完成")
@@ -227,4 +207,4 @@ if __name__ == "__main__":
         print("⚠️ 冇搵到特價產品")
     posts = generate_content(products)
     generate_html(products, posts)
-    print("✅ 完成！去睇 content.html")
+    print("✅ 完成！")
