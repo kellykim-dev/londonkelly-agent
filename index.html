@@ -45,11 +45,16 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
       <div id="alistrows"></div>
     </div>
   </div>
-  <div id="links">
-    <a href="report.html" class="link-btn gold">📊 週報 中文</a>
-    <a href="report_kr.html" class="link-btn gold">🇰🇷 週報 한국어</a>
-    <a href="content.html" class="link-btn">✍️ 本週內容</a>
-    <a href="competitor.html" class="link-btn" style="color:#FF8800;border-color:#331500;">🔍 競爭對手</a>
+  <div id="links" style="flex-direction:column;gap:6px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="report.html" class="link-btn gold">📊 週報 中文</a>
+      <a href="content.html" class="link-btn">✍️ 本週內容</a>
+      <a href="competitor.html" class="link-btn" style="color:#FF8800;border-color:#331500;">🔍 競爭對手</a>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="report_kr.html" class="link-btn gold">🇰🇷 週報 한국어</a>
+      <a href="competitor_kr.html" class="link-btn" style="color:#FF8800;border-color:#331500;">🇰🇷 경쟁사 분석</a>
+    </div>
   </div>
   <div id="sbar">
     <span class="st" id="lastrun">載入中...</span>
