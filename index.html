@@ -49,6 +49,7 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
     <a href="report.html" class="link-btn gold">📊 週報 中文</a>
     <a href="report_kr.html" class="link-btn gold">🇰🇷 週報 한국어</a>
     <a href="content.html" class="link-btn">✍️ 本週內容</a>
+    <a href="competitor.html" class="link-btn" style="color:#FF8800;border-color:#331500;">🔍 競爭對手</a>
   </div>
   <div id="sbar">
     <span class="st" id="lastrun">載入中...</span>
@@ -272,6 +273,8 @@ function updateFromStatus(){
   if(wr.status==='done')agents[2].baseStatus='done';
   if(ca.status==='done')agents[3].baseStatus='done';
   if(ix.status==='done')agents[4].baseStatus='done';
+  const comp=realStatus.competitor||{};
+  if(comp.status==='done')agents[5].baseStatus='done';
   const logEl=document.getElementById('loglines');logEl.innerHTML='';
   if(realStatus.last_run)addLog('lk-info','[系統] '+toHKT(realStatus.last_run));
   if(sa.sort_collections)addLog('lk-ok','[花花] 排序 ✓');
@@ -279,6 +282,7 @@ function updateFromStatus(){
   if(wr.last_run)addLog('lk-ok','[豆芽] 週報 ✓');
   if(ca.last_run)addLog('lk-ok','[啾皮] 內容 ✓');
   if(ix.last_run)addLog('lk-ok','[咕嚕] Indexing ✓');
+  if(comp.last_run)addLog('lk-ok','[彩彩] 競爭對手 ✓');
   addLog('lk-warn','[系統] 下次: 明日 06:00');
 }
 function addLog(cls,txt){
