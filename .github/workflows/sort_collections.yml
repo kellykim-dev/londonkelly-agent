@@ -1,0 +1,42 @@
+name: LondonKelly Collection Sorter
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每日 UTC 2am = 香港時間 10am
+  workflow_dispatch:      # 可以手動觸發
+
+jobs:
+  sort:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    
+    - name: Install dependencies
+      run: |
+        pip install requests google-analytics-data google-auth
+    
+    - name: Create GA4 key file
+      run: |
+        echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
+    
+    - name: Run sort collections
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        GA4_KEY_FILE: ga4_key.json
+      run: python sort_collections.py
+    
+    - name: Run update hot items
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        GA4_KEY_FILE: ga4_key.json
+      run: python update_hot_items.py
