@@ -25,6 +25,7 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
 .st{font-size:6px;color:#FFD700;}
 .dot{display:inline-block;width:7px;height:7px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:5px;vertical-align:middle;}
 @keyframes dp{0%,100%{opacity:1;}50%{opacity:.2;}}
+.report-btn{display:block;text-align:center;background:#1a1a3e;border:1px solid #00FF88;color:#00FF88;font-size:6px;padding:6px;margin-top:6px;text-decoration:none;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -38,6 +39,7 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
   <div id="logbox">
     <div id="logtitle">&gt;_ 實時 log</div>
     <div id="loglines"></div>
+    <a href="report.html" class="report-btn">📊 睇週報 →</a>
   </div>
   <div id="agentlist">
     <div id="alisttitle">agents</div>
@@ -46,76 +48,64 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
 </div>
 <div id="sbar">
   <span class="st" id="lastrun">載入中...</span>
-  <span class="st"><span class="dot"></span>每日 06:00 HKT 自動跑</span>
+  <span class="st"><span class="dot"></span>每日 06:00 HKT</span>
 </div>
 </div>
 <script>
 const C=document.getElementById('canvas'),ctx=C.getContext('2d');
 const W=720,H=420;
 
-// ── Status from GitHub ────────────────────────────────
-let realStatus = null;
+let realStatus=null;
 async function fetchStatus(){
-  try {
-    const r = await fetch('status.json?t='+Date.now());
-    realStatus = await r.json();
+  try{
+    const r=await fetch('status.json?t='+Date.now());
+    realStatus=await r.json();
     updateFromStatus();
-  } catch(e){ console.log('status.json not ready'); }
+  }catch(e){}
+}
+
+function toHKT(utcStr){
+  const dt=new Date(utcStr);
+  const hk=new Date(dt.getTime()+8*3600000);
+  return hk.toISOString().slice(0,16).replace('T',' ')+' HKT';
 }
 
 function updateFromStatus(){
-  if(!realStatus) return;
-  // Update last run
-  const dt = new Date(realStatus.last_run);
-  const hkt = new Date(dt.getTime()+8*3600000);
-  const timeStr = hkt.toISOString().slice(0,19).replace('T',' ')+' HKT';
-  document.getElementById('lastrun').textContent = '上次: '+timeStr+' ✓';
+  if(!realStatus)return;
+  const sa=realStatus.agents||{};
+  const wr=realStatus.weekly_report||{};
 
-  // Update log
-  const logEl = document.getElementById('loglines');
-  logEl.innerHTML = '';
-  const sa = realStatus.agents;
-  if(sa){
-    addRealLog('lk-info', '[系統] 上次執行: '+timeStr);
-    if(sa.sort_collections){
-      const s = sa.sort_collections.status;
-      const log = sa.sort_collections.log || '';
-      const match = log.match(/總:(\d+)/);
-      const total = match ? match[1] : '?';
-      const solmatch = log.match(/Sold Out:(\d+)/);
-      const sold = solmatch ? solmatch[1] : '?';
-      addRealLog(s==='done'?'lk-ok':'lk-warn',
-        '[花花] sort_collections '+(s==='done'?'✓':'跳過')+' 總:'+total+' SoldOut:'+sold);
-    }
-    if(sa.update_hot_items){
-      const s = sa.update_hot_items.status;
-      addRealLog(s==='done'?'lk-ok':'lk-warn',
-        '[阿鼻] update_hot_items '+(s==='done'?'✓':'跳過'));
-    }
-    addRealLog('lk-warn', '[系統] 下次: 明日 06:00 HKT');
+  // Last run
+  if(realStatus.last_run){
+    document.getElementById('lastrun').textContent='Sort: '+toHKT(realStatus.last_run)+' ✓';
   }
 
-  // Update agent states
-  if(sa && sa.sort_collections){
-    const s = sa.sort_collections.status;
-    agents[1].baseStatus = s==='done'?'done':'idle';
-    agents[2].baseStatus = sa.update_hot_items.status==='done'?'done':'idle';
-  }
+  // Update agent base status
+  if(sa.sort_collections) agents[1].baseStatus=sa.sort_collections.status==='done'?'done':'idle';
+  if(sa.update_hot_items) agents[2].baseStatus=sa.update_hot_items.status==='done'?'done':'idle';
+  if(wr.status==='done') agents[3].baseStatus='done'; // 豆芽
+
+  // Log
+  const logEl=document.getElementById('loglines');
+  logEl.innerHTML='';
+  if(realStatus.last_run) addLog('lk-info','[系統] Sort: '+toHKT(realStatus.last_run));
+  if(sa.sort_collections) addLog('lk-ok','[花花] 排序 ✓ '+( sa.sort_collections.log||'').slice(0,30));
+  if(sa.update_hot_items) addLog('lk-ok','[阿鼻] Hot items ✓');
+  if(wr.last_run) addLog('lk-ok','[豆芽] 週報: '+toHKT(wr.last_run)+' ✓');
+  addLog('lk-warn','[系統] 下次: 明日 06:00 HKT');
 }
 
-function addRealLog(cls, txt){
-  const logEl = document.getElementById('loglines');
-  const div = document.createElement('div');
-  div.className = cls; div.textContent = txt;
+function addLog(cls,txt){
+  const logEl=document.getElementById('loglines');
+  const div=document.createElement('div');
+  div.className=cls;div.textContent=txt;
   logEl.appendChild(div);
-  while(logEl.children.length>6) logEl.removeChild(logEl.firstChild);
+  while(logEl.children.length>6)logEl.removeChild(logEl.firstChild);
 }
 
-// Fetch on load + every 5 mins
 fetchStatus();
-setInterval(fetchStatus, 300000);
+setInterval(fetchStatus,300000);
 
-// ── Draw functions ────────────────────────────────────
 function drawFloor(){
   for(let tx=0;tx<16;tx++)for(let ty=0;ty<13;ty++){
     ctx.fillStyle=(tx+ty)%2===0?'#9B8365':'#8B7355';
@@ -164,35 +154,29 @@ function drawDesk(x,y,glowing,label){
 }
 
 function drawFurniture(){
-  // Coffee machine
   ctx.fillStyle='#1a1a1a';ctx.fillRect(520,28,55,65);
   ctx.fillStyle='#cc2200';ctx.fillRect(524,32,47,22);
   ctx.fillStyle='#ff4400';ctx.fillRect(526,34,43,18);
   ctx.fillStyle='#00ff88';ctx.fillRect(530,37,8,8);ctx.fillRect(542,37,8,8);
   ctx.fillStyle='#888';ctx.fillRect(534,70,22,18);ctx.fillRect(538,66,14,6);
   ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('COFFEE',521,58);
-  // TV
   ctx.fillStyle='#111';ctx.fillRect(518,98,80,22);
   ctx.fillStyle='#0a1a2a';ctx.fillRect(521,100,74,18);
   ctx.fillStyle='#0066ff';ctx.font='6px monospace';ctx.fillText('TV',548,113);
-  // Sofa
   ctx.fillStyle='#8B3A0A';ctx.fillRect(514,128,95,40);
   ctx.fillStyle='#A04515';ctx.fillRect(514,128,95,12);ctx.fillRect(514,128,12,40);ctx.fillRect(597,128,12,40);
   ctx.fillStyle='#C05A20';ctx.fillRect(528,140,25,24);ctx.fillRect(558,140,25,24);
-  // Meeting table
   ctx.fillStyle='#5a3a18';ctx.fillRect(520,170,175,52);
   ctx.fillStyle='#6a4a28';ctx.fillRect(522,172,171,48);
   ctx.fillStyle='rgba(255,220,150,0.08)';ctx.fillRect(522,172,171,18);
   ctx.fillStyle='#3a2810';
   for(let i=0;i<4;i++){ctx.fillRect(526+i*42,163,30,10);ctx.fillRect(526+i*42,220,30,10);}
-  // Claw machine
   ctx.fillStyle='#1a1aaa';ctx.fillRect(624,18,88,108);
   ctx.fillStyle='#5555ff';ctx.fillRect(628,22,80,68);
   ctx.fillStyle='rgba(150,200,255,0.15)';ctx.fillRect(628,22,80,68);
   const tc=['#ff66aa','#ffaa00','#66ffaa','#ff4444','#aaaaff'];
   for(let i=0;i<5;i++){ctx.fillStyle=tc[i];ctx.beginPath();ctx.arc(637+i*15,72,7,0,Math.PI*2);ctx.fill();}
   ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('夾娃娃',628,105);
-  // Toilet
   ctx.fillStyle='#eee';ctx.fillRect(520,242,32,44);ctx.fillStyle='#ddd';ctx.fillRect(520,242,32,10);
   ctx.fillStyle='#bbb';ctx.fillRect(523,252,26,30);
   ctx.fillStyle='#ddd';ctx.fillRect(574,236,38,28);ctx.fillStyle='#ccc';ctx.fillRect(577,239,32,22);
@@ -225,7 +209,7 @@ function drawPerson(x,y,col,frame,dir,sitting){
     row(1,2,9,col.pants);row(1,2,10,col.pants);row(3,4,9,col.pants);row(3,4,10,col.pants);
     p(0,10,col.pants);p(5,10,col.pants);
     row(0,2,11,col.shoe);row(3,5,11,col.shoe);
-  } else {
+  }else{
     col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe);p(2,12+ll,col.shoe);
     col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe);p(4,12+rl,col.shoe);
   }
@@ -260,16 +244,21 @@ const PCOLS=[
 ];
 const DPOS=[[38,55],[138,55],[238,55],[338,55],[38,175],[138,175],[238,175],[338,175]];
 const AINFO=[
-  {name:'蜜醬',status:'working'},{name:'花花',status:'done'},
-  {name:'阿鼻',status:'done'},{name:'豆芽',status:'idle'},
-  {name:'啾皮',status:'idle'},{name:'彩彩',status:'idle'},
-  {name:'咕嚕',status:'idle'},{name:'咕噹',status:'idle'},
+  {name:'蜜醬',status:'working'},
+  {name:'花花',status:'done'},
+  {name:'阿鼻',status:'done'},
+  {name:'豆芽',status:'done'},  // weekly report
+  {name:'啾皮',status:'idle'},
+  {name:'彩彩',status:'idle'},
+  {name:'咕嚕',status:'idle'},
+  {name:'咕噹',status:'idle'},
 ];
 const WB=['排序中...','拉GA4數據','計算分數','更新tags'];
 const IB=['zzz','等指令','發呆中','無野做'];
 const CB=['好香☕','補充能量','喝完返工'];
 const TB=['去一去','解決咗','返黎啦'];
 const DB=['✓ 完成','搞掂!','去休息'];
+const RB=['出週報!','分析數據','ROAS34.9x'];
 const SC={working:'#FFD700',done:'#00FF88',idle:'#555',coffee:'#FF8800',toilet:'#88DDFF'};
 
 const agents=AINFO.map((a,i)=>({
@@ -281,10 +270,11 @@ const agents=AINFO.map((a,i)=>({
   walkFrame:0,walkTimer:0,dir:1,moving:false,sitting:false,speed:0.9+Math.random()*0.4,
 }));
 
-function pb(s){
+function pb(s,id){
   if(s==='working')return WB[Math.floor(Math.random()*WB.length)];
   if(s==='coffee')return CB[Math.floor(Math.random()*CB.length)];
   if(s==='toilet')return TB[Math.floor(Math.random()*TB.length)];
+  if(s==='done'&&id===3)return RB[Math.floor(Math.random()*RB.length)];
   if(s==='done')return DB[Math.floor(Math.random()*DB.length)];
   return IB[Math.floor(Math.random()*IB.length)];
 }
@@ -295,11 +285,11 @@ function agentTick(a){
     const r=Math.random();
     if(a.baseStatus==='working'){
       a.state='working';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('working');a.bubbleTimer=120;a.actionTimer=160;
-    } else if(a.baseStatus==='done'){
-      if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done');a.bubbleTimer=90;a.actionTimer=200;}
+    }else if(a.baseStatus==='done'){
+      if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done',a.id);a.bubbleTimer=90;a.actionTimer=200;}
       else if(r<0.7){a.state='coffee';a.tx=525+Math.random()*30;a.ty=75+Math.random()*45;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=190;}
       else{a.state='done';a.tx=40+Math.random()*420;a.ty=40+Math.random()*300;a.bubble='';a.actionTimer=130;}
-    } else {
+    }else{
       if(r<0.35){a.state='idle';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('idle');a.bubbleTimer=100;a.actionTimer=230;}
       else if(r<0.55){a.state='coffee';a.tx=520+Math.random()*35;a.ty=70+Math.random()*50;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=210;}
       else if(r<0.7){a.state='toilet';a.tx=520+Math.random()*30;a.ty=252+Math.random()*35;a.bubble=pb('toilet');a.bubbleTimer=100;a.actionTimer=220;}
@@ -311,7 +301,7 @@ function agentTick(a){
     a.x+=dx/dist*a.speed;a.y+=dy/dist*a.speed;a.moving=true;
     if(dx!==0)a.dir=dx>0?1:-1;
     a.walkTimer++;if(a.walkTimer%8===0)a.walkFrame=(a.walkFrame+1)%4;
-  } else {a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
+  }else{a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
   a.sitting=!a.moving;
 }
 
