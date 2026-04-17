@@ -1,5 +1,5 @@
 import os
-import json
+import re
 import anthropic
 from datetime import datetime, timedelta
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
@@ -50,7 +50,6 @@ def get_ga4_data():
     return {}
 
 def get_ads_data():
-    # 之後從 Sheets 讀，暫時用上週真實數據
     return {
         "cost": 1259.92,
         "roas": 34.9,
@@ -59,9 +58,11 @@ def get_ads_data():
         "conv_value": 0
     }
 
-def analyze_with_claude(ga4, ads):
+def analyze_with_claude(ga4, ads, lang="zh"):
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
-    prompt = f"""你係 LondonKelly 嘅數據分析師，用繁體中文寫週報。
+
+    if lang == "zh":
+        prompt = f"""你係 LondonKelly 嘅數據分析師，用繁體中文寫週報。
 LondonKelly 係香港代購服務，主要賣歐洲奢侈品牌。
 
 上週數據（{ga4.get('week_start','')} ~ {ga4.get('week_end','')}）：
@@ -85,6 +86,33 @@ ROAS: {ads.get('roas',0)}x
 4. 下週建議行動3條
 
 用emoji，簡潔，適合手機睇。"""
+
+    else:  # Korean
+        prompt = f"""당신은 LondonKelly의 데이터 분석가입니다. 한국어로 주간 보고서를 작성해주세요.
+LondonKelly는 홍콩 대리구매 서비스로 유럽 명품 브랜드를 주로 판매합니다.
+
+지난주 데이터（{ga4.get('week_start','')} ~ {ga4.get('week_end','')}）：
+
+【Google Analytics】
+세션: {ga4.get('sessions',0):,}
+사용자: {ga4.get('users',0):,}
+페이지뷰: {ga4.get('pageviews',0):,}
+장바구니 추가: {ga4.get('add_to_carts',0):,}
+구매: {ga4.get('purchases',0):,}
+수익: HK${ga4.get('revenue',0):,.0f}
+
+【Google Ads】
+광고비: HK${ads.get('cost',0):,.2f}
+ROAS: {ads.get('roas',0)}x
+
+다음 항목을 작성해주세요:
+1. 이번 주 성과 요약
+2. 하이라이트
+3. 주의사항
+4. 다음 주 추천 행동 3가지
+
+이모지 사용, 간결하게, 모바일에서 보기 좋게."""
+
     message = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1000,
@@ -92,17 +120,44 @@ ROAS: {ads.get('roas',0)}x
     )
     return message.content[0].text
 
-def generate_html(ga4, ads, analysis):
+def md2html(t):
+    t = re.sub(r'##+ (.+)', r'<h3 style="color:#00FF88;margin:12px 0 6px;">\1</h3>', t)
+    t = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', t)
+    t = re.sub(r'^- (.+)', r'<li style="margin:4px 0;">\1</li>', t, flags=re.MULTILINE)
+    t = re.sub(r'---+', '<hr style="border-color:#1a1a3e;margin:10px 0;">', t)
+    t = t.replace('\n', '<br>')
+    return t
+
+def generate_html(ga4, ads, analysis, lang="zh"):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    # Convert analysis newlines to HTML
-    analysis_html = analysis.replace('\n', '<br>')
+    analysis_html = md2html(analysis)
+
+    if lang == "zh":
+        title = "LondonKelly 週報"
+        back = "← 返回辦公室"
+        labels = ["Sessions", "用戶數", "加購物車", "成交", "Ads 花費", "ROAS"]
+        analysis_title = ">_ Claude 分析"
+        footer = f"由 LondonKelly Agent 生成 · {now}"
+        filename = "report.html"
+        other_link = "report_kr.html"
+        other_label = "🇰🇷 한국어 버전"
+    else:
+        title = "LondonKelly 주간 보고서"
+        back = "← 사무실로 돌아가기"
+        labels = ["Sessions", "사용자", "장바구니", "구매", "광고비", "ROAS"]
+        analysis_title = ">_ Claude 분석"
+        footer = f"LondonKelly Agent 자동 생성 · {now}"
+        filename = "report_kr.html"
+        other_link = "report.html"
+        other_label = "🇨🇳 繁體中文版"
+
     html = f"""<!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="{'zh-HK' if lang=='zh' else 'ko'}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LondonKelly 週報</title>
+<title>{title}</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;}}
@@ -119,59 +174,69 @@ body{{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}}
 .analysis{{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:16px;font-size:14px;line-height:1.8;}}
 .analysis-title{{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin-bottom:12px;}}
 .footer{{color:#555;font-size:11px;text-align:center;margin-top:12px;}}
-.back{{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:16px;text-decoration:none;font-family:'Press Start 2P',monospace;}}
+.back{{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}}
+.other{{display:block;text-align:center;color:#88DDFF;font-size:11px;margin-bottom:16px;text-decoration:none;border:1px solid #1a1a3e;padding:6px;border-radius:4px;}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="index.html" class="back">← 返回辦公室</a>
-  <div class="title">★ LondonKelly 週報 ★</div>
+  <a href="index.html" class="back">{back}</a>
+  <a href="{other_link}" class="other">{other_label}</a>
+  <div class="title">★ {title} ★</div>
   <div class="week">📅 {week}</div>
   <div class="cards">
     <div class="card">
-      <div class="card-label">Sessions</div>
+      <div class="card-label">{labels[0]}</div>
       <div class="card-value blue">{ga4.get('sessions',0):,}</div>
     </div>
     <div class="card">
-      <div class="card-label">用戶數</div>
+      <div class="card-label">{labels[1]}</div>
       <div class="card-value blue">{ga4.get('users',0):,}</div>
     </div>
     <div class="card">
-      <div class="card-label">加購物車</div>
+      <div class="card-label">{labels[2]}</div>
       <div class="card-value">{ga4.get('add_to_carts',0):,}</div>
     </div>
     <div class="card">
-      <div class="card-label">成交</div>
+      <div class="card-label">{labels[3]}</div>
       <div class="card-value">{ga4.get('purchases',0):,}</div>
     </div>
     <div class="card">
-      <div class="card-label">Ads 花費</div>
+      <div class="card-label">{labels[4]}</div>
       <div class="card-value gold">HK${ads.get('cost',0):,.0f}</div>
     </div>
     <div class="card">
-      <div class="card-label">ROAS</div>
+      <div class="card-label">{labels[5]}</div>
       <div class="card-value gold">{ads.get('roas',0)}x</div>
     </div>
   </div>
   <div class="analysis">
-    <div class="analysis-title">&gt;_ Claude 分析</div>
+    <div class="analysis-title">{analysis_title}</div>
     {analysis_html}
   </div>
-  <div class="footer">由 LondonKelly Agent 生成 · {now}</div>
+  <div class="footer">{footer}</div>
 </div>
 </body>
 </html>"""
-    with open("report.html", "w", encoding="utf-8") as f:
+
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(html)
-    print("✅ report.html 生成完成")
+    print(f"✅ {filename} 生成完成")
 
 if __name__ == "__main__":
     print("📊 拉 GA4 數據...")
     ga4 = get_ga4_data()
-    print(f"  Sessions: {ga4.get('sessions',0)}")
+    print(f"  Sessions: {ga4.get('sessions',0):,}")
+
     print("📈 拉 Ads 數據...")
     ads = get_ads_data()
-    print("🤖 Claude 分析緊...")
-    analysis = analyze_with_claude(ga4, ads)
-    print("📄 生成 report.html...")
-    generate_html(ga4, ads, analysis)
+
+    print("🤖 Claude 分析緊（繁中）...")
+    analysis_zh = analyze_with_claude(ga4, ads, lang="zh")
+    generate_html(ga4, ads, analysis_zh, lang="zh")
+
+    print("🤖 Claude 분석 중（韓文）...")
+    analysis_kr = analyze_with_claude(ga4, ads, lang="kr")
+    generate_html(ga4, ads, analysis_kr, lang="kr")
+
+    print("✅ 完成！兩個版本都生成咗。")
