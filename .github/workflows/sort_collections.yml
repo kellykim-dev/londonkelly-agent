@@ -26,7 +26,6 @@ jobs:
       run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
 
     - name: Run sort collections
-      id: sort
       env:
         SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
         SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
@@ -34,6 +33,7 @@ jobs:
         GA4_KEY_FILE: ga4_key.json
       run: |
         python sort_collections.py 2>&1 | tee sort_output.txt
+        echo "exit_code=$?" >> $GITHUB_ENV
 
     - name: Run update hot items
       env:
@@ -49,11 +49,18 @@ jobs:
         SORT_OUT=$(cat sort_output.txt | tail -5 | tr '\n' '|' | sed 's/"/\\"/g')
         HOT_OUT=$(cat hot_output.txt | tail -3 | tr '\n' '|' | sed 's/"/\\"/g')
         NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        SKIPPED=$(grep -c "未夠3日" sort_output.txt || true)
+        if [ "$SKIPPED" -gt "0" ]; then
+          SORT_STATUS="skipped"
+        else
+          SORT_STATUS="done"
+        fi
         cat > status.json << JSONEOF
         {
           "last_run": "$NOW",
+          "sort_status": "$SORT_STATUS",
           "agents": {
-            "sort_collections": {"status": "done", "log": "$SORT_OUT"},
+            "sort_collections": {"status": "$SORT_STATUS", "log": "$SORT_OUT"},
             "update_hot_items": {"status": "done", "log": "$HOT_OUT"}
           }
         }
@@ -63,6 +70,6 @@ jobs:
       run: |
         git config user.name "LondonKelly Bot"
         git config user.email "bot@londonkelly.com"
-        git add status.json
+        git add status.json last_run.txt || true
         git diff --staged --quiet || git commit -m "Update status [skip ci]"
         git push
