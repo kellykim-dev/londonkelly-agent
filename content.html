@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LondonKelly 本週內容</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}
+.wrap{max-width:680px;margin:0 auto;}
+.title{font-family:'Press Start 2P',monospace;color:#FFD700;font-size:9px;text-align:center;padding:12px;background:#2a1808;border:2px solid #5C4A2A;margin-bottom:16px;}
+.back{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}
+.section-title{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin:16px 0 10px;}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.product-card{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:10px;position:relative;}
+.product-vendor{color:#FFD700;font-size:10px;margin-bottom:4px;}
+.product-title{color:#ccc;font-size:11px;margin-bottom:6px;line-height:1.4;}
+.product-price{color:#00FF88;font-size:14px;font-weight:bold;}
+.original{color:#555;font-size:11px;text-decoration:line-through;}
+.discount-badge{position:absolute;top:8px;right:8px;background:#FF4444;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;}
+.post-card{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:8px;padding:16px;margin-bottom:12px;}
+.post-header{display:flex;justify-content:space-between;margin-bottom:8px;}
+.post-day{color:#FFD700;font-family:'Press Start 2P',monospace;font-size:7px;}
+.post-theme{color:#888;font-size:11px;}
+.post-title{color:#00FF88;font-size:15px;font-weight:bold;margin-bottom:8px;}
+.post-content{color:#ddd;font-size:13px;line-height:1.7;margin-bottom:10px;}
+.post-hashtags{color:#88DDFF;font-size:11px;margin-bottom:10px;line-height:1.8;}
+.post-notes{color:#666;font-size:11px;margin-bottom:10px;font-style:italic;}
+.copy-btn{background:#1a1a3e;border:1px solid #00FF88;color:#00FF88;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;}
+.copy-btn:hover{background:#00FF88;color:#000;}
+.copied-msg{color:#00FF88;font-size:12px;margin-top:6px;}
+.footer{color:#555;font-size:11px;text-align:center;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back">← 返回辦公室</a>
+  <div class="title">★ 本週社群內容 2026-04-17 ★</div>
+  
+  <div class="section-title">&gt;_ 本週特價產品</div>
+  <div class="products">
+        <div class="product-card">
+            <div class="product-vendor">Burberry</div>
+            <div class="product-title">BURBERRY Luna Small Wallet | 博柏利 銀包 (多色)...</div>
+            <div class="product-price">HK$0 <span class="original">HK$4500</span></div>
+            <div class="discount-badge">-100%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Miu Miu</div>
+            <div class="product-title">MIU MIU Leather Bracelet | 繆繆 手帶 (多色)...</div>
+            <div class="product-price">HK$0 <span class="original">HK$3800</span></div>
+            <div class="discount-badge">-100%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Miu Miu</div>
+            <div class="product-title">MIU MIU Shopping Tote Bag | 繆繆 手提袋 (藍色)...</div>
+            <div class="product-price">HK$0 <span class="original">HK$22480</span></div>
+            <div class="discount-badge">-100%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Miu Miu</div>
+            <div class="product-title">MIU MIU Women's Bracelet | 繆繆 手鏈 (多色)...</div>
+            <div class="product-price">HK$0 <span class="original">HK$1820</span></div>
+            <div class="discount-badge">-100%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Gucci</div>
+            <div class="product-title">GUCCI Top Handle Zipped Handbag | 古馳 手袋 ...</div>
+            <div class="product-price">HK$7160 <span class="original">HK$16870</span></div>
+            <div class="discount-badge">-58%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Gucci</div>
+            <div class="product-title">GUCCI Top Handle Zipped Leather Handbag ...</div>
+            <div class="product-price">HK$7215 <span class="original">HK$16000</span></div>
+            <div class="discount-badge">-55%</div>
+        </div></div>
+  
+  <div class="section-title">&gt;_ 7日內容計劃</div>
+  
+        <div class="post-card" id="post-0">
+            <div class="post-header">
+                <span class="post-day">週一</span>
+                <span class="post-theme">限時優惠開幕</span>
+            </div>
+            <div class="post-title">🔥 本週大減價正式開始！Miu Miu、Burberry 低至 HK$0？！</div>
+            <div class="post-content">唔係眼花！今週 LondonKelly 為大家帶來超瘋狂嘅限時特賣，Miu Miu 手帶、手鏈同購物袋全部 HK$0 起（即係免費送）🎁 Burberry、Gucci、Celine、Hermès 亦低至半價或以下，全部英國直送、正品保證。手快有手慢冇，依家就 DM 我哋查詢！</div>
+            <div class="post-hashtags">#LondonKelly #香港代購 #英國代購 #MiuMiu #Burberry #Gucci #Celine #Hermes #歐洲奢侈品 #限時優惠</div>
+            <div class="post-notes">Instagram／Threads 可配搭多款產品平鋪 flatlay 圖；Facebook 可加入產品清單作 carousel post，吸引更多互動。</div>
+            <button class="copy-btn" onclick="copyPost(0)">📋 複製</button>
+            <div class="copied-msg" id="copied-0" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-1">
+            <div class="post-header">
+                <span class="post-day">週二</span>
+                <span class="post-theme">產品介紹 — Miu Miu</span>
+            </div>
+            <div class="post-title">✨ Miu Miu 女孩，你的心機配件到了！</div>
+            <div class="post-content">繆繆 (Miu Miu) 以少女感與精緻工藝聞名全球，今週三款配件——皮革手帶、女士手鏈及購物手提袋——全部以 HK$0 特價發售，原價合共逾 HK$28,000💸 每件均為倫敦門市正品，附原裝包裝及購買憑證，由英國直送香港，讓你安心購物。</div>
+            <div class="post-hashtags">#MiuMiu #繆繆 #MiuMiuBracelet #MiuMiuBag #奢侈品配件 #香港代購 #LondonKelly #英國直送 #正品保證 #名牌手帶</div>
+            <div class="post-notes">Instagram 建議使用 Miu Miu 官方品牌色調（粉、奶白）作背景，突顯產品；Threads 可加入互動問題如「你最鍾意邊款 Miu Miu 配件？」</div>
+            <button class="copy-btn" onclick="copyPost(1)">📋 複製</button>
+            <div class="copied-msg" id="copied-1" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-2">
+            <div class="post-header">
+                <span class="post-day">週三</span>
+                <span class="post-theme">品牌故事 — Burberry</span>
+            </div>
+            <div class="post-title">🧣 從英倫風衣到時尚手袋——Burberry 的百年傳奇</div>
+            <div class="post-content">創立於 1856 年的 Burberry（博柏利），以標誌性格紋與英倫工藝屹立時尚界超過一個半世紀🏛️ 今週 Baby Macken Bag 及 Small Macken Bag 分別以 HK$3,950 及 HK$4,550 發售，原價各約 HK$7,900－$9,100，折扣高達 50%！LondonKelly 直接於英國門市採購，讓你以最實惠價格擁有真正嘅英倫品味。</div>
+            <div class="post-hashtags">#Burberry #博柏利 #BurberryBag #MackenBag #英倫風格 #香港代購 #LondonKelly #英國直送 #正品名牌 #奢侈手袋</div>
+            <div class="post-notes">Facebook 適合加入品牌歷史短片連結或 Burberry 官方 lookbook 圖片（需版權許可）；Instagram 可用倫敦街景配搭手袋，強調英國直送概念。</div>
+            <button class="copy-btn" onclick="copyPost(2)">📋 複製</button>
+            <div class="copied-msg" id="copied-2" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-3">
+            <div class="post-header">
+                <span class="post-day">週四</span>
+                <span class="post-theme">代購攻略</span>
+            </div>
+            <div class="post-title">📦 第一次用代購？5 個問題幫你掃除疑慮！</div>
+            <div class="post-content">好多客人問：「代購係咪真係正品？」、「點樣付款先安全？」、「幾耐到貨？」 LondonKelly 提供全程單據、倫敦門市收據及真品鑑定，讓每一位客人買得放心😊 由下單到抵港一般只需 5－10 個工作天，全程追蹤，仲有售後跟進服務。</div>
+            <div class="post-hashtags">#代購攻略 #香港代購 #英國代購 #LondonKelly #正品保證 #安心購物 #代購教學 #名牌代購 #英倫直送 #奢侈品代購</div>
+            <div class="post-notes">Threads 非常適合此類教育性內容，可做成串文（thread）逐點解答疑問；Facebook 可製作 FAQ 格式帖文，提升分享率。</div>
+            <button class="copy-btn" onclick="copyPost(3)">📋 複製</button>
+            <div class="copied-msg" id="copied-3" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-4">
+            <div class="post-header">
+                <span class="post-day">週五</span>
+                <span class="post-theme">產品介紹 — Gucci & Celine</span>
+            </div>
+            <div class="post-title">👜 Gucci 手袋 + Celine 水手帽，時尚感即刻升級！</div>
+            <div class="post-content">想為 weekend look 加分？今週 Gucci Top Handle Zipped Handbag 低至 HK$7,160（原價 HK$16,870，折扣 58%），配搭 Celine Triomphe Sailor Cap 只需 HK$3,260（原價 HK$7,100，折扣 54%）🤩 兩款均由倫敦直送，正品無憂，係你輕鬆入手歐洲名牌嘅最佳時機！</div>
+            <div class="post-hashtags">#Gucci #古馳 #GucciHandbag #Celine #賽琳 #CelineCap #香港代購 #LondonKelly #英國直送 #名牌折扣</div>
+            <div class="post-notes">Instagram Reels 可考慮製作短片示範如何搭配 Gucci 手袋與 Celine 帽；Facebook 適合用 before/after 原價對比圖吸引眼球。</div>
+            <button class="copy-btn" onclick="copyPost(4)">📋 複製</button>
+            <div class="copied-msg" id="copied-4" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-5">
+            <div class="post-header">
+                <span class="post-day">週六</span>
+                <span class="post-theme">客戶見證</span>
+            </div>
+            <div class="post-title">💬「收到貨嗰一刻，真係開心到喊！」—— 真實客人分享</div>
+            <div class="post-content">每次見到客人收貨後嘅笑容，都係 LondonKelly 最大嘅動力🥹 今週已有多位客人成功入手 Miu Miu 手帶及 Burberry 手袋，全部反映包裝完整、正品無誤，並對快速送達讚不絕口！你都想成為下一個幸福客人？依家 DM 我哋，今週特賣優惠即將結束！</div>
+            <div class="post-hashtags">#客戶見證 #LondonKelly #香港代購 #真實評價 #正品保證 #MiuMiu #Burberry #英國直送 #名牌購物 #開心收貨</div>
+            <div class="post-notes">Instagram Stories 可轉發客人授權的開箱影片或截圖；Facebook 可邀請滿意客人在留言區留下評價，增加社交信任度。</div>
+            <button class="copy-btn" onclick="copyPost(5)">📋 複製</button>
+            <div class="copied-msg" id="copied-5" style="display:none">✅ 已複製！</div>
+        </div>
+        <div class="post-card" id="post-6">
+            <div class="post-header">
+                <span class="post-day">週日</span>
+                <span class="post-theme">限時優惠倒數 + Hermès 焦點</span>
+            </div>
+            <div class="post-title">⏰ 最後一天！Hermès Kelly 吊飾低至 HK$14,800，仲等咩？</div>
+            <div class="post-content">今週特賣今日完結，錯過就要等下次！壓軸推介：Hermès Kelly Bag Charm（大象灰／銀扣）現售 HK$14,800，原價 HK$29,900，折扣高達 51%🤍 Hermès 正品一向一飾難求，LondonKelly 直接從倫敦門市購入，附完整購買單據，係送禮自用兩相宜嘅至尊之選。立即 DM 我哋下單，今晚截單！</div>
+            <div class="post-hashtags">#Hermes #愛馬仕 #HermesKelly #KellyCharm #限時優惠 #最後一天 #LondonKelly #香港代購 #英國直送 #奢侈品</div>
+            <div class="post-notes">Instagram 及 Threads 適合加入倒數貼圖或限時動態提醒；Facebook 可 boost 此帖文作付費推廣，針對香港奢侈品消費群體，最大化最後一天曝光率。</div>
+            <button class="copy-btn" onclick="copyPost(6)">📋 複製</button>
+            <div class="copied-msg" id="copied-6" style="display:none">✅ 已複製！</div>
+        </div>
+  
+  <div class="footer">由 LondonKelly Agent 啾皮 生成 · 2026-04-17 15:53</div>
+</div>
+<script>
+function copyPost(i) {
+  const card = document.getElementById('post-' + i);
+  const title = card.querySelector('.post-title').textContent;
+  const content = card.querySelector('.post-content').textContent;
+  const hashtags = card.querySelector('.post-hashtags').textContent;
+  const text = title + '\n\n' + content + '\n\n' + hashtags;
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copied-' + i);
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2000);
+  });
+}
+</script>
+</body>
+</html>

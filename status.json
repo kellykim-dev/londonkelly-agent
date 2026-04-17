@@ -13,5 +13,9 @@
   "weekly_report": {
     "status": "done",
     "last_run": "2026-04-17T15:22:49Z"
+  },
+  "content_agent": {
+    "status": "done",
+    "last_run": "2026-04-17T15:53:18Z"
   }
 }
