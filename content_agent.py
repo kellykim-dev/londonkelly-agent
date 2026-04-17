@@ -29,7 +29,7 @@ def get_sale_products():
             for v in p.get("variants", []):
                 cap = v.get("compare_at_price")
                 price = v.get("price")
-                if cap and price and float(cap) > float(price):
+                if cap and price and float(price) > 0 and float(cap) > float(price):
                     discount = round((1 - float(price)/float(cap)) * 100)
                     sale_products.append({
                         "title": p["title"],
