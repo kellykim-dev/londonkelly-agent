@@ -6,142 +6,290 @@
 <title>LondonKelly AI 辦公室</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #2C2416; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; font-family: 'Press Start 2P', monospace; }
-.office { background: #8B7355; border: 4px solid #5C4A2A; border-radius: 4px; padding: 12px; position: relative; width: 100%; max-width: 600px; }
-.office-title { text-align: center; background: #5C4A2A; color: #FFD700; font-size: 7px; padding: 6px; margin-bottom: 12px; border: 2px solid #FFD700; letter-spacing: 1px; }
-.floor { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-.desk { background: #6B5B3E; border: 2px solid #4A3728; border-radius: 2px; padding: 6px 4px; text-align: center; position: relative; cursor: pointer; transition: transform 0.1s; }
-.desk:hover { transform: scale(1.05); }
-.desk.active { border-color: #00FF88; box-shadow: 0 0 0 1px #00FF88; }
-.desk.idle { border-color: #888; }
-.desk.success { border-color: #00FF88; }
-.monitor { width: 28px; height: 20px; background: #1a1a2e; border: 2px solid #333; margin: 0 auto 4px; position: relative; border-radius: 1px; }
-.monitor.on { background: #0a2a1a; }
-.monitor.on::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; background: #00FF88; opacity: 0.4; animation: blink 1.5s infinite; }
-.monitor.idle::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; background: #444; }
-@keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
-.agent-sprite { font-size: 16px; display: block; margin-bottom: 2px; }
-.agent-name { color: #FFD700; font-size: 5px; display: block; margin-bottom: 2px; }
-.agent-status { font-size: 4px; display: block; line-height: 1.4; }
-.status-running { color: #00FF88; }
-.status-idle { color: #888; }
-.status-done { color: #88DDFF; }
-.status-error { color: #FF4444; }
-.bottom-row { display: flex; gap: 8px; margin-top: 8px; }
-.breakroom { background: #5C4A2A; border: 2px solid #4A3728; border-radius: 2px; padding: 6px; flex: 1; text-align: center; }
-.breakroom-title { color: #FFD700; font-size: 5px; margin-bottom: 6px; display: block; }
-.appliances { display: flex; gap: 4px; justify-content: center; }
-.appliance { font-size: 14px; }
-.log-panel { background: #1a1a2e; border: 2px solid #333; border-radius: 2px; padding: 6px; flex: 2; }
-.log-title { color: #00FF88; font-size: 5px; margin-bottom: 4px; display: block; }
-.log-entry { font-size: 4px; line-height: 1.8; color: #88FF88; font-family: monospace; }
-.log-entry.error { color: #FF4444; }
-.log-entry.info { color: #88DDFF; }
-.status-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; background: #5C4A2A; border: 2px solid #4A3728; padding: 4px 8px; }
-.next-run { color: #FFD700; font-size: 5px; }
-.last-run { color: #88DDFF; font-size: 5px; }
-.pulse { display: inline-block; width: 6px; height: 6px; background: #00FF88; border-radius: 50%; animation: pulse 1s infinite; margin-right: 4px; }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
-.walking { animation: walk 3s infinite; display: inline-block; }
-@keyframes walk { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(2px); } 75% { transform: translateX(-2px); } }
-.tooltip { display: none; position: absolute; background: #1a1a2e; border: 1px solid #00FF88; color: #00FF88; font-size: 5px; padding: 4px 6px; z-index: 10; top: -44px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 2px; line-height: 1.6; pointer-events: none; }
-.desk:hover .tooltip { display: block; }
-.last-updated { color: #888; font-size: 5px; text-align: center; margin-top: 8px; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1208;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px;}
+#wrap{max-width:720px;width:100%;font-family:'Press Start 2P',monospace;}
+#topbar{background:#2a1808;color:#FFD700;font-size:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #5C4A2A;}
+#canvas{display:block;width:100%;image-rendering:pixelated;}
+#bottom{background:#0a0a1e;border-top:2px solid #1a1a3e;padding:8px 12px;display:flex;gap:12px;}
+#logbox{flex:1;}
+#logtitle{color:#00FF88;font-size:6px;margin-bottom:4px;}
+#loglines div{font-size:6px;line-height:2;font-family:monospace;}
+.lk-ok{color:#00FF88;}.lk-info{color:#88DDFF;}.lk-warn{color:#FFD700;}
+#agentlist{width:140px;}
+#alisttitle{color:#FFD700;font-size:6px;margin-bottom:4px;}
+.alist-row{font-size:5px;line-height:2.2;display:flex;gap:4px;align-items:center;}
+.alist-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.alist-name{color:#ccc;}
+#sbar{background:#3a2810;display:flex;justify-content:space-between;padding:7px 12px;border-top:2px solid #5C4A2A;}
+.st{font-size:6px;color:#FFD700;}
+.dot{display:inline-block;width:7px;height:7px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:5px;vertical-align:middle;}
+@keyframes dp{0%,100%{opacity:1;}50%{opacity:.2;}}
 </style>
 </head>
 <body>
-<div class="office">
-  <div class="office-title">LondonKelly AI 辦公室</div>
-  <div class="floor">
-    <div class="desk active">
-      <div class="tooltip">指揮中心</div>
-      <div class="monitor on"></div>
-      <span class="agent-sprite"><span class="walking">🤖</span></span>
-      <span class="agent-name">蜜醬</span>
-      <span class="agent-status status-done">指揮中心</span>
-    </div>
-    <div class="desk success">
-      <div class="tooltip">sort_collections.py<br>成功:48 搵唔到:0</div>
-      <div class="monitor on"></div>
-      <span class="agent-sprite">👩‍💻</span>
-      <span class="agent-name">花花</span>
-      <span class="agent-status status-done">✓ 排序完成</span>
-    </div>
-    <div class="desk success">
-      <div class="tooltip">update_hot_items.py<br>Hot collection 更新</div>
-      <div class="monitor on"></div>
-      <span class="agent-sprite">🔥</span>
-      <span class="agent-name">阿鼻</span>
-      <span class="agent-status status-done">✓ Tags 更新</span>
-    </div>
-    <div class="desk idle">
-      <div class="tooltip">GA4 + Shopify 數據<br>等待下次排程</div>
-      <div class="monitor idle"></div>
-      <span class="agent-sprite">📊</span>
-      <span class="agent-name">豆芽</span>
-      <span class="agent-status status-idle">待機中</span>
-    </div>
+<div id="wrap">
+<div id="topbar">
+  <span>★ LondonKelly AI 辦公室</span>
+  <span id="clock"></span>
+</div>
+<canvas id="canvas" width="720" height="420"></canvas>
+<div id="bottom">
+  <div id="logbox">
+    <div id="logtitle">&gt;_ log</div>
+    <div id="loglines"></div>
   </div>
-  <div class="floor">
-    <div class="desk idle">
-      <div class="tooltip">SEO Blog 生成</div>
-      <div class="monitor idle"></div>
-      <span class="agent-sprite">✍️</span>
-      <span class="agent-name">啾皮</span>
-      <span class="agent-status status-idle">待機中</span>
-    </div>
-    <div class="desk idle">
-      <div class="tooltip">社群內容規劃</div>
-      <div class="monitor idle"></div>
-      <span class="agent-sprite">📱</span>
-      <span class="agent-name">彩彩</span>
-      <span class="agent-status status-idle">待機中</span>
-    </div>
-    <div class="desk idle">
-      <div class="tooltip">競品分析</div>
-      <div class="monitor idle"></div>
-      <span class="agent-sprite">🔍</span>
-      <span class="agent-name">咕嚕</span>
-      <span class="agent-status status-idle">待機中</span>
-    </div>
-    <div class="desk idle">
-      <div class="tooltip">廣告策略</div>
-      <div class="monitor idle"></div>
-      <span class="agent-sprite">📣</span>
-      <span class="agent-name">咕噹</span>
-      <span class="agent-status status-idle">待機中</span>
-    </div>
+  <div id="agentlist">
+    <div id="alisttitle">agents</div>
+    <div id="alistrows"></div>
   </div>
-  <div class="bottom-row">
-    <div class="breakroom">
-      <span class="breakroom-title">休息室</span>
-      <div class="appliances">
-        <span class="appliance">☕</span>
-        <span class="appliance">📺</span>
-        <span class="appliance">🕹️</span>
-        <span class="appliance">🎰</span>
-      </div>
-    </div>
-    <div class="log-panel">
-      <span class="log-title">&gt; 最新 log</span>
-      <div class="log-entry info" id="log1">[06:00] GitHub Actions 啟動</div>
-      <div class="log-entry" id="log2">[06:01] 安裝 dependencies...</div>
-      <div class="log-entry" id="log3">[06:02] GA4 key 已載入</div>
-      <div class="log-entry" id="log4">[06:03] sort_collections.py 跑緊...</div>
-      <div class="log-entry" id="log5">[06:04] 成功:48 | 搵唔到:0</div>
-      <div class="log-entry" id="log6">[06:05] update_hot_items.py 跑緊...</div>
-      <div class="log-entry" id="log7">[06:06] ✓ Hot collection 自動更新</div>
-    </div>
-  </div>
-  <div class="status-bar">
-    <span class="last-run">上次: 今日 06:06 ✓</span>
-    <span class="next-run"><span class="pulse"></span>下次: 明日 06:00 HKT</span>
-  </div>
-  <div class="last-updated" id="lastUpdated"></div>
+</div>
+<div id="sbar">
+  <span class="st">上次: 今日 06:06 ✓</span>
+  <span class="st"><span class="dot"></span>下次: 明日 06:00 HKT</span>
+</div>
 </div>
 <script>
-document.getElementById('lastUpdated').textContent = 'Page loaded: ' + new Date().toLocaleString('zh-HK');
+const C=document.getElementById('canvas'),ctx=C.getContext('2d');
+const W=720,H=420;
+
+function drawFloor(){
+  for(let tx=0;tx<16;tx++)for(let ty=0;ty<13;ty++){
+    ctx.fillStyle=(tx+ty)%2===0?'#9B8365':'#8B7355';
+    ctx.fillRect(tx*32,ty*32,32,32);
+    ctx.strokeStyle='rgba(0,0,0,0.08)';ctx.lineWidth=0.5;
+    ctx.strokeRect(tx*32,ty*32,32,32);
+  }
+  ctx.fillStyle='#4a3820';ctx.fillRect(512,0,208,210);
+  for(let tx=0;tx<6;tx++)for(let ty=0;ty<6;ty++){
+    ctx.fillStyle=(tx+ty)%2===0?'#4a3828':'#3a2818';
+    ctx.fillRect(512+tx*34,ty*34,34,34);
+  }
+  ctx.fillStyle='#5a7a5a';ctx.fillRect(512,210,208,210);
+  for(let tx=0;tx<6;tx++)for(let ty=0;ty<6;ty++){
+    ctx.fillStyle=(tx+ty)%2===0?'#5a7a5a':'#4a6a4a';
+    ctx.fillRect(512+tx*34,210+ty*34,34,34);
+  }
+  ctx.fillStyle='#3a2810';ctx.fillRect(508,0,6,H);
+  ctx.fillStyle='#2a1a08';ctx.fillRect(0,0,W,4);
+  ctx.fillStyle='#FFD700';ctx.font='7px "Press Start 2P",monospace';
+  ctx.fillText('休息室',530,20);
+  ctx.fillStyle='#ccffcc';ctx.fillText('洗手間',530,228);
+  ctx.fillStyle='#6B4A2A';ctx.fillRect(506,95,8,48);ctx.fillRect(506,280,8,48);
+  ctx.fillStyle='#FFD700';ctx.fillRect(507,117,5,5);ctx.fillRect(507,300,5,5);
+}
+
+function drawDesk(x,y,glowing,label){
+  ctx.fillStyle='#7d6a49';ctx.fillRect(x,y,76,52);
+  ctx.fillStyle='#6B5B3E';ctx.fillRect(x+2,y+2,72,48);
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(x,y+52,76,5);
+  ctx.fillStyle='#1a1a1a';ctx.fillRect(x+18,y+6,40,28);
+  ctx.fillStyle=glowing?'#0a2a1a':'#111';ctx.fillRect(x+21,y+9,34,22);
+  if(glowing){
+    ctx.fillStyle=`rgba(0,255,136,${0.25+0.2*Math.sin(Date.now()/600)})`;
+    ctx.fillRect(x+21,y+9,34,22);
+    ctx.fillStyle='rgba(0,255,136,0.5)';
+    for(let i=0;i<3;i++)ctx.fillRect(x+24,y+12+i*6,24,2);
+  }
+  ctx.fillStyle='#333';ctx.fillRect(x+35,y+34,6,8);ctx.fillRect(x+28,y+41,20,3);
+  ctx.fillStyle='#2a2a2a';ctx.fillRect(x+10,y+43,56,7);
+  ctx.fillStyle='#3a3a3a';
+  for(let k=0;k<8;k++)ctx.fillRect(x+12+k*7,y+44,5,4);
+  ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(x,y+52,76,14);
+  ctx.fillStyle='#FFD700';ctx.font='5px "Press Start 2P",monospace';
+  ctx.fillText(label,x+2,y+62);
+}
+
+function drawFurniture(){
+  ctx.fillStyle='#1a1a1a';ctx.fillRect(520,30,55,65);
+  ctx.fillStyle='#cc2200';ctx.fillRect(524,34,47,22);
+  ctx.fillStyle='#ff4400';ctx.fillRect(526,36,43,18);
+  ctx.fillStyle='#00ff88';ctx.fillRect(530,39,8,8);ctx.fillRect(542,39,8,8);
+  ctx.fillStyle='#888';ctx.fillRect(534,72,22,18);ctx.fillRect(538,68,14,6);
+  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('COFFEE',522,60);
+  ctx.fillStyle='#111';ctx.fillRect(518,100,80,22);
+  ctx.fillStyle='#0a1a2a';ctx.fillRect(521,102,74,18);
+  ctx.fillStyle='#0066ff';ctx.font='6px monospace';ctx.fillText('TV',548,115);
+  ctx.fillStyle='#8B3A0A';ctx.fillRect(514,130,95,40);
+  ctx.fillStyle='#A04515';ctx.fillRect(514,130,95,12);ctx.fillRect(514,130,12,40);ctx.fillRect(597,130,12,40);
+  ctx.fillStyle='#C05A20';ctx.fillRect(528,142,25,24);ctx.fillRect(558,142,25,24);
+  ctx.fillStyle='#5a3a18';ctx.fillRect(520,170,180,55);
+  ctx.fillStyle='#6a4a28';ctx.fillRect(522,172,176,51);
+  ctx.fillStyle='rgba(255,220,150,0.08)';ctx.fillRect(522,172,176,20);
+  ctx.fillStyle='#3a2810';
+  for(let i=0;i<4;i++){ctx.fillRect(528+i*44,165,32,8);ctx.fillRect(528+i*44,223,32,8);}
+  ctx.fillStyle='#1a1aaa';ctx.fillRect(625,20,85,105);
+  ctx.fillStyle='#5555ff';ctx.fillRect(629,24,77,65);
+  ctx.fillStyle='rgba(150,200,255,0.2)';ctx.fillRect(629,24,77,65);
+  const tc=['#ff66aa','#ffaa00','#66ffaa','#ff4444','#aaaaff'];
+  for(let i=0;i<5;i++){ctx.fillStyle=tc[i];ctx.beginPath();ctx.arc(638+i*14,70,7,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#3333cc';ctx.fillRect(648,89,24,10);
+  ctx.fillStyle='#FFD700';ctx.font='5px monospace';ctx.fillText('夾娃娃',627,105);
+  ctx.fillStyle='#eee';ctx.fillRect(520,245,32,42);ctx.fillStyle='#ddd';ctx.fillRect(520,245,32,10);
+  ctx.fillStyle='#bbb';ctx.fillRect(523,255,26,28);
+  ctx.fillStyle='#ddd';ctx.fillRect(575,238,38,28);ctx.fillStyle='#ccc';ctx.fillRect(578,241,32,22);
+  ctx.fillStyle='#888';ctx.fillRect(590,237,6,6);ctx.fillStyle='#aaa';ctx.fillRect(580,263,28,4);
+  ctx.fillStyle='#99bbcc';ctx.fillRect(575,215,38,20);ctx.strokeStyle='#888';ctx.lineWidth=2;ctx.strokeRect(575,215,38,20);
+}
+
+function drawPerson(x,y,col,frame,dir,sitting){
+  const S=3;
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));
+  if(dir<0)ctx.scale(-1,1);
+  function p(px,py,c){ctx.fillStyle=c;ctx.fillRect(px*S,py*S,S,S);}
+  function row(px1,px2,py,c){for(let i=px1;i<=px2;i++)p(i,py,c);}
+  function col2(py1,py2,px,c){for(let i=py1;i<=py2;i++)p(px,i,c);}
+  const wf=frame%4;
+  const la=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.2);
+  const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.2);
+  const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
+  const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(S*3,S*16,S*3,S,0,0,Math.PI*2);ctx.fill();
+  row(1,4,0,col.hair);row(1,4,1,col.hair);p(0,1,col.hair);p(5,1,col.hair);
+  row(1,4,2,col.skin);row(1,4,3,col.skin);
+  p(2,2,'#1a1a1a');p(3,2,'#1a1a1a');p(2,3,'#cc4444');
+  p(0,2,col.skin);p(5,2,col.skin);
+  p(2,4,col.skin);p(3,4,col.skin);
+  row(1,4,5,col.shirt);row(1,4,6,col.shirt);row(1,4,7,col.shirt);row(1,4,8,col.shirt);
+  col2(5+la,8+la,0,col.skin);p(0,9+la,col.skin);
+  col2(5+ra,8+ra,5,col.skin);p(5,9+ra,col.skin);
+  if(sitting){
+    row(1,2,9,col.pants);row(1,2,10,col.pants);row(3,4,9,col.pants);row(3,4,10,col.pants);
+    p(0,10,col.pants);p(5,10,col.pants);
+    row(0,2,11,col.shoe||'#2a1a00');row(3,5,11,col.shoe||'#2a1a00');
+  } else {
+    col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe||'#2a1a00');p(2,12+ll,col.shoe||'#2a1a00');
+    col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe||'#2a1a00');p(4,12+rl,col.shoe||'#2a1a00');
+  }
+  ctx.restore();
+}
+
+function drawBubble(x,y,text,color){
+  if(!text)return;
+  ctx.font='6px "Press Start 2P",monospace';
+  const tw=ctx.measureText(text).width,bw=tw+12,bh=16;
+  const bx=x-bw/2,by=y-bh-8;
+  ctx.fillStyle='rgba(8,8,20,0.92)';
+  if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,3);else ctx.rect(bx,by,bw,bh);
+  ctx.fill();ctx.strokeStyle=color||'#00FF88';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='rgba(8,8,20,0.92)';ctx.beginPath();
+  ctx.moveTo(x-4,by+bh);ctx.lineTo(x,by+bh+7);ctx.lineTo(x+4,by+bh);ctx.fill();
+  ctx.strokeStyle=color||'#00FF88';ctx.lineWidth=1;ctx.beginPath();
+  ctx.moveTo(x-4,by+bh);ctx.lineTo(x,by+bh+7);ctx.lineTo(x+4,by+bh);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='6px "Press Start 2P",monospace';ctx.fillText(text,bx+6,by+11);
+}
+
+const PCOLS=[
+  {skin:'#FFCCAA',hair:'#2a1000',shirt:'#dd3333',pants:'#223399',shoe:'#1a1a2a'},
+  {skin:'#FFCCAA',hair:'#1a1a1a',shirt:'#9933dd',pants:'#1a3300',shoe:'#2a1a00'},
+  {skin:'#FFDDBB',hair:'#3a1800',shirt:'#ee7700',pants:'#331100',shoe:'#1a1000'},
+  {skin:'#FFD0AA',hair:'#2a1800',shirt:'#1177dd',pants:'#001133',shoe:'#001122'},
+  {skin:'#FFCCAA',hair:'#1a0000',shirt:'#dd4488',pants:'#330011',shoe:'#1a0011'},
+  {skin:'#FFDDCC',hair:'#001a00',shirt:'#33aa33',pants:'#001100',shoe:'#001100'},
+  {skin:'#FFCC99',hair:'#002a2a',shirt:'#009999',pants:'#001a1a',shoe:'#002222'},
+  {skin:'#FFD0AA',hair:'#1a1a00',shirt:'#ddcc00',pants:'#1a1a00',shoe:'#0a0a00'},
+];
+const DPOS=[[38,55],[138,55],[238,55],[338,55],[38,175],[138,175],[238,175],[338,175]];
+const AINFO=[
+  {name:'蜜醬',status:'working'},{name:'花花',status:'done'},
+  {name:'阿鼻',status:'done'},{name:'豆芽',status:'idle'},
+  {name:'啾皮',status:'idle'},{name:'彩彩',status:'idle'},
+  {name:'咕嚕',status:'idle'},{name:'咕噹',status:'idle'},
+];
+const WB=['排序中...','拉GA4數據','計算分數','更新tags','分析緊...'];
+const IB=['zzz','等指令','發呆中','無野做'];
+const CB=['好香☕','補充能量','喝完返工'];
+const TB=['去一去','解決咗','返黎啦'];
+const DB=['✓ 完成','搞掂!','去休息'];
+const SC={working:'#FFD700',done:'#00FF88',idle:'#555',coffee:'#FF8800',toilet:'#88DDFF'};
+
+const agents=AINFO.map((a,i)=>({
+  id:i,name:a.name,baseStatus:a.status,col:PCOLS[i],
+  deskX:DPOS[i][0]+20,deskY:DPOS[i][1]+58,
+  x:DPOS[i][0]+20,y:DPOS[i][1]+58,tx:DPOS[i][0]+20,ty:DPOS[i][1]+58,
+  state:a.status,bubble:'',bubbleTimer:0,
+  actionTimer:60+Math.floor(Math.random()*180),
+  walkFrame:0,walkTimer:0,dir:1,moving:false,sitting:false,speed:0.9+Math.random()*0.4,
+}));
+
+function pb(state){
+  if(state==='working')return WB[Math.floor(Math.random()*WB.length)];
+  if(state==='coffee')return CB[Math.floor(Math.random()*CB.length)];
+  if(state==='toilet')return TB[Math.floor(Math.random()*TB.length)];
+  if(state==='done')return DB[Math.floor(Math.random()*DB.length)];
+  return IB[Math.floor(Math.random()*IB.length)];
+}
+
+function agentTick(a){
+  a.actionTimer--;if(a.bubbleTimer>0)a.bubbleTimer--;
+  if(a.actionTimer<=0){
+    const r=Math.random();
+    if(a.baseStatus==='working'){
+      a.state='working';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('working');a.bubbleTimer=120;a.actionTimer=160;
+    } else if(a.baseStatus==='done'){
+      if(r<0.45){a.state='done';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('done');a.bubbleTimer=90;a.actionTimer=200;}
+      else if(r<0.7){a.state='coffee';a.tx=530+Math.random()*30;a.ty=80+Math.random()*40;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=190;}
+      else{a.state='done';a.tx=40+Math.random()*420;a.ty=40+Math.random()*310;a.bubble='';a.actionTimer=130;}
+    } else {
+      if(r<0.35){a.state='idle';a.tx=a.deskX;a.ty=a.deskY;a.bubble=pb('idle');a.bubbleTimer=100;a.actionTimer=230;}
+      else if(r<0.55){a.state='coffee';a.tx=525+Math.random()*35;a.ty=75+Math.random()*50;a.bubble=pb('coffee');a.bubbleTimer=110;a.actionTimer=210;}
+      else if(r<0.7){a.state='toilet';a.tx=525+Math.random()*30;a.ty=255+Math.random()*40;a.bubble=pb('toilet');a.bubbleTimer=100;a.actionTimer=220;}
+      else{a.state='idle';a.tx=40+Math.random()*430;a.ty=40+Math.random()*310;a.bubble='';a.actionTimer=160;}
+    }
+  }
+  const dx=a.tx-a.x,dy=a.ty-a.y,dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist>2){
+    a.x+=dx/dist*a.speed;a.y+=dy/dist*a.speed;a.moving=true;
+    if(dx!==0)a.dir=dx>0?1:-1;
+    a.walkTimer++;if(a.walkTimer%8===0)a.walkFrame=(a.walkFrame+1)%4;
+  } else {a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
+  a.sitting=!a.moving;
+}
+
+const logEl=document.getElementById('loglines');
+const LOGS=[
+  {c:'lk-info',t:'[06:00] GitHub Actions 啟動'},
+  {c:'lk-ok',t:'[06:02] GA4 key 載入 ✓'},
+  {c:'lk-ok',t:'[06:04] sort_collections 成功:48 ✓'},
+  {c:'lk-ok',t:'[06:06] Hot collection 更新 ✓'},
+  {c:'lk-warn',t:'[06:06] 下次: 明日 06:00 HKT'},
+];
+let li=0;
+function addLog(){
+  const d=LOGS[li%LOGS.length];li++;
+  const div=document.createElement('div');div.className=d.c;div.textContent=d.t;
+  logEl.appendChild(div);while(logEl.children.length>5)logEl.removeChild(logEl.firstChild);
+  setTimeout(addLog,2800);
+}
+setTimeout(addLog,600);
+
+const alistEl=document.getElementById('alistrows');
+function updateAlist(){
+  alistEl.innerHTML=agents.map(a=>`<div class="alist-row"><div class="alist-dot" style="background:${SC[a.state]||'#555'}"></div><span class="alist-name">${a.name} ${a.state==='working'?'▶':a.state==='done'?'✓':a.state==='coffee'?'☕':a.state==='toilet'?'🚽':'…'}</span></div>`).join('');
+}
+
+function updateClock(){
+  const now=new Date(),hk=new Date(now.getTime()+8*3600000);
+  document.getElementById('clock').textContent=hk.toISOString().slice(11,19)+' HKT';
+}
+setInterval(updateClock,1000);updateClock();
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  drawFloor();drawFurniture();
+  DPOS.forEach((d,i)=>drawDesk(d[0],d[1],agents[i].state==='working'||agents[i].state==='done',AINFO[i].name));
+  agents.forEach(a=>agentTick(a));
+  [...agents].sort((a,b)=>a.y-b.y).forEach(a=>{
+    drawPerson(a.x,a.y,a.col,a.walkFrame,a.dir,a.sitting);
+    if(a.bubble&&a.bubbleTimer>0)drawBubble(a.x+9,a.y,a.bubble,SC[a.state]||'#00FF88');
+  });
+  updateAlist();
+  requestAnimationFrame(loop);
+}
+
+function resize(){const s=document.getElementById('wrap').offsetWidth/W;C.style.height=Math.round(H*s)+'px';}
+resize();window.addEventListener('resize',resize);
+loop();
 </script>
 </body>
 </html>
