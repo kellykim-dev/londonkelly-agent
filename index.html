@@ -21,11 +21,15 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
 .alist-row{font-size:5px;line-height:2.2;display:flex;gap:4px;align-items:center;}
 .alist-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .alist-name{color:#ccc;}
+#links{background:#0a0a1e;border-top:1px solid #1a1a3e;padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;}
+.link-btn{flex:1;min-width:120px;text-align:center;background:#1a1a3e;border:1px solid #333;color:#88DDFF;font-size:6px;padding:7px 4px;text-decoration:none;border-radius:3px;}
+.link-btn:hover{border-color:#00FF88;color:#00FF88;}
+.link-btn.gold{color:#FFD700;border-color:#3a2810;}
+.link-btn.gold:hover{border-color:#FFD700;}
 #sbar{background:#3a2810;display:flex;justify-content:space-between;padding:7px 12px;border-top:2px solid #5C4A2A;flex-wrap:wrap;gap:4px;}
 .st{font-size:6px;color:#FFD700;}
 .dot{display:inline-block;width:7px;height:7px;background:#00FF88;border-radius:50%;animation:dp 1s infinite;margin-right:5px;vertical-align:middle;}
 @keyframes dp{0%,100%{opacity:1;}50%{opacity:.2;}}
-.report-btn{display:block;text-align:center;background:#1a1a3e;border:1px solid #00FF88;color:#00FF88;font-size:6px;padding:6px;margin-top:6px;text-decoration:none;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -39,12 +43,16 @@ body{background:#1a1208;display:flex;flex-direction:column;align-items:center;mi
   <div id="logbox">
     <div id="logtitle">&gt;_ 實時 log</div>
     <div id="loglines"></div>
-    <a href="report.html" class="report-btn">📊 睇週報 →</a>
   </div>
   <div id="agentlist">
     <div id="alisttitle">agents</div>
     <div id="alistrows"></div>
   </div>
+</div>
+<div id="links">
+  <a href="report.html" class="link-btn gold">📊 週報 中文</a>
+  <a href="report_kr.html" class="link-btn gold">🇰🇷 週報 한국어</a>
+  <a href="content.html" class="link-btn">✍️ 本週內容</a>
 </div>
 <div id="sbar">
   <span class="st" id="lastrun">載入中...</span>
@@ -74,24 +82,26 @@ function updateFromStatus(){
   if(!realStatus)return;
   const sa=realStatus.agents||{};
   const wr=realStatus.weekly_report||{};
+  const ca=realStatus.content_agent||{};
 
-  // Last run
   if(realStatus.last_run){
     document.getElementById('lastrun').textContent='Sort: '+toHKT(realStatus.last_run)+' ✓';
   }
 
-  // Update agent base status
+  // Update agent states
   if(sa.sort_collections) agents[1].baseStatus=sa.sort_collections.status==='done'?'done':'idle';
   if(sa.update_hot_items) agents[2].baseStatus=sa.update_hot_items.status==='done'?'done':'idle';
-  if(wr.status==='done') agents[3].baseStatus='done'; // 豆芽
+  if(wr.status==='done') agents[3].baseStatus='done';
+  if(ca.status==='done') agents[4].baseStatus='done';
 
   // Log
   const logEl=document.getElementById('loglines');
   logEl.innerHTML='';
   if(realStatus.last_run) addLog('lk-info','[系統] Sort: '+toHKT(realStatus.last_run));
-  if(sa.sort_collections) addLog('lk-ok','[花花] 排序 ✓ '+( sa.sort_collections.log||'').slice(0,30));
+  if(sa.sort_collections) addLog('lk-ok','[花花] 排序 ✓ '+(sa.sort_collections.log||'').slice(0,28));
   if(sa.update_hot_items) addLog('lk-ok','[阿鼻] Hot items ✓');
   if(wr.last_run) addLog('lk-ok','[豆芽] 週報: '+toHKT(wr.last_run)+' ✓');
+  if(ca.last_run) addLog('lk-ok','[啾皮] 內容: '+toHKT(ca.last_run)+' ✓');
   addLog('lk-warn','[系統] 下次: 明日 06:00 HKT');
 }
 
@@ -247,8 +257,8 @@ const AINFO=[
   {name:'蜜醬',status:'working'},
   {name:'花花',status:'done'},
   {name:'阿鼻',status:'done'},
-  {name:'豆芽',status:'done'},  // weekly report
-  {name:'啾皮',status:'idle'},
+  {name:'豆芽',status:'done'},
+  {name:'啾皮',status:'done'},
   {name:'彩彩',status:'idle'},
   {name:'咕嚕',status:'idle'},
   {name:'咕噹',status:'idle'},
@@ -259,6 +269,7 @@ const CB=['好香☕','補充能量','喝完返工'];
 const TB=['去一去','解決咗','返黎啦'];
 const DB=['✓ 完成','搞掂!','去休息'];
 const RB=['出週報!','分析數據','ROAS34.9x'];
+const CB2=['寫文案!','7日內容','IG post!'];
 const SC={working:'#FFD700',done:'#00FF88',idle:'#555',coffee:'#FF8800',toilet:'#88DDFF'};
 
 const agents=AINFO.map((a,i)=>({
@@ -275,6 +286,7 @@ function pb(s,id){
   if(s==='coffee')return CB[Math.floor(Math.random()*CB.length)];
   if(s==='toilet')return TB[Math.floor(Math.random()*TB.length)];
   if(s==='done'&&id===3)return RB[Math.floor(Math.random()*RB.length)];
+  if(s==='done'&&id===4)return CB2[Math.floor(Math.random()*CB2.length)];
   if(s==='done')return DB[Math.floor(Math.random()*DB.length)];
   return IB[Math.floor(Math.random()*IB.length)];
 }
