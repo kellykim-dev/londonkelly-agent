@@ -37,7 +37,7 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
     <span>★ LondonKelly AI 辦公室</span>
     <span id="clock"></span>
   </div>
-  <canvas id="C" width="900" height="520"></canvas>
+  <canvas id="C" width="720" height="420"></canvas>
   <div id="bottom">
     <div id="logbox">
       <div id="logtitle">&gt;_ 實時 log</div>
@@ -60,7 +60,7 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
 </div>
 <script>
 const canvas=document.getElementById('C'),ctx=canvas.getContext('2d');
-const W=900,H=520,S=4;
+const W=720,H=420,S=3;
 
 function drawWoodTile(tx,ty){
   const x=tx*16*S,y=ty*16*S;
