@@ -2,7 +2,7 @@ name: LondonKelly Weekly Report
 
 on:
   schedule:
-    - cron: '0 22 * * 0'  # 每週日 UTC 10pm = 週一 HKT 6am
+    - cron: '0 22 * * 0'
   workflow_dispatch:
 
 jobs:
@@ -30,12 +30,28 @@ jobs:
         GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
         GA4_KEY_FILE: ga4_key.json
         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      run: python weekly_report.py
+      run: python weekly_report.py 2>&1 | tee report_output.txt
 
-    - name: Commit report.html
+    - name: Update status.json
+      run: |
+        NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        PREV=$(cat status.json 2>/dev/null || echo '{}')
+        python3 - << PYEOF
+import json, os
+with open('status.json', 'r') as f:
+    data = json.load(f)
+data['weekly_report'] = {
+    'status': 'done',
+    'last_run': '$NOW'
+}
+with open('status.json', 'w') as f:
+    json.dump(data, f, indent=2)
+PYEOF
+
+    - name: Commit files
       run: |
         git config user.name "LondonKelly Bot"
         git config user.email "bot@londonkelly.com"
-        git add report.html
+        git add report.html status.json
         git diff --staged --quiet || git commit -m "Update weekly report [skip ci]"
         git push
