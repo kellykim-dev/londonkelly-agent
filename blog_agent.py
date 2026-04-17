@@ -219,7 +219,11 @@ def publish_to_shopify(title, content, tags, slug, schedule_item):
             }
         }
         resp = requests.post(url, headers=headers, json=payload, timeout=15)
-        article = resp.json().get("article", {})
+        resp_json = resp.json()
+        if "errors" in resp_json:
+            print(f"  ❌ Shopify 錯誤: {resp_json['errors']}")
+            return None
+        article = resp_json.get("article", {})
         article_id = article.get("id")
         handle = article.get("handle", slug)
         print(f"  ✅ Draft 已上傳 Shopify！Article ID: {article_id}")
