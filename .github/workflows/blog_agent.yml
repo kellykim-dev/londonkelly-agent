@@ -1,0 +1,42 @@
+name: LondonKelly Blog Agent
+
+on:
+  schedule:
+    - cron: '0 22 * * 1,4'  # 每週一、四 06:00 HKT = 約每3-4日一篇
+  workflow_dispatch:
+
+jobs:
+  blog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: pip install anthropic requests
+
+    - name: Run blog agent
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+      run: python blog_agent.py
+
+    - name: Commit files
+      run: |
+        git config user.name "LondonKelly Bot"
+        git config user.email "bot@londonkelly.com"
+        git add content.html blog_index.json status.json
+        git stash
+        git pull --rebase origin main
+        git stash pop
+        git add content.html blog_index.json status.json
+        git diff --staged --quiet || git commit -m "New blog draft: $(date '+%Y-%m-%d') [skip ci]"
+        git push
