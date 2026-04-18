@@ -1,0 +1,28 @@
+name: LondonKelly Hot Items Updater
+
+on:
+  schedule:
+    - cron: '0 22 * * 0'  # 每週日香港時間早上6點
+  workflow_dispatch:
+
+jobs:
+  update-hot-items:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: pip install requests google-analytics-data google-auth
+        
+      - name: Write GA4 key
+        run: echo '${{ secrets.GA4_KEY_JSON }}' > ga4_key.json
+        
+      - name: Run hot items updater
+        env:
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        run: python update_hot_items.py
