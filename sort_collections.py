@@ -440,7 +440,23 @@ def run():
         [{"id": c["id"], "title": c["title"], "sort_order": c.get("sort_order",""), "type": "custom"} for c in custom] +
         [{"id": c["id"], "title": c["title"], "sort_order": c.get("sort_order",""), "type": "smart"}  for c in smart]
     )
-    print(f"   找到 {len(collections)} 個 collections")
+    SKIP_TITLES = [
+        'Alexis Bittar','Alo Yoga','APM Monaco','Anya Hindmarch',
+        'Balenciaga','Berluti','Bottega Veneta','Burberry',
+        'Celine','Chanel','Chloe','Christian Dior','Cos',
+        'Delvaux','Demellier','Fendi','Golden Goose','Goyard',
+        'Gucci','Hermes','Jellycat','Lemaire','Loewe','Longchamp',
+        'Loro Piana','Louis Vuitton','Maison Margiela','Marni',
+        'Miu Miu','Moncler','Monica Vinader','Moynat','Mulberry',
+        'Persee','Prada','Polene','Redline','Roger Vivier',
+        'Strathberry','The Row','Tiffany','Van Cleef','Vivienne Westwood',
+        'YSL','Saint Laurent','MM6','all','All','new-in','outlet'
+    ]
+    collections = [
+        c for c in collections
+        if not any(skip.lower() in c['title'].lower() for skip in SKIP_TITLES)
+    ]
+    print(f"   找到 {len(collections)} 個 collections（已排除品牌 collections）")
 
     backup_all(collections)
 
