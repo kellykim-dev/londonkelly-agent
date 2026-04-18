@@ -21,7 +21,7 @@ jobs:
       run: pip install requests google-auth google-api-python-client
 
     - name: Write GA4 key file
-      run: echo "${{ secrets.GA4_KEY_JSON }}" | base64 -d > ga4_key.json
+      run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
 
     - name: Run Indexing API
       env:
