@@ -16,7 +16,7 @@ canvas{display:block;width:100%;image-rendering:pixelated;}
 #logtitle{color:#00FF88;font-size:10px;margin-bottom:6px;}
 #loglines div{font-size:9px;line-height:2.2;font-family:monospace;}
 .lk-ok{color:#00FF88;}.lk-info{color:#88DDFF;}.lk-warn{color:#FFD700;}
-#agentlist{width:170px;}
+#agentlist{width:200px;}
 #alisttitle{color:#FFD700;font-size:10px;margin-bottom:6px;}
 .alist-row{font-size:9px;line-height:2.2;display:flex;gap:6px;align-items:center;}
 .alist-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
@@ -235,7 +235,7 @@ const DESK_PX=[
   {ax:sX+2*(dW+gX)+P*4,ay:r2Y+dH+P*3},{ax:sX+3*(dW+gX)+P*4,ay:r2Y+dH+P*3},
 ];
 const AINFO=[
-  {name:'花花',status:'done'},{name:'阿鼻',status:'done'},
+  {name:'花花',status:'idle'},{name:'阿鼻',status:'working'},
   {name:'豆芽',status:'done'},{name:'啾皮',status:'done'},
   {name:'咕嚕',status:'done'},{name:'彩彩',status:'idle'},
   {name:'咕噹',status:'done'},{name:'蜜醬',status:'working'},
@@ -285,7 +285,6 @@ function updateFromStatus(){
   if(blog.status==='done')agents[6].baseStatus='done';
   const logEl=document.getElementById('loglines');logEl.innerHTML='';
   if(realStatus.last_run)addLog('lk-info','[系統] '+toHKT(realStatus.last_run));
-  if(sa.sort_collections)addLog('lk-ok','[花花] 排序 ✓');
   if(sa.update_hot_items)addLog('lk-ok','[阿鼻] Hot items ✓');
   if(wr.last_run)addLog('lk-ok','[豆芽] 週報 ✓');
   if(ca.last_run)addLog('lk-ok','[啾皮] 內容 ✓');
@@ -342,7 +341,7 @@ function agentTick(a){
 const logFake=document.getElementById('loglines');
 const LOGS=[
   {c:'lk-info',t:'[06:00] GitHub Actions 啟動'},
-  {c:'lk-ok',t:'[06:04] sort_collections ✓'},
+  
   {c:'lk-ok',t:'[06:06] Hot items 更新 ✓'},
   {c:'lk-ok',t:'[09:00] Indexing 200URL ✓'},
   {c:'lk-warn',t:'[系統] 下次: 明日 06:00'},
@@ -358,8 +357,9 @@ function addFakeLog(){
 setTimeout(addFakeLog,600);
 
 const alistEl=document.getElementById('alistrows');
+const AGENT_ROLES=['停止','Hot Items','週報','社群內容','Indexing','競爭對手','Blog','待機'];
 function updateAlist(){
-  alistEl.innerHTML=agents.map(a=>`<div class="alist-row"><div class="alist-dot" style="background:${SC[a.state]||'#555'}"></div><span class="alist-name">${a.name} ${a.state==='working'?'▶':a.state==='done'?'✓':a.state==='coffee'?'☕':a.state==='toilet'?'🚽':'…'}</span></div>`).join('');
+  alistEl.innerHTML=agents.map((a,i)=>`<div class="alist-row"><div class="alist-dot" style="background:${SC[a.state]||'#555'}"></div><span class="alist-name">${a.name}<span style="color:#666;font-size:8px;"> ${AGENT_ROLES[i]}</span> ${a.state==='working'?'▶':a.state==='done'?'✓':a.state==='coffee'?'☕':a.state==='toilet'?'🚽':'…'}</span></div>`).join('');
 }
 function updateClock(){
   const now=new Date(),hk=new Date(now.getTime()+8*3600000);
