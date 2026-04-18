@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 SHOPIFY_STORE = "londonkelly.myshopify.com"
-SHOPIFY_TOKEN = "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"
+SHOPIFY_TOKEN = os.environ.get("SHOPIFY_TOKEN", "")
 BACKUP_DIR    = "backups"
 
 HEADERS  = {"X-Shopify-Access-Token": SHOPIFY_TOKEN, "Content-Type": "application/json"}
