@@ -440,22 +440,25 @@ def run():
         [{"id": c["id"], "title": c["title"], "sort_order": c.get("sort_order",""), "type": "custom"} for c in custom] +
         [{"id": c["id"], "title": c["title"], "sort_order": c.get("sort_order",""), "type": "smart"}  for c in smart]
     )
-    SKIP_TITLES = [
-        'Alexis Bittar','Alo Yoga','APM Monaco','Anya Hindmarch',
-        'Balenciaga','Berluti','Bottega Veneta','Burberry',
-        'Celine','Chanel','Chloe','Christian Dior','Cos',
-        'Delvaux','Demellier','Fendi','Golden Goose','Goyard',
-        'Gucci','Hermes','Jellycat','Lemaire','Loewe','Longchamp',
-        'Loro Piana','Louis Vuitton','Maison Margiela','Marni',
-        'Miu Miu','Moncler','Monica Vinader','Moynat','Mulberry',
-        'Persee','Prada','Polene','Redline','Roger Vivier',
-        'Strathberry','The Row','Tiffany','Van Cleef','Vivienne Westwood',
-        'YSL','Saint Laurent','MM6','all','All','new-in','outlet'
-    ]
-    collections = [
-        c for c in collections
-        if not any(skip.lower() in c['title'].lower() for skip in SKIP_TITLES)
-    ]
+    SKIP_IDS = {
+        280504336448,280473010240,280522391616,277399109696,282038534208,
+        273488347200,281966870592,282892206144,272457367616,280636325952,
+        281635586112,272457433152,272457465920,272457498688,283464695872,
+        272457531456,272457564224,272457629760,280532451392,280532615232,
+        279364173888,280532680768,273307074624,280504401984,280636424256,
+        280636948544,273209720896,280532484160,281945374784,
+        272457695296,272457728064,272457760832,280636883008,
+        280618467392,275091488832,284163145792,284163113024,279685005376,
+        272457793600,276055294016,275066454080,272457826368,283496251456,
+        280532516928,280532418624,280353472576,284163178560,
+        281051168832,272457924672,284163211328,283196784704,284163244096,
+        280485265472,280636915776,280949129280,280636981312,
+        273453809728,282872381504,280794955840,282404880448,272457957440,
+        277453307968,273275715648,280637014080,280637046848,280473075776,
+        284107604032,277125267520,284078145600,284088401984,276580794432,
+        284057108544,277185855552,272458088512,272942006336,284196143168,
+    }
+    collections = [c for c in collections if c['id'] not in SKIP_IDS]
     print(f"   找到 {len(collections)} 個 collections（已排除品牌 collections）")
 
     backup_all(collections)
