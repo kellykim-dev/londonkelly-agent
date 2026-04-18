@@ -69,7 +69,10 @@ jobs:
       run: |
         git config user.name "LondonKelly Bot"
         git config user.email "bot@londonkelly.com"
+        git add status.json last_run.txt || true
+        git stash
         git pull --rebase origin main
+        git stash pop
         git add status.json last_run.txt || true
         git diff --staged --quiet || git commit -m "Update status [skip ci]"
         git push
