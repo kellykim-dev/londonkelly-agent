@@ -185,31 +185,30 @@ function drawPerson(x,y,col,frame,dir,sitting){
   const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.2);
   const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
   const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
-  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(P*3,P*18,P*3,P,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(P*3,P*16,P*3,P,0,0,Math.PI*2);ctx.fill();
   // 長頭髮
-  p(0,0,col.hair);row(1,4,0,col.hair);p(5,0,col.hair);
-  row(0,5,1,col.hair);row(0,5,2,col.hair);
-  col2(3,9,0,col.hair);col2(3,9,5,col.hair);
+  row(0,5,0,col.hair);row(0,5,1,col.hair);
+  col2(2,7,0,col.hair);col2(2,7,5,col.hair);
   // 臉
-  row(1,4,3,col.skin);row(1,4,4,col.skin);
-  p(2,3,'#1a1a1a');p(3,3,'#1a1a1a');
-  p(2,4,'#ff6688');p(3,4,'#ff6688');
-  p(0,3,col.skin);p(5,3,col.skin);p(2,5,col.skin);p(3,5,col.skin);
+  row(1,4,2,col.skin);row(1,4,3,col.skin);
+  p(2,2,'#1a1a1a');p(3,2,'#1a1a1a');
+  p(2,3,'#ff6688');p(3,3,'#ff6688');
+  p(0,2,col.skin);p(5,2,col.skin);p(2,4,col.skin);p(3,4,col.skin);
   // 裙子身體
-  row(1,4,6,col.shirt);row(1,4,7,col.shirt);
-  row(0,5,8,col.shirt);row(0,5,9,col.shirt);
-  row(0,5,10,col.pants);row(0,5,11,col.pants);
+  row(1,4,5,col.shirt);row(1,4,6,col.shirt);
+  row(0,5,7,col.shirt);row(0,5,8,col.shirt);
+  row(0,5,9,col.pants);row(0,5,10,col.pants);
   // 手臂
-  col2(7+la,10+la,0,col.skin);p(0,11+la,col.skin);
-  col2(7+ra,10+ra,5,col.skin);p(5,11+ra,col.skin);
+  col2(6+la,9+la,0,col.skin);p(0,10+la,col.skin);
+  col2(6+ra,9+ra,5,col.skin);p(5,10+ra,col.skin);
   if(sitting){
-    row(1,4,12,col.pants);
-    row(0,5,13,col.shoe);
+    row(1,4,11,col.pants);
+    row(0,5,12,col.shoe);
   }else{
-    col2(12,14+ll,1,col.pants);col2(12,14+ll,2,col.pants);
-    p(1,15+ll,col.shoe);p(2,15+ll,col.shoe);
-    col2(12,14+rl,3,col.pants);col2(12,14+rl,4,col.pants);
-    p(3,15+rl,col.shoe);p(4,15+rl,col.shoe);
+    col2(11,13+ll,1,col.pants);col2(11,13+ll,2,col.pants);
+    p(1,14+ll,col.shoe);p(2,14+ll,col.shoe);
+    col2(11,13+rl,3,col.pants);col2(11,13+rl,4,col.pants);
+    p(3,14+rl,col.shoe);p(4,14+rl,col.shoe);
   }
   ctx.restore();
 }
@@ -376,6 +375,9 @@ function agentTick(a){
     if(dx!==0)a.dir=dx>0?1:-1;
     a.walkTimer++;if(a.walkTimer%9===0)a.walkFrame=(a.walkFrame+1)%4;
   }else{a.x=a.tx;a.y=a.ty;a.moving=false;a.walkFrame=0;}
+  // 防止走出 canvas
+  a.x=Math.max(P*2,Math.min(offW2-P*10,a.x));
+  a.y=Math.max(40,Math.min(H-P*20,a.y));
   a.sitting=!a.moving;
 }
 
