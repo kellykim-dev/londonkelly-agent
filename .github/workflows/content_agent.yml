@@ -1,50 +1,42 @@
 name: LondonKelly Content Agent
-
 on:
   workflow_dispatch:
-
 jobs:
   content:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: Install dependencies
-      run: pip install anthropic requests
-
-    - name: Run content agent
-      env:
-        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
-        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      run: python content_agent.py
-
-    - name: Update status.json
-      run: python update_status.py content_agent
-
-    - name: Commit files
-      run: |
-        git config user.name "LondonKelly Bot"
-        git config user.email "bot@londonkelly.com"
-        git add content.html status.json
-        git diff --staged --quiet || git commit -m "Update content [skip ci]"
-        git pull --rebase origin main
-        git push
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests anthropic
+      - name: Run Content Agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        run: python content_agent.py
+      - name: Commit files
+        run: |
+          git config user.name "LondonKelly Bot"
+          git config user.email "bot@londonkelly.com"
+          git add content.html status.json
+          git stash
+          git pull --rebase origin main
+          git stash pop
+          git add content.html status.json
+          git diff --staged --quiet || git commit -m "Update content [skip ci]"
+          git push
 
       - name: Send WhatsApp notification
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
+          if [ "${ job.status }" = "success" ]; then
             MSG="%F0%9F%A4%96+啾皮%3A+本週社群內容已生成"
           else
-            MSG="%F0%9F%86%98+啾皮+%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
+            MSG="%F0%9F%86%98+啾皮+失敗%EF%BC%81請檢查+Actions"
           fi
-          curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=${ secrets.CALLMEBOT_PHONE }&text=${MSG}&apikey=${ secrets.CALLMEBOT_APIKEY }" || true

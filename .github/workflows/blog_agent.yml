@@ -1,52 +1,47 @@
 name: LondonKelly Blog Agent
-
 on:
   schedule:
-    - cron: '0 22 * * 1,4'  # 每週一、四 06:00 HKT = 約每3-4日一篇
+    - cron: '0 22 * * 1,4'
   workflow_dispatch:
-
 jobs:
   blog:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: Install dependencies
-      run: pip install anthropic requests
-
-    - name: Run blog agent
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
-        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
-      run: python blog_agent.py
-
-    - name: Commit files
-      run: |
-        git config user.name "LondonKelly Bot"
-        git config user.email "bot@londonkelly.com"
-        git add blog_draft.html blog_index.json status.json
-        git stash
-        git pull --rebase origin main
-        git stash pop
-        git add blog_draft.html blog_index.json status.json
-        git diff --staged --quiet || git commit -m "New blog draft: $(date '+%Y-%m-%d') [skip ci]"
-        git push
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests anthropic
+      - name: Write GA4 key
+        run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
+      - name: Run Blog Agent
+        env:
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python blog_agent.py
+      - name: Commit files
+        run: |
+          git config user.name "LondonKelly Bot"
+          git config user.email "bot@londonkelly.com"
+          git add blog_draft.html blog_index.json status.json
+          git stash
+          git pull --rebase origin main
+          git stash pop
+          git add blog_draft.html blog_index.json status.json
+          git diff --staged --quiet || git commit -m "New blog draft: $(date '+%Y-%m-%d') [skip ci]"
+          git push
 
       - name: Send WhatsApp notification
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            MSG="%F0%9F%A4%96+咕噹%3A+Blog+Draft+已生成！去+Shopify+審核"
+          if [ "${ job.status }" = "success" ]; then
+            MSG="%F0%9F%A4%96+咕噹%3A+Blog+Draft+已生成"
           else
-            MSG="%F0%9F%86%98+咕噹+%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
+            MSG="%F0%9F%86%98+咕噹+失敗%EF%BC%81請檢查+Actions"
           fi
-          curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=${ secrets.CALLMEBOT_PHONE }&text=${MSG}&apikey=${ secrets.CALLMEBOT_APIKEY }" || true

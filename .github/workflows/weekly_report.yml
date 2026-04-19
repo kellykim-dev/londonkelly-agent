@@ -1,54 +1,47 @@
 name: LondonKelly Weekly Report
-
 on:
   schedule:
     - cron: '0 22 * * 0'
   workflow_dispatch:
-
 jobs:
   report:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: Install dependencies
-      run: pip install anthropic google-analytics-data google-auth
-
-    - name: Create GA4 key file
-      run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
-
-    - name: Run weekly report
-      env:
-        GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-        GA4_KEY_FILE: ga4_key.json
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      run: python weekly_report.py
-
-    - name: Update status.json
-      run: python update_status.py weekly_report
-
-    - name: Commit files
-      run: |
-        git config user.name "LondonKelly Bot"
-        git config user.email "bot@londonkelly.com"
-        git add report.html report_kr.html status.json
-        git diff --staged --quiet || git commit -m "Update weekly report [skip ci]"
-        git push
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests anthropic google-analytics-data google-auth
+      - name: Write GA4 key
+        run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
+      - name: Run Weekly Report
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        run: python weekly_report.py
+      - name: Commit files
+        run: |
+          git config user.name "LondonKelly Bot"
+          git config user.email "bot@londonkelly.com"
+          git add weekly_report.html weekly_report_kr.html status.json
+          git stash
+          git pull --rebase origin main
+          git stash pop
+          git add weekly_report.html weekly_report_kr.html status.json
+          git diff --staged --quiet || git commit -m "Update weekly report [skip ci]"
+          git push
 
       - name: Send WhatsApp notification
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            MSG="%F0%9F%A4%96+豆芽%3A+週報已生成，請查閱"
+          if [ "${ job.status }" = "success" ]; then
+            MSG="%F0%9F%A4%96+豆芽%3A+週報已生成"
           else
-            MSG="%F0%9F%86%98+豆芽+%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
+            MSG="%F0%9F%86%98+豆芽+失敗%EF%BC%81請檢查+Actions"
           fi
-          curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=${ secrets.CALLMEBOT_PHONE }&text=${MSG}&apikey=${ secrets.CALLMEBOT_APIKEY }" || true
