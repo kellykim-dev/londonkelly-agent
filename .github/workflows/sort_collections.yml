@@ -1,88 +1,45 @@
 name: LondonKelly Collection Sorter
-
 on:
   schedule:
     - cron: '0 22 * * *'
   workflow_dispatch:
-
 jobs:
   sort:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-
-    - name: Install dependencies
-      run: pip install requests google-analytics-data google-auth
-
-    - name: Create GA4 key file
-      run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
-
-    - name: Run sort collections
-      env:
-        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
-        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
-        GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-        GA4_KEY_FILE: ga4_key.json
-      run: |
-        python sort_collections.py 2>&1 | tee sort_output.txt
-
-    - name: Run update hot items
-      env:
-        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
-        SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
-        GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-        GA4_KEY_FILE: ga4_key.json
-      run: |
-        python update_hot_items.py 2>&1 | tee hot_output.txt
-
-    - name: Write status.json
-      run: |
-        SORT_OUT=$(cat sort_output.txt | tail -5 | tr '\n' '|' | sed 's/"/\\"/g')
-        HOT_OUT=$(cat hot_output.txt | tail -3 | tr '\n' '|' | sed 's/"/\\"/g')
-        NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        SKIPPED=$(grep -c "未夠3日" sort_output.txt || true)
-          if [ "$SKIPPED" -gt "0" ]; then
-          SORT_STATUS="skipped"
-        else
-          SORT_STATUS="done"
-          fi
-        cat > status.json << JSONEOF
-        {
-          "last_run": "$NOW",
-          "sort_status": "$SORT_STATUS",
-          "agents": {
-            "sort_collections": {"status": "$SORT_STATUS", "log": "$SORT_OUT"},
-            "update_hot_items": {"status": "done", "log": "$HOT_OUT"}
-          }
-        }
-        JSONEOF
-
-    - name: Commit status.json
-      run: |
-        git config user.name "LondonKelly Bot"
-        git config user.email "bot@londonkelly.com"
-        git add status.json last_run.txt || true
-        git stash
-        git pull --rebase origin main
-        git stash pop
-        git add status.json last_run.txt || true
-        git diff --staged --quiet || git commit -m "Update status [skip ci]"
-        git push
-
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests google-analytics-data google-auth
+      - name: Write GA4 key
+        run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
+      - name: Run Collection Sorter
+        env:
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        run: python sort_collections.py
+      - name: Commit files
+        run: |
+          git config user.name "LondonKelly Bot"
+          git config user.email "bot@londonkelly.com"
+          git add status.json last_run.txt || true
+          git stash
+          git pull --rebase origin main
+          git stash pop
+          git add status.json last_run.txt || true
+          git diff --staged --quiet || git commit -m "Update status [skip ci]"
+          git push
       - name: Send WhatsApp notification
         if: always()
         run: |
           if [ "${{ job.status }}" = "success" ]; then
             MSG="%F0%9F%A4%96+花花%3A+排序完成"
           else
-            MSG="%F0%9F%86%98+花花+%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
+            MSG="%F0%9F%86%98+花花+失敗%EF%BC%81請檢查+Actions"
           fi
           curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
