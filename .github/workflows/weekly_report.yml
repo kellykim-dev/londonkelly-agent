@@ -42,3 +42,15 @@ jobs:
         git add report.html report_kr.html status.json
         git diff --staged --quiet || git commit -m "Update weekly report [skip ci]"
         git push
+
+    - name: Send WhatsApp notification
+      if: always()
+      run: |
+        STATUS="${{ job.status }}"
+        WF="${{ github.workflow }}"
+        if [ "$STATUS" = "success" ]; then
+          MSG="✅+${WF}+完成！"
+        else
+          MSG="❌+${WF}+失敗！請檢查+Actions"
+        fi
+        curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
