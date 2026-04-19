@@ -2,12 +2,14 @@ name: LondonKelly Hot Items Updater
 
 on:
   schedule:
-    - cron: '0 22 * * 0'  # 每週日香港時間早上6點
+    - cron: '0 22 * * *'  # 每日香港時間早上6點
   workflow_dispatch:
 
 jobs:
   update-hot-items:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       
@@ -20,7 +22,7 @@ jobs:
         run: pip install requests google-analytics-data google-auth
         
       - name: Write GA4 key
-        run: echo '${{ secrets.GA4_KEY_JSON }}' > ga4_key.json
+        run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
         
       - name: Run hot items updater
         env:
