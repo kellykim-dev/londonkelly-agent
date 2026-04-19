@@ -1,10 +1,8 @@
 name: LondonKelly Hot Items Updater
-
 on:
   schedule:
     - cron: '0 22 * * *'
   workflow_dispatch:
-
 jobs:
   update-hot-items:
     runs-on: ubuntu-latest
@@ -12,18 +10,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: pip install requests google-analytics-data google-auth
-
       - name: Write GA4 key
         run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
-
       - name: Run hot items updater
         env:
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
@@ -32,9 +26,9 @@ jobs:
       - name: Send WhatsApp notification
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
+          if [ "${ job.status }" = "success" ]; then
             MSG="%F0%9F%A4%96+阿鼻%3A+Hot+Items+更新完成"
           else
-            MSG="%F0%9F%86%98+阿鼻+%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
+            MSG="%F0%9F%86%98+阿鼻+失敗%EF%BC%81請檢查+Actions"
           fi
-          curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=${ secrets.CALLMEBOT_PHONE }&text=${MSG}&apikey=${ secrets.CALLMEBOT_APIKEY }" || true
