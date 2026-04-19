@@ -25,10 +25,14 @@ jobs:
 
       - name: Send WhatsApp notification
         if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
         run: |
-          if [ "${ job.status }" = "success" ]; then
+          if [ "$JOB_STATUS" = "success" ]; then
             MSG="%F0%9F%A4%96+阿鼻%3A+Hot+Items+更新完成"
           else
-            MSG="%F0%9F%86%98+阿鼻+失敗%EF%BC%81請檢查+Actions"
+            MSG="%F0%9F%86%98+阿鼻%3A+Hot+Items失敗"
           fi
-          curl -s "https://api.callmebot.com/whatsapp.php?phone=${ secrets.CALLMEBOT_PHONE }&text=${MSG}&apikey=${ secrets.CALLMEBOT_APIKEY }" || true
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=$PHONE&text=$MSG&apikey=$APIKEY" || true
