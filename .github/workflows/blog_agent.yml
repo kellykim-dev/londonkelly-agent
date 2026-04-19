@@ -44,11 +44,9 @@ jobs:
       - name: Send WhatsApp notification
         if: always()
         run: |
-          STATUS="${{ job.status }}"
-          WF="${{ github.workflow }}"
-          if [ "$STATUS" = "success" ]; then
-            MSG="✅+${WF}+完成！"
-        else
-            MSG="❌+${WF}+失敗！請檢查+Actions"
+          if [ "${{ job.status }}" = "success" ]; then
+            MSG="%F0%9F%A4%96+咕噹%3A+Blog+Draft+已生成！去+Shopify+審核"
+          else
+            MSG="%F0%9F%86%98+咕噹%E5%A4%B1%E6%95%97%EF%BC%81%E8%AB%8B%E6%AA%A2%E6%9F%A5+Actions"
           fi
           curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
