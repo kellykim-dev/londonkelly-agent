@@ -44,6 +44,7 @@ jobs:
         git add status.json
         git diff --staged --quiet || git commit -m "Update indexing status [skip ci]"
         git push
+
       - name: Send WhatsApp notification
         if: always()
         run: |

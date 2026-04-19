@@ -38,6 +38,7 @@ jobs:
         git diff --staged --quiet || git commit -m "Update content [skip ci]"
         git pull --rebase origin main
         git push
+
       - name: Send WhatsApp notification
         if: always()
         run: |

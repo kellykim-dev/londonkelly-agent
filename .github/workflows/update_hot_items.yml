@@ -28,6 +28,7 @@ jobs:
         env:
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
         run: python update_hot_items.py
+
       - name: Send WhatsApp notification
         if: always()
         run: |
