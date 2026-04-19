@@ -70,7 +70,7 @@ BLOG_SCHEDULE = [
 
 WHATSAPP_LINK = "https://wa.me/85296996990"
 WEBSITE = "https://londonkelly.com.hk"
-BLOG_ID = "56143962176"  # LondonKelly Shopify blog ID
+BLOG_ID = "78071889984"  # LondonKelly Shopify blog ID
 
 def get_current_blog_index():
     """追蹤輪到邊個品牌"""
