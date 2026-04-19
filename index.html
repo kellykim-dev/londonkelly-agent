@@ -185,20 +185,31 @@ function drawPerson(x,y,col,frame,dir,sitting){
   const ra=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.2);
   const ll=sitting?0:Math.round(Math.sin(wf*Math.PI/2)*1.5);
   const rl=sitting?0:Math.round(-Math.sin(wf*Math.PI/2)*1.5);
-  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(P*3,P*17,P*3,P,0,0,Math.PI*2);ctx.fill();
-  row(1,4,0,col.hair);row(1,4,1,col.hair);p(0,1,col.hair);p(5,1,col.hair);
-  row(1,4,2,col.skin);row(1,4,3,col.skin);
-  p(2,2,'#1a1a1a');p(3,2,'#1a1a1a');p(2,3,'#cc4444');
-  p(0,2,col.skin);p(5,2,col.skin);p(2,4,col.skin);p(3,4,col.skin);
-  row(1,4,5,col.shirt);row(1,4,6,col.shirt);row(1,4,7,col.shirt);row(1,4,8,col.shirt);
-  col2(5+la,8+la,0,col.skin);p(0,9+la,col.skin);
-  col2(5+ra,8+ra,5,col.skin);p(5,9+ra,col.skin);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(P*3,P*18,P*3,P,0,0,Math.PI*2);ctx.fill();
+  // 長頭髮
+  p(0,0,col.hair);row(1,4,0,col.hair);p(5,0,col.hair);
+  row(0,5,1,col.hair);row(0,5,2,col.hair);
+  col2(3,9,0,col.hair);col2(3,9,5,col.hair);
+  // 臉
+  row(1,4,3,col.skin);row(1,4,4,col.skin);
+  p(2,3,'#1a1a1a');p(3,3,'#1a1a1a');
+  p(2,4,'#ff6688');p(3,4,'#ff6688');
+  p(0,3,col.skin);p(5,3,col.skin);p(2,5,col.skin);p(3,5,col.skin);
+  // 裙子身體
+  row(1,4,6,col.shirt);row(1,4,7,col.shirt);
+  row(0,5,8,col.shirt);row(0,5,9,col.shirt);
+  row(0,5,10,col.pants);row(0,5,11,col.pants);
+  // 手臂
+  col2(7+la,10+la,0,col.skin);p(0,11+la,col.skin);
+  col2(7+ra,10+ra,5,col.skin);p(5,11+ra,col.skin);
   if(sitting){
-    row(1,2,9,col.pants);row(1,2,10,col.pants);row(3,4,9,col.pants);row(3,4,10,col.pants);
-    row(0,2,11,col.shoe);row(3,5,11,col.shoe);
+    row(1,4,12,col.pants);
+    row(0,5,13,col.shoe);
   }else{
-    col2(9,11+ll,1,col.pants);col2(9,11+ll,2,col.pants);p(1,12+ll,col.shoe);p(2,12+ll,col.shoe);
-    col2(9,11+rl,3,col.pants);col2(9,11+rl,4,col.pants);p(3,12+rl,col.shoe);p(4,12+rl,col.shoe);
+    col2(12,14+ll,1,col.pants);col2(12,14+ll,2,col.pants);
+    p(1,15+ll,col.shoe);p(2,15+ll,col.shoe);
+    col2(12,14+rl,3,col.pants);col2(12,14+rl,4,col.pants);
+    p(3,15+rl,col.shoe);p(4,15+rl,col.shoe);
   }
   ctx.restore();
 }
@@ -218,14 +229,14 @@ function drawBubble(x,y,text,color){
 }
 
 const PCOLS=[
-  {skin:'#FFCCAA',hair:'#2a1000',shirt:'#dd3333',pants:'#223399',shoe:'#1a1a2a'},
-  {skin:'#FFCCAA',hair:'#1a1a1a',shirt:'#9933dd',pants:'#1a3300',shoe:'#2a1a00'},
-  {skin:'#FFDDBB',hair:'#3a1800',shirt:'#ee7700',pants:'#331100',shoe:'#1a1000'},
-  {skin:'#FFD0AA',hair:'#2a1800',shirt:'#1177dd',pants:'#001133',shoe:'#001122'},
-  {skin:'#FFCCAA',hair:'#1a0000',shirt:'#dd4488',pants:'#330011',shoe:'#1a0011'},
-  {skin:'#FFDDCC',hair:'#001a00',shirt:'#33aa33',pants:'#001100',shoe:'#001100'},
-  {skin:'#FFCC99',hair:'#002a2a',shirt:'#009999',pants:'#001a1a',shoe:'#002222'},
-  {skin:'#FFD0AA',hair:'#1a1a00',shirt:'#ddcc00',pants:'#1a1a00',shoe:'#0a0a00'},
+  {skin:'#FFCCAA',hair:'#2a0808',shirt:'#ff6699',pants:'#ff99bb',shoe:'#cc2255'},
+  {skin:'#FFCCAA',hair:'#0a0a0a',shirt:'#cc44ff',pants:'#eebb ff',shoe:'#7700aa'},
+  {skin:'#FFDDBB',hair:'#3a1800',shirt:'#ff8833',pants:'#ffcc99',shoe:'#cc5500'},
+  {skin:'#FFD0AA',hair:'#1a0a30',shirt:'#4499ff',pants:'#aaccff',shoe:'#0044aa'},
+  {skin:'#FFCCAA',hair:'#2a0020',shirt:'#ff44aa',pants:'#ffaadd',shoe:'#cc0077'},
+  {skin:'#FFEECC',hair:'#001a00',shirt:'#44cc66',pants:'#aaffcc',shoe:'#008833'},
+  {skin:'#FFCC99',hair:'#001a2a',shirt:'#00cccc',pants:'#aaffff',shoe:'#007777'},
+  {skin:'#FFD0AA',hair:'#1a1500',shirt:'#ffcc00',pants:'#fff0aa',shoe:'#aa8800'},
 ];
 const dW=P*28,dH=P*20,gX=P*6,sX=P*8,r1Y=50,r2Y=230;
 const DESK_PX=[
@@ -299,6 +310,36 @@ function addLog(cls,txt){
   logEl.appendChild(div);while(logEl.children.length>6)logEl.removeChild(logEl.firstChild);
 }
 fetchStatus();setInterval(fetchStatus,300000);
+
+function playBeep(success){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=success?880:440;
+    o.type='sine';
+    g.gain.setValueAtTime(0.3,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+    o.start();o.stop(ctx.currentTime+0.5);
+  }catch(e){}
+}
+
+let lastStatusHash='';
+async function fetchStatusWithSound(){
+  try{
+    const r=await fetch('status.json?t='+Date.now());
+    const data=await r.json();
+    const hash=JSON.stringify(data);
+    if(lastStatusHash && hash!==lastStatusHash){
+      playBeep(true);
+    }
+    lastStatusHash=hash;
+    realStatus=data;
+    updateFromStatus();
+  }catch(e){}
+}
+fetchStatusWithSound();setInterval(fetchStatusWithSound,60000);
 
 function pb(s,id){
   if(s==='working')return WB[Math.floor(Math.random()*WB.length)];
