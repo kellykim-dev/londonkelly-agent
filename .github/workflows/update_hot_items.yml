@@ -2,7 +2,7 @@ name: LondonKelly Hot Items Updater
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 每日香港時間早上6點
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,31 +12,31 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          
+
       - name: Install dependencies
         run: pip install requests google-analytics-data google-auth
-        
+
       - name: Write GA4 key
         run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
-        
+
       - name: Run hot items updater
         env:
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
         run: python update_hot_items.py
 
       - name: Send WhatsApp notification
-      if: always()
-      run: |
-        STATUS="${{ job.status }}"
-        WF="${{ github.workflow }}"
-        if [ "$STATUS" = "success" ]; then
-          MSG="✅+${WF}+完成！"
-        else
-          MSG="❌+${WF}+失敗！請檢查+Actions"
-        fi
-        curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          WF="${{ github.workflow }}"
+          if [ "$STATUS" = "success" ]; then
+            MSG="✅+${WF}+完成！"
+          else
+            MSG="❌+${WF}+失敗！請檢查+Actions"
+          fi
+          curl -s "https://api.callmebot.com/whatsapp.php?phone=${{ secrets.CALLMEBOT_PHONE }}&text=${MSG}&apikey=${{ secrets.CALLMEBOT_APIKEY }}" || true
