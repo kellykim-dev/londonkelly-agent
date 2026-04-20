@@ -28,11 +28,11 @@ jobs:
         run: |
           git config user.name "LondonKelly Bot"
           git config user.email "bot@londonkelly.com"
-          git add weekly_report.html weekly_report_kr.html status.json
+          git add report.html report_kr.html status.json || true
           git stash
           git pull --rebase origin main
           git stash pop
-          git add weekly_report.html weekly_report_kr.html status.json
+          git add report.html report_kr.html status.json || true
           git diff --staged --quiet || git commit -m "Update weekly report [skip ci]"
           git push
 
