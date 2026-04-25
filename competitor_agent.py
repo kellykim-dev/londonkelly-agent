@@ -159,9 +159,9 @@ def build_status_cards(all_data):
             color = "#00FF88" if p["status"] == "success" else "#FF4444"
             icon = "✅" if p["status"] == "success" else "❌"
             page_lines += f'<div style="font-size:10px;color:{color};margin-top:4px;">{icon} {p["label"]}</div>'
-        cards += f'''<div style="background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:12px;flex:1;">
-            <div style="color:#FFD700;font-size:13px;font-weight:bold;margin-bottom:8px;">{comp["name"]}</div>
-            <div style="color:#00FF88;font-size:11px;">爬取成功: {success}/{total}</div>
+        cards += f'''<div style="background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:12px;flex:1;">
+            <div style="color:#ffd580;font-size:13px;font-weight:800;margin-bottom:8px;">{comp["name"]}</div>
+            <div style="color:#4dd0c4;font-size:11px;">爬取成功: {success}/{total}</div>
             {page_lines}
         </div>'''
     return cards
@@ -171,8 +171,8 @@ def generate_html(all_data, analysis, lang="zh"):
     today = datetime.now().strftime("%Y-%m-%d")
 
     def md2html(t):
-        t = re.sub(r'##+ (.+)', r'<h3 style="color:#FFD700;margin:14px 0 8px;font-size:14px;">\1</h3>', t)
-        t = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color:#88DDFF">\1</strong>', t)
+        t = re.sub(r'##+ (.+)', '<h3 style=\"color:#4dd0c4;margin:14px 0 6px;font-size:14px;font-weight:800;\">\\1</h3>', t)
+        t = re.sub(r'\*\*(.+?)\*\*', '<strong style=\"color:#ffd580;\">\\1</strong>', t)
         t = re.sub(r'^(\d+)\. (.+)', r'<div style="margin:6px 0;"><span style="color:#FFD700">\1.</span> \2</div>', t, flags=re.MULTILINE)
         t = re.sub(r'^- (.+)', r'<li style="margin:4px 0;">\1</li>', t, flags=re.MULTILINE)
         t = re.sub(r'---+', '<hr style="border-color:#1a1a3e;margin:12px 0;">', t)
@@ -184,14 +184,14 @@ def generate_html(all_data, analysis, lang="zh"):
         all_brands = set()
         for page in comp["pages"].values():
             all_brands.update(page.get("brands", []))
-        brand_rows += f"<tr><td style='color:#FFD700;padding:8px;border-bottom:1px solid #1a1a3e;'>{comp['name']}</td><td style='padding:8px;border-bottom:1px solid #1a1a3e;font-size:11px;color:#ccc;'>{', '.join(sorted(all_brands)) if all_brands else '未搵到'}</td></tr>"
+        brand_rows += f"<tr><td style='color:#ffd580;padding:9px 10px;border:1px solid #2a1a50;font-weight:800;'>{comp['name']}</td><td style='padding:9px 10px;border:1px solid #2a1a50;font-size:13px;color:#d0c8e8;'>{', '.join(sorted(all_brands)) if all_brands else '未搵到'}</td></tr>"
 
     price_rows = ""
     for comp in all_data:
         all_prices = []
         for page in comp["pages"].values():
             all_prices.extend(page.get("prices", []))
-        price_rows += f"<tr><td style='color:#FFD700;padding:8px;border-bottom:1px solid #1a1a3e;'>{comp['name']}</td><td style='padding:8px;border-bottom:1px solid #1a1a3e;font-size:11px;color:#00FF88;'>{', '.join(list(set(all_prices))[:6]) if all_prices else '未搵到'}</td></tr>"
+        price_rows += f"<tr><td style='color:#ffd580;padding:9px 10px;border:1px solid #2a1a50;font-weight:800;'>{comp['name']}</td><td style='padding:9px 10px;border:1px solid #2a1a50;font-size:13px;color:#4dd0c4;'>{', '.join(list(set(all_prices))[:6]) if all_prices else '未搵到'}</td></tr>"
 
     status_cards = build_status_cards(all_data)
 
@@ -230,19 +230,28 @@ def generate_html(all_data, analysis, lang="zh"):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title} {today}</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 *{{box-sizing:border-box;margin:0;padding:0;}}
-body{{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}}
+body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:16px;}}
 .wrap{{max-width:720px;margin:0 auto;}}
-.title{{font-family:'Press Start 2P',monospace;color:#FFD700;font-size:9px;text-align:center;padding:12px;background:#2a1808;border:2px solid #5C4A2A;margin-bottom:16px;}}
-.back{{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}}
-.other{{display:block;text-align:center;color:#88DDFF;font-size:11px;margin-bottom:16px;text-decoration:none;border:1px solid #1a1a3e;padding:6px;border-radius:4px;}}
-.section-title{{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin:16px 0 10px;}}
-.analysis{{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:16px;font-size:13px;line-height:1.9;}}
-table{{width:100%;border-collapse:collapse;background:#0a0a1e;border-radius:6px;overflow:hidden;margin-bottom:16px;}}
-th{{background:#1a1a3e;color:#FFD700;padding:10px 8px;text-align:left;font-size:12px;}}
-.footer{{color:#555;font-size:11px;text-align:center;margin-top:16px;}}
+.title{{font-family:'Nunito',sans-serif;font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px 20px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:16px;}}
+.back{{display:inline-flex;align-items:center;gap:6px;color:#ffd580;font-size:13px;font-weight:800;margin-bottom:12px;text-decoration:none;background:rgba(255,213,128,0.1);border:1.5px solid rgba(255,213,128,0.3);padding:7px 16px;border-radius:10px;}}
+.back:hover{{background:rgba(255,213,128,0.2);}}
+.other{{display:block;text-align:center;color:#b0a0d0;font-size:13px;font-weight:700;margin-bottom:14px;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:9px;border-radius:10px;}}
+.other:hover{{background:#2a1a40;color:#f0e8c0;}}
+.section-title{{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 8px;}}
+.analysis{{background:#130d25;border:1.5px solid #2a1a50;border-radius:12px;padding:18px;font-size:14px;line-height:1.9;}}
+.analysis h3{{color:#4dd0c4;margin:14px 0 6px;font-size:14px;font-weight:800;}}
+.analysis strong{{color:#ffd580;}}
+.analysis hr{{border:none;border-top:1px solid #2a1a50;margin:12px 0;}}
+.analysis li{{margin:4px 0;}}
+table{{width:100%;border-collapse:collapse;margin-bottom:16px;border-radius:8px;overflow:hidden;}}
+th{{background:#1a1030;color:#ffd580;padding:10px;border:1px solid #2a1a50;text-align:left;font-size:13px;font-weight:800;}}
+td{{padding:9px 10px;border:1px solid #2a1a50;font-size:13px;color:#d0c8e8;}}
+.status-card{{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:12px;flex:1;}}
+.footer{{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}}
 </style>
 </head>
 <body>
@@ -256,7 +265,7 @@ th{{background:#1a1a3e;color:#FFD700;padding:10px 8px;text-align:left;font-size:
   <table>
     <tr><th>{brand_th[0]}</th><th>{brand_th[1]}</th></tr>
     {brand_rows}
-    <tr><td style="color:#FFD700;padding:8px;">LondonKelly</td><td style="padding:8px;font-size:11px;color:#ccc;">{lk_brands}</td></tr>
+    <tr><td style="color:#ffd580;padding:9px 10px;font-weight:800;">LondonKelly</td><td style="padding:9px 10px;font-size:13px;color:#d0c8e8;">{lk_brands}</td></tr>
   </table>
   <div class="section-title">&gt;_ {section_price}</div>
   <table>

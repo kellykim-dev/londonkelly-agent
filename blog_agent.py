@@ -238,13 +238,13 @@ def generate_html_report(blogs_drafted):
     items = ""
     for b in blogs_drafted:
         items += f"""
-        <div style="background:#0a0a1e;border:1px solid #1a1a3e;border-radius:8px;padding:16px;margin-bottom:16px;">
-            <div style="color:#FFD700;font-size:14px;font-weight:bold;margin-bottom:8px;">📝 {b['title']}</div>
-            <div style="color:#888;font-size:11px;margin-bottom:8px;">品牌：{b['brand']} ｜ 類型：{b['type']}</div>
-            {'<div style="color:#00FF88;font-size:11px;margin-bottom:12px;">✅ Shopify Draft: <a href="' + b['shopify_url'] + '" target="_blank" style="color:#88DDFF;">' + b['shopify_url'] + '</a></div>' if b.get('shopify_url') else '<div style="color:#FF8800;font-size:11px;margin-bottom:12px;">⚠️ 未上傳 Shopify</div>'}
+        <div class="blog-entry">
+            <div class="blog-entry-title">📝 {b['title']}</div>
+            <div class="blog-entry-meta">品牌：{b['brand']} ｜ 類型：{b['type']}</div>
+            {'<div class="blog-entry-link">✅ Shopify Draft: <a href="' + b['shopify_url'] + '" target="_blank" style="color:#88DDFF;">' + b['shopify_url'] + '</a></div>' if b.get('shopify_url') else '<div style="color:#FF8800;font-size:11px;margin-bottom:12px;">⚠️ 未上傳 Shopify</div>'}
             <details>
-                <summary style="color:#88DDFF;cursor:pointer;font-size:12px;">👁️ 預覽 HTML 內容</summary>
-                <div style="margin-top:12px;padding:12px;background:#050515;border-radius:4px;font-size:12px;color:#ccc;max-height:300px;overflow-y:auto;">
+                <summary style="color:#90caf9;cursor:pointer;font-size:13px;font-weight:700;">👁️ 預覽 HTML 內容</summary>
+                <div style="margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;font-size:12px;color:#b0a0d0;max-height:300px;overflow-y:auto;line-height:1.8;">
                     {b['content'][:1000]}...
                 </div>
             </details>
@@ -256,15 +256,28 @@ def generate_html_report(blogs_drafted):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LondonKelly Blog Drafts</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
-body{{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}}
-.wrap{{max-width:720px;margin:0 auto;}}
-.title{{font-family:'Press Start 2P',monospace;color:#FFD700;font-size:9px;text-align:center;padding:12px;background:#2a1808;border:2px solid #5C4A2A;margin-bottom:16px;}}
-.back{{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}}
-.section{{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin:16px 0 10px;}}
-.note{{background:#0a0a1e;border:1px solid #333;border-radius:6px;padding:12px;margin-bottom:16px;font-size:12px;color:#aaa;line-height:2;}}
-.footer{{color:#555;font-size:11px;text-align:center;margin-top:16px;}}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
+*{{box-sizing:border-box;margin:0;padding:0;}}
+body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:16px;}}
+.wrap{{max-width:700px;margin:0 auto;}}
+.title{{font-family:'Nunito',sans-serif;font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px 20px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:16px;}}
+.back{{display:inline-flex;align-items:center;gap:6px;color:#ffd580;font-size:13px;font-weight:800;margin-bottom:12px;text-decoration:none;background:rgba(255,213,128,0.1);border:1.5px solid rgba(255,213,128,0.3);padding:7px 16px;border-radius:10px;}}
+.back:hover{{background:rgba(255,213,128,0.2);}}
+.other{{display:block;text-align:center;color:#b0a0d0;font-size:13px;font-weight:700;margin-bottom:14px;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:9px;border-radius:10px;}}
+.other:hover{{background:#2a1a40;color:#f0e8c0;}}
+.section-title{{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 8px;}}
+.footer{{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}}
+.section{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 10px;}
+.note{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#d0c8e8;line-height:2;}
+.note a{color:#90caf9;}
+.blog-entry{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:14px;}
+.blog-entry-title{color:#ffd580;font-size:14px;font-weight:800;margin-bottom:8px;}
+.blog-entry-meta{color:#8070a0;font-size:11px;margin-bottom:8px;}
+.blog-entry-link{color:#90caf9;font-size:11px;margin-bottom:12px;}
+.blog-entry summary{color:#90caf9;cursor:pointer;font-size:13px;font-weight:700;}
+details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;font-size:12px;color:#b0a0d0;max-height:300px;overflow-y:auto;line-height:1.8;}
 </style>
 </head>
 <body>
