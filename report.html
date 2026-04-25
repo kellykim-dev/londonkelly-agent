@@ -4,90 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LondonKelly 週報</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:16px;}
-.wrap{max-width:700px;margin:0 auto;}
-
-/* Title */
-.title{font-family:'Nunito',sans-serif;font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px 20px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:16px;letter-spacing:1px;}
-.week{color:#b0a0d0;font-size:13px;text-align:center;margin-bottom:16px;font-weight:700;}
-
-/* Nav */
-.back{display:inline-flex;align-items:center;gap:6px;color:#ffd580;font-size:13px;font-weight:800;margin-bottom:12px;text-decoration:none;background:rgba(255,213,128,0.1);border:1.5px solid rgba(255,213,128,0.3);padding:7px 16px;border-radius:10px;transition:all .2s;}
-.back:hover{background:rgba(255,213,128,0.2);}
-.other{display:block;text-align:center;color:#b0a0d0;font-size:13px;font-weight:700;margin-bottom:14px;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:9px;border-radius:10px;transition:all .2s;}
-.other:hover{background:#2a1a40;color:#f0e8c0;}
-
-/* Stat cards */
+body{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}
+.wrap{max-width:600px;margin:0 auto;}
+.title{font-family:'Press Start 2P',monospace;color:#FFD700;font-size:10px;text-align:center;padding:12px;background:#2a1808;border:2px solid #5C4A2A;margin-bottom:16px;}
+.week{color:#88DDFF;font-size:12px;text-align:center;margin-bottom:16px;}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;text-align:center;}
-.card-label{color:#8070a0;font-size:12px;margin-bottom:6px;font-weight:700;}
-.card-value{color:#4dd0c4;font-size:22px;font-weight:800;}
-.card-value.gold{color:#ffd580;}
-.card-value.blue{color:#90caf9;}
-
-/* Analysis */
-.analysis{background:#130d25;border:1.5px solid #2a1a50;border-radius:12px;padding:18px;font-size:14px;line-height:1.9;}
-.analysis-title{font-family:'Nunito',sans-serif;font-weight:800;color:#4dd0c4;font-size:13px;margin-bottom:14px;}
-.analysis h3{color:#4dd0c4;margin:14px 0 6px;font-size:14px;font-weight:800;}
-.analysis strong{color:#ffd580;}
-.analysis hr{border:none;border-top:1px solid #2a1a50;margin:12px 0;}
-.analysis pre,.analysis code{background:#0d0820;border:1px solid #2a1a50;border-radius:6px;padding:8px;display:block;margin:8px 0;font-size:12px;color:#81c784;font-family:monospace;white-space:pre-wrap;}
-.analysis blockquote{border-left:3px solid #ffd580;padding-left:12px;color:#b0a0d0;margin:8px 0;}
-.analysis table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
-.analysis th,.analysis td{border:1px solid #2a1a50;padding:6px 10px;text-align:left;}
-.analysis th{background:#1a1030;color:#ffd580;font-weight:800;}
-.analysis li{margin:4px 0;padding-left:4px;}
-
-/* Section titles */
-.section-title{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
-
-/* Status cards (competitor page) */
-.status-grid{display:flex;gap:10px;margin-bottom:16px;}
-.status-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:12px;flex:1;}
-
-/* Tables (competitor page) */
-table{width:100%;border-collapse:collapse;margin-bottom:16px;border-radius:8px;overflow:hidden;}
-th{background:#1a1030;color:#ffd580;padding:10px 10px;text-align:left;font-size:13px;font-weight:800;border-bottom:1.5px solid #2a1a50;}
-td{padding:9px 10px;border-bottom:1px solid #1a1030;font-size:13px;color:#d0c8e8;}
-tr:last-child td{border-bottom:none;}
-
-/* Product cards (content page) */
-.products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-.product-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:10px;padding:10px;position:relative;}
-.product-vendor{color:#ffd580;font-size:11px;margin-bottom:4px;font-weight:800;}
-.product-title{color:#d0c8e8;font-size:11px;margin-bottom:6px;line-height:1.5;}
-.product-price{color:#4dd0c4;font-size:14px;font-weight:800;}
-.original{color:#4a3a6a;font-size:11px;text-decoration:line-through;margin-left:6px;}
-.discount-badge{position:absolute;top:8px;right:8px;background:#e74c3c;color:white;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}
-
-/* Post cards (content page) */
-.post-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:12px;}
-.post-header{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center;}
-.post-day{color:#ffd580;font-size:12px;font-weight:800;}
-.post-theme{color:#8070a0;font-size:11px;font-weight:700;}
-.post-title{color:#ffd580;font-size:15px;font-weight:800;margin-bottom:8px;}
-.post-content{color:#d0c8e8;font-size:13px;line-height:1.8;margin-bottom:10px;}
-.post-hashtags{color:#4a90d9;font-size:11px;margin-bottom:8px;line-height:1.8;}
-.post-notes{color:#6a5a8a;font-size:11px;margin-bottom:10px;font-style:italic;}
-.copy-btn{background:#1a2a3a;border:1.5px solid #2a3a5a;color:#90caf9;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
-.copy-btn:hover{background:#2a3a5a;}
-.copied-msg{color:#81c784;font-size:12px;margin-top:6px;}
-
-/* Blog draft page */
-.note{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#d0c8e8;line-height:2;}
-.note a{color:#90caf9;}
-.section{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 10px;}
-.blog-entry{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:14px;}
-.blog-entry summary{color:#90caf9;cursor:pointer;font-size:13px;font-weight:700;}
-details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;font-size:12px;color:#b0a0d0;max-height:300px;overflow-y:auto;line-height:1.8;}
-
-/* Footer */
-.footer{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}
-
+.card{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:12px;text-align:center;}
+.card-label{color:#888;font-size:11px;margin-bottom:4px;}
+.card-value{color:#00FF88;font-size:20px;font-weight:bold;}
+.card-value.gold{color:#FFD700;}
+.card-value.blue{color:#88DDFF;}
+.analysis{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:16px;font-size:14px;line-height:1.8;}
+.analysis-title{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin-bottom:12px;}
+.footer{color:#555;font-size:11px;text-align:center;margin-top:12px;}
+.back{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}
+.other{display:block;text-align:center;color:#88DDFF;font-size:11px;margin-bottom:16px;text-decoration:none;border:1px solid #1a1a3e;padding:6px;border-radius:4px;}
 </style>
 </head>
 <body>
@@ -99,7 +33,7 @@ details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;fo
   <div class="cards">
     <div class="card">
       <div class="card-label">Sessions</div>
-      <div class="card-value blue">57,026</div>
+      <div class="card-value blue">58,327</div>
     </div>
     <div class="card">
       <div class="card-label">用戶數</div>
@@ -124,12 +58,9 @@ details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;fo
   </div>
   <div class="analysis">
     <div class="analysis-title">>_ Claude 分析</div>
-    # LondonKelly 週報<br><h3 style="color:#4dd0c4;margin:12px 0 6px;">📅 2026-04-13 ~ 2026-04-19</h3><br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#4dd0c4;margin:12px 0 6px;">📊 本週表現總結</h3><br><br>本週流量強勁，Sessions 突破 <strong>5.7萬</strong>，但流量轉化至成交仍有明顯落差。整體廣告效益極為出色，以低成本帶動高回報，收入近 <strong>HK$73K</strong>。<br><br><table><tr><th>指標</th><th>數據</th></tr><tr><td>👥 Sessions</td><td>57,026</td></tr><tr><td>👤 用戶數</td><td>54,463</td></tr><tr><td>📄 Page Views</td><td>74,389</td></tr><tr><td>🛒 加購物車</td><td>276</td></tr><tr><td>✅ 成交</td><td>22</td></tr><tr><td>💰 收入</td><td>HK$72,986</td></tr><tr><td>📣 廣告花費</td><td>HK$1,259.92</td></tr><tr><td>📈 ROAS</td><td>34.9x</td></tr></table>
-       加購率 0.48%    成交率 8.0%
-       整體轉化率僅 0.04%
-</pre><br><br>> 每 2,592 個訪客只有 1 人成交<br>> 大量流量未能有效承接 💸<br><br><strong>🛒 加購但未付款問題</strong><br>276 人加購，只有 22 人完成付款<br><strong>棄購率高達 92%</strong>，需深入了解原因<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#4dd0c4;margin:12px 0 6px;">🎯 下週建議行動</h3><br><br><strong>1️⃣ 推出棄購挽回流程</strong><br>針對加購未付款用戶發送 WhatsApp / Email 提醒，提供限時優惠或專人跟進，目標棄購率降至 80% 以下<br><br><strong>2️⃣ 優化產品頁至加購體驗</strong><br>檢視流量最高但加購率低的頁面，改善產品圖片、真實買家評價及到港時間說明，降低用戶猶豫<br><br><strong>3️⃣ 擴大廣告預算測試</strong><br>ROAS 34.9x 遠超健康水平，建議本週廣告預算提升 <strong>30-50%</strong> 做測試，趁現有素材效果好時加速收割<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br>*📝 報告由數據分析團隊整理 | 如有疑問請聯絡分析師*
+    # LondonKelly 週報<br><h3 style="color:#00FF88;margin:12px 0 6px;">2026-04-13 ~ 2026-04-19</h3><br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#00FF88;margin:12px 0 6px;">📊 本週表現總結</h3><br><br>本週流量強勁，Sessions突破58K，惟轉化率極低，大量訪客未能轉化為購買，整體業績仍有相當大提升空間。<br><br>| 指標 | 數據 |<br>|<hr style="border-color:#1a1a3e;margin:10px 0;">|<hr style="border-color:#1a1a3e;margin:10px 0;">|<br>| 👥 Sessions | 58,327 |<br>| 👤 用戶數 | 54,463 |<br>| 📄 Page Views | 74,389 |<br>| 🛒 加購物車 | 276 |<br>| ✅ 成交 | 22 |<br>| 💰 收入 | HK$72,986 |<br>| 📢 廣告花費 | HK$1,259.92 |<br>| 📈 ROAS | 34.9x |<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#00FF88;margin:12px 0 6px;">✨ 亮點</h3><br><br><strong>🔥 ROAS 34.9x — 廣告效益極高</strong><br>每HK$1廣告費帶來近HK$35收入，遠超行業平均，廣告投放方向正確。<br><br><strong>📣 流量規模健康</strong><br>58K Sessions反映品牌曝光度良好，SEO或社交媒體引流有成效。<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#00FF88;margin:12px 0 6px;">⚠️ 需要關注問題</h3><br><br><strong>1️⃣ 轉化率極低 — 最大警號</strong><br>> Sessions → 成交轉化率僅 <strong>0.038%</strong><br>> 加購物車率僅 <strong>0.47%</strong><br><br>即係每1,000個訪客，連5個都唔加購物車 😬<br><br><strong>2️⃣ 加購 → 成交流失嚴重</strong><br>276人加購，最終只有22人付款<br>棄單率高達 <strong>92%</strong> 🚨<br><br><strong>3️⃣ 每單平均客價 HK$3,317</strong><br>客單價不低，但成交量太少，收入潛力未被釋放。<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br><h3 style="color:#00FF88;margin:12px 0 6px;">💡 下週建議行動</h3><br><br><strong>① 🛒 棄單挽回 — 立即執行</strong><br>設置棄購物車自動WhatsApp／Email提醒，針對276位已加購用戶跟進，目標挽回10%即額外22單。<br><br><strong>② 📄 檢查落地頁體驗</strong><br>74K Page Views但極少加購，懷疑產品頁資訊不足或信任度不夠。建議檢視：<br><li style="margin:4px 0;">產品圖片質素</li><br><li style="margin:4px 0;">代購流程說明是否清晰</li><br><li style="margin:4px 0;">客戶評價／正品保證標章是否顯眼</li><br><br><strong>③ 💰 善用高ROAS勢頭加碼投放</strong><br>ROAS 34.9x表現優異，建議將廣告預算提升20-30%，趁勢擴大觸及，同時A/B測試不同受眾群組。<br><br><hr style="border-color:#1a1a3e;margin:10px 0;"><br><br>> 📝 <strong>總結一句話：流量夠，但漏斗中間嚴重漏水，下週重點補底。</strong>
   </div>
-  <div class="footer">由 LondonKelly Agent 生成 · 2026-04-20 04:54</div>
+  <div class="footer">由 LondonKelly Agent 生成 · 2026-04-25 22:00</div>
 </div>
 </body>
 </html>
