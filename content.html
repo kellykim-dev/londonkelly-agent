@@ -4,132 +4,75 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LondonKelly 本週內容</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:16px;}
-.wrap{max-width:700px;margin:0 auto;}
-
-/* Title */
-.title{font-family:'Nunito',sans-serif;font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px 20px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:16px;letter-spacing:1px;}
-.week{color:#b0a0d0;font-size:13px;text-align:center;margin-bottom:16px;font-weight:700;}
-
-/* Nav */
-.back{display:inline-flex;align-items:center;gap:6px;color:#ffd580;font-size:13px;font-weight:800;margin-bottom:12px;text-decoration:none;background:rgba(255,213,128,0.1);border:1.5px solid rgba(255,213,128,0.3);padding:7px 16px;border-radius:10px;transition:all .2s;}
-.back:hover{background:rgba(255,213,128,0.2);}
-.other{display:block;text-align:center;color:#b0a0d0;font-size:13px;font-weight:700;margin-bottom:14px;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:9px;border-radius:10px;transition:all .2s;}
-.other:hover{background:#2a1a40;color:#f0e8c0;}
-
-/* Stat cards */
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;text-align:center;}
-.card-label{color:#8070a0;font-size:12px;margin-bottom:6px;font-weight:700;}
-.card-value{color:#4dd0c4;font-size:22px;font-weight:800;}
-.card-value.gold{color:#ffd580;}
-.card-value.blue{color:#90caf9;}
-
-/* Analysis */
-.analysis{background:#130d25;border:1.5px solid #2a1a50;border-radius:12px;padding:18px;font-size:14px;line-height:1.9;}
-.analysis-title{font-family:'Nunito',sans-serif;font-weight:800;color:#4dd0c4;font-size:13px;margin-bottom:14px;}
-.analysis h3{color:#4dd0c4;margin:14px 0 6px;font-size:14px;font-weight:800;}
-.analysis strong{color:#ffd580;}
-.analysis hr{border:none;border-top:1px solid #2a1a50;margin:12px 0;}
-.analysis pre,.analysis code{background:#0d0820;border:1px solid #2a1a50;border-radius:6px;padding:8px;display:block;margin:8px 0;font-size:12px;color:#81c784;font-family:monospace;white-space:pre-wrap;}
-.analysis blockquote{border-left:3px solid #ffd580;padding-left:12px;color:#b0a0d0;margin:8px 0;}
-.analysis table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
-.analysis th,.analysis td{border:1px solid #2a1a50;padding:6px 10px;text-align:left;}
-.analysis th{background:#1a1030;color:#ffd580;font-weight:800;}
-.analysis li{margin:4px 0;padding-left:4px;}
-
-/* Section titles */
-.section-title{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
-
-/* Status cards (competitor page) */
-.status-grid{display:flex;gap:10px;margin-bottom:16px;}
-.status-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:12px;flex:1;}
-
-/* Tables (competitor page) */
-table{width:100%;border-collapse:collapse;margin-bottom:16px;border-radius:8px;overflow:hidden;}
-th{background:#1a1030;color:#ffd580;padding:10px 10px;text-align:left;font-size:13px;font-weight:800;border-bottom:1.5px solid #2a1a50;}
-td{padding:9px 10px;border-bottom:1px solid #1a1030;font-size:13px;color:#d0c8e8;}
-tr:last-child td{border-bottom:none;}
-
-/* Product cards (content page) */
+body{background:#1a1208;color:#eee;font-family:sans-serif;padding:16px;}
+.wrap{max-width:680px;margin:0 auto;}
+.title{font-family:'Press Start 2P',monospace;color:#FFD700;font-size:9px;text-align:center;padding:12px;background:#2a1808;border:2px solid #5C4A2A;margin-bottom:16px;}
+.back{display:block;text-align:center;color:#FFD700;font-size:11px;margin-bottom:12px;text-decoration:none;font-family:'Press Start 2P',monospace;}
+.section-title{font-family:'Press Start 2P',monospace;color:#00FF88;font-size:7px;margin:16px 0 10px;}
 .products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-.product-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:10px;padding:10px;position:relative;}
-.product-vendor{color:#ffd580;font-size:11px;margin-bottom:4px;font-weight:800;}
-.product-title{color:#d0c8e8;font-size:11px;margin-bottom:6px;line-height:1.5;}
-.product-price{color:#4dd0c4;font-size:14px;font-weight:800;}
-.original{color:#4a3a6a;font-size:11px;text-decoration:line-through;margin-left:6px;}
-.discount-badge{position:absolute;top:8px;right:8px;background:#e74c3c;color:white;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}
-
-/* Post cards (content page) */
-.post-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:12px;}
-.post-header{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center;}
-.post-day{color:#ffd580;font-size:12px;font-weight:800;}
-.post-theme{color:#8070a0;font-size:11px;font-weight:700;}
-.post-title{color:#ffd580;font-size:15px;font-weight:800;margin-bottom:8px;}
-.post-content{color:#d0c8e8;font-size:13px;line-height:1.8;margin-bottom:10px;}
-.post-hashtags{color:#4a90d9;font-size:11px;margin-bottom:8px;line-height:1.8;}
-.post-notes{color:#6a5a8a;font-size:11px;margin-bottom:10px;font-style:italic;}
-.copy-btn{background:#1a2a3a;border:1.5px solid #2a3a5a;color:#90caf9;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
-.copy-btn:hover{background:#2a3a5a;}
-.copied-msg{color:#81c784;font-size:12px;margin-top:6px;}
-
-/* Blog draft page */
-.note{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#d0c8e8;line-height:2;}
-.note a{color:#90caf9;}
-.section{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 10px;}
-.blog-entry{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:14px;}
-.blog-entry summary{color:#90caf9;cursor:pointer;font-size:13px;font-weight:700;}
-details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;font-size:12px;color:#b0a0d0;max-height:300px;overflow-y:auto;line-height:1.8;}
-
-/* Footer */
-.footer{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}
-
+.product-card{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:6px;padding:10px;position:relative;}
+.product-vendor{color:#FFD700;font-size:10px;margin-bottom:4px;}
+.product-title{color:#ccc;font-size:11px;margin-bottom:6px;line-height:1.4;}
+.product-price{color:#00FF88;font-size:14px;font-weight:bold;}
+.original{color:#555;font-size:11px;text-decoration:line-through;}
+.discount-badge{position:absolute;top:8px;right:8px;background:#FF4444;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;}
+.post-card{background:#0a0a1e;border:1px solid #1a1a3e;border-radius:8px;padding:16px;margin-bottom:12px;}
+.post-header{display:flex;justify-content:space-between;margin-bottom:8px;}
+.post-day{color:#FFD700;font-family:'Press Start 2P',monospace;font-size:7px;}
+.post-theme{color:#888;font-size:11px;}
+.post-title{color:#00FF88;font-size:15px;font-weight:bold;margin-bottom:8px;}
+.post-content{color:#ddd;font-size:13px;line-height:1.7;margin-bottom:10px;}
+.post-hashtags{color:#88DDFF;font-size:11px;margin-bottom:10px;line-height:1.8;}
+.post-notes{color:#666;font-size:11px;margin-bottom:10px;font-style:italic;}
+.copy-btn{background:#1a1a3e;border:1px solid #00FF88;color:#00FF88;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;}
+.copy-btn:hover{background:#00FF88;color:#000;}
+.copied-msg{color:#00FF88;font-size:12px;margin-top:6px;}
+.footer{color:#555;font-size:11px;text-align:center;margin-top:16px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <a href="index.html" class="back">← 返回辦公室</a>
-  <div class="title">★ 本週社群內容 2026-04-21 ★</div>
+  <div class="title">★ 本週社群內容 2026-04-25 ★</div>
   <div class="section-title">&gt;_ 本週特價產品（有貨）</div>
   <div class="products">
         <div class="product-card">
             <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Heart JaDior Hair Clip | ...</div>
+            <div class="product-title">CHRISTIAN DIOR Heart JaDior Hair Clip Go...</div>
             <div class="product-price">HK$1920 <span class="original">HK$3800</span></div>
             <div class="discount-badge">-49%</div>
         </div>
         <div class="product-card">
             <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Medium Diorcamp Bag | 迪奧 ...</div>
+            <div class="product-title">CHRISTIAN DIOR Diorcamp Bag Oblique Jacq...</div>
             <div class="product-price">HK$28950 <span class="original">HK$36000</span></div>
             <div class="discount-badge">-20%</div>
         </div>
         <div class="product-card">
             <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Diortravel Backpack | 迪奧 ...</div>
-            <div class="product-price">HK$21080 <span class="original">HK$25500</span></div>
-            <div class="discount-badge">-17%</div>
-        </div>
-        <div class="product-card">
-            <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Oblique Hooded Poncho | 迪...</div>
-            <div class="product-price">HK$9185 <span class="original">HK$11000</span></div>
-            <div class="discount-badge">-17%</div>
-        </div>
-        <div class="product-card">
-            <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Small Diorcamp Bag | 迪奧 手...</div>
+            <div class="product-title">CHRISTIAN DIOR Diorcamp Bag Cowhide Leat...</div>
             <div class="product-price">HK$24930 <span class="original">HK$30000</span></div>
             <div class="discount-badge">-17%</div>
         </div>
         <div class="product-card">
             <div class="product-vendor">Christian Dior</div>
-            <div class="product-title">CHRISTIAN DIOR Small DiorTravel Vanity C...</div>
+            <div class="product-title">CHRISTIAN DIOR Diortravel Backpack Obliq...</div>
+            <div class="product-price">HK$21080 <span class="original">HK$25500</span></div>
+            <div class="discount-badge">-17%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Christian Dior</div>
+            <div class="product-title">CHRISTIAN DIOR DiorTravel Vanity Case Ob...</div>
             <div class="product-price">HK$17760 <span class="original">HK$21500</span></div>
+            <div class="discount-badge">-17%</div>
+        </div>
+        <div class="product-card">
+            <div class="product-vendor">Christian Dior</div>
+            <div class="product-title">CHRISTIAN DIOR Oblique Hooded Poncho Cot...</div>
+            <div class="product-price">HK$9185 <span class="original">HK$11000</span></div>
             <div class="discount-badge">-17%</div>
         </div></div>
   <div class="section-title">&gt;_ 7日內容計劃</div>
@@ -137,36 +80,36 @@ details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;fo
         <div class="post-card" id="post-0">
             <div class="post-header">
                 <span class="post-day">週一</span>
-                <span class="post-theme">限時優惠登場</span>
+                <span class="post-theme">限時優惠開跑</span>
             </div>
-            <div class="post-title">🔥 本週 Dior 限時特賣！最高勁減 49%！</div>
-            <div class="post-content">全新一週嘅 LondonKelly 特賣正式開始！今週精選多款 Christian Dior 人氣單品，最平低至半價，包括經典老花系列手袋、背囊及時尚配飾，全部英國正價門市直送，正品保證無懸念。心動唔好等，早買早享受，貨量有限先到先得！</div>
-            <div class="post-hashtags">#LondonKelly #英國代購 #Dior #迪奧 #ChristianDior #代購優惠 #正品保證 #英國直送 #奢侈品代購 #限時特賣</div>
-            <div class="post-notes">適合配搭本週所有產品拼圖，Instagram 可用 Carousel 格式展示多款產品；Facebook 可附上產品連結；Threads 可加入問答互動，例如：「你最想入手哪一件？」</div>
+            <div class="post-title">🔥 本週 Dior 特價來了！最高減49%，錯過等一年！</div>
+            <div class="post-content">LondonKelly 本週精選 Christian Dior 特價貨品，由髮夾到手袋一應俱全，最抵係 Heart JaDior Hair Clip，原價 HK$3800，今週只需 HK$1920，足足減少一半！所有貨品均由英國正店直送，正品保證，安心購物。立即 DM 我哋查詢，數量有限，先到先得！</div>
+            <div class="post-hashtags">#LondonKelly #香港代購 #Dior代購 #ChristianDior #英國直送 #正品保證 #限時優惠 #奢侈品代購 #香港時尚 #DiorSale</div>
+            <div class="post-notes">Instagram 建議配上 Heart JaDior Hair Clip 產品平放圖；Facebook 可附上完整特價清單；Threads 可用輕鬆語氣問讀者最想入手哪件</div>
             <button class="copy-btn" onclick="copyPost(0)">📋 複製</button>
             <div class="copied-msg" id="copied-0" style="display:none">✅ 已複製！</div>
         </div>
         <div class="post-card" id="post-1">
             <div class="post-header">
                 <span class="post-day">週二</span>
-                <span class="post-theme">明星產品介紹</span>
+                <span class="post-theme">產品介紹 — Diorcamp Bag</span>
             </div>
-            <div class="post-title">💙 Dior 藍色老花系列｜一次過收齊全套！</div>
-            <div class="post-content">Dior 標誌性藍色 Oblique 老花系列一向係潮人至愛，今週 LondonKelly 帶來多款藍色老花單品，包括 Diorcamp 郵差袋（中碼 HK$28,950）、Diortravel 背囊（HK$21,080）及化妝盒袋（HK$17,760），比香港門市慳最多 17%。由英國直接入手，正品有保障，仲可以省去親身排隊嘅煩惱！</div>
-            <div class="post-hashtags">#LondonKelly #DiorOblique #迪奧老花 #Dior藍色 #DiorBag #迪奧手袋 #英國代購 #奢侈品 #正品代購 #Dior2026</div>
-            <div class="post-notes">Instagram 建議用藍色系產品照片，視覺統一感強；可Tag 朋友分享；Facebook 可製作產品比較圖，列出三款藍色老花單品價格對比。</div>
+            <div class="post-title">👜 出街必備：Diorcamp Bag，時尚與實用兼備</div>
+            <div class="post-content">Christian Dior Diorcamp Bag 以標誌性 Oblique Jacquard 布料製成，設計率性瀟灑，係都市型人嘅日常首選。今週 Medium Blue 款特價 HK$28,950（原價 HK$36,000），Small Blue 款 HK$25,890（原價 HK$31,000），更有 Small Black 真皮款 HK$24,930，三款任你揀！LondonKelly 由英國專業採購，全程正品保障，放心入手。</div>
+            <div class="post-hashtags">#LondonKelly #DiorCamp #Dior手袋 #ChristianDior #香港代購 #奢侈品手袋 #英國直送 #Oblique #正品代購 #香港時尚</div>
+            <div class="post-notes">Instagram 建議用三款 Diorcamp Bag 拼圖展示；Facebook 可列出三款價格比較；Threads 可問讀者喜歡 Oblique 布料定皮革款</div>
             <button class="copy-btn" onclick="copyPost(1)">📋 複製</button>
             <div class="copied-msg" id="copied-1" style="display:none">✅ 已複製！</div>
         </div>
         <div class="post-card" id="post-2">
             <div class="post-header">
                 <span class="post-day">週三</span>
-                <span class="post-theme">品牌故事</span>
+                <span class="post-theme">品牌故事 — Christian Dior</span>
             </div>
-            <div class="post-title">👑 認識 Christian Dior｜為何 Dior 值得你投資？</div>
-            <div class="post-content">Christian Dior 自 1946 年創立以來，一直係法國高級時裝嘅代名詞，以精緻工藝、優雅設計征服全球時尚愛好者。每一件 Dior 單品背後都承載着無數工匠嘅心血，無論係手袋、服飾定係配飾，都係經得起時間考驗嘅投資之選。LondonKelly 直接從英國門市為你帶來正價貨品，讓你以更實惠嘅價格擁有真正嘅 Dior 品味！</div>
-            <div class="post-hashtags">#LondonKelly #ChristianDior #Dior品牌故事 #法國奢侈品 #時尚投資 #英國代購 #奢侈品代購 #Dior正品 #時尚品味 #代購香港</div>
-            <div class="post-notes">建議配搭 Dior 品牌歷史圖片或經典廣告畫面；Threads 可分享一個關於 Dior 品牌嘅有趣小知識帶動討論；Instagram 可用 Story 做小測驗：「你對 Dior 認識幾多？」</div>
+            <div class="post-title">✨ 認識 Christian Dior：一個改變時裝歷史的名字</div>
+            <div class="post-content">1947年，Christian Dior 在巴黎推出「New Look」系列，以優雅線條重新定義女性美學，震驚整個時裝界，從此奠定品牌傳奇地位。時至今日，Dior 的每一件單品都承載著近八十年的工藝傳承與法式優雅，由標誌性 Oblique 印花到精緻金屬配件，細節盡見心思。透過 LondonKelly，你可以從英國直接購入這份傳奇，價錢更比香港零售更實惠。</div>
+            <div class="post-hashtags">#LondonKelly #ChristianDior #Dior品牌故事 #法式優雅 #奢侈品牌 #香港代購 #英國直送 #時裝歷史 #DiorHeritage #正品保證</div>
+            <div class="post-notes">Instagram 建議配上 Dior 經典黑白歷史感圖片或品牌 logo 特寫；Facebook 可加入品牌歷史簡介作長文貼；Threads 可用問答形式考考讀者 Dior 知識</div>
             <button class="copy-btn" onclick="copyPost(2)">📋 複製</button>
             <div class="copied-msg" id="copied-2" style="display:none">✅ 已複製！</div>
         </div>
@@ -175,22 +118,22 @@ details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;fo
                 <span class="post-day">週四</span>
                 <span class="post-theme">代購攻略</span>
             </div>
-            <div class="post-title">📦 英國代購點揀？LondonKelly 教你避坑指南！</div>
-            <div class="post-content">代購市場魚龍混雜，點樣確保買到正品係最多客人問嘅問題！LondonKelly 所有貨品直接從英國正規門市或授權零售商購入，附有正式收據及原裝包裝，全程透明，讓你安心每一分錢都花得值。我哋仲提供專業包裝及保險服務，確保貨品安全抵達你手中，由下單到收貨全程跟進，代購無憂！</div>
-            <div class="post-hashtags">#LondonKelly #代購攻略 #英國代購 #正品保證 #代購安心 #奢侈品代購 #香港代購 #代購須知 #Dior代購 #安全代購</div>
-            <div class="post-notes">此 post 教育性較強，適合 Facebook 長文配合圖文並茂；Instagram 可製作 Carousel 圖文，逐步解釋 LondonKelly 購物流程；Threads 可鼓勵用戶留言分享代購經歷。</div>
+            <div class="post-title">📦 第一次代購？跟住呢5步，安心從英國入手正品！</div>
+            <div class="post-content">好多朋友問代購係咪安全可靠，LondonKelly 為你拆解整個流程：①客人落單確認款式 → ②我哋親自到英國 Dior 門市採購 → ③拍攝實物及購買收據作實 → ④專業包裝直送香港 → ⑤安全到手！全程透明，正品有保證，仲有購買憑證隨貨附上，讓你買得安心、用得放心。今週 Dior 特價貨品仲有多款在售，立即 DM 查詢！</div>
+            <div class="post-hashtags">#LondonKelly #代購攻略 #香港代購 #英國代購 #正品保證 #ChristianDior #安心代購 #代購流程 #奢侈品代購 #英國直送</div>
+            <div class="post-notes">Instagram 建議製作步驟式輪播圖（Carousel）；Facebook 可做詳細長文教學；Threads 適合用 5 點列表形式呈現，輕鬆易讀</div>
             <button class="copy-btn" onclick="copyPost(3)">📋 複製</button>
             <div class="copied-msg" id="copied-3" style="display:none">✅ 已複製！</div>
         </div>
         <div class="post-card" id="post-4">
             <div class="post-header">
                 <span class="post-day">週五</span>
-                <span class="post-theme">單品精選推介</span>
+                <span class="post-theme">產品介紹 — 旅行系列</span>
             </div>
-            <div class="post-title">✨ 平日都可以好有型｜Dior 髮夾 + 皮帶驚喜減價！</div>
-            <div class="post-content">奢華唔一定要大件！今週 LondonKelly 特別推介兩款超值配飾：Dior Heart JaDior 髮夾勁減 49%，現售 HK$1,920（原價 HK$3,800），心形設計甜美優雅，係入門 Dior 嘅最佳選擇；另有 30 Montaigne 雙面皮帶（35mm）減至 HK$6,100，兩色可選，百搭實用。配件控快啲手，靚價唔等人！</div>
-            <div class="post-hashtags">#LondonKelly #Dior髮夾 #DiorBelt #迪奧配飾 #JaDior #30Montaigne #英國代購 #奢侈品配飾 #Dior入門 #半價優惠</div>
-            <div class="post-notes">Instagram 適合用精美特寫產品照；髮夾減幅達49%非常吸引，可重點標示「-49%」字眼製造視覺衝擊；Facebook 可做「你更鍾意哪一款？」投票功能。</div>
+            <div class="post-title">🧳 旅行季節到！Dior Travel 系列陪你走遍世界</div>
+            <div class="post-content">五一假期快到，係時候為你嘅旅行裝備升級！今週 Dior Travel 系列特價發售：Diortravel Backpack Oblique Jacquard Navy 款 HK$21,080（原價 HK$25,500），DiorTravel Vanity Case Small Blue 款 HK$17,760（原價 HK$21,500），行李配搭成套更有型！兩件均以品牌標誌性 Oblique 印花設計，耐用兼顯品味，由 LondonKelly 英國直送，正品保障無憂。</div>
+            <div class="post-hashtags">#LondonKelly #DiorTravel #Dior背囊 #旅行必備 #ChristianDior #香港代購 #英國直送 #奢侈品旅行袋 #五一旅遊 #正品代購</div>
+            <div class="post-notes">Instagram 建議配上旅行場景生活化照片搭配產品；Facebook 可強調五一假期限時購入的訊息；Threads 可問讀者五一假期打算去哪旅行互動</div>
             <button class="copy-btn" onclick="copyPost(4)">📋 複製</button>
             <div class="copied-msg" id="copied-4" style="display:none">✅ 已複製！</div>
         </div>
@@ -199,26 +142,26 @@ details>div{margin-top:12px;padding:12px;background:#0d0820;border-radius:8px;fo
                 <span class="post-day">週六</span>
                 <span class="post-theme">客戶見證</span>
             </div>
-            <div class="post-title">💬 客人真實分享｜收到 Dior 包包嘅一刻！</div>
-            <div class="post-content">每次見到客人開箱嘅興奮表情，都係 LondonKelly 最大嘅動力！上週有客人入手咗 Dior Small Diorcamp 黑色手袋（現售 HK$24,930），話收貨時包裝完好無缺，正品質感同英國門市一模一樣，非常滿意。我哋深信每一位客人都值得擁有最好嘅購物體驗，正品、安心、準時，係 LondonKelly 嘅承諾！</div>
-            <div class="post-hashtags">#LondonKelly #客戶見證 #真實分享 #Dior開箱 #DiorBag #迪奧手袋 #英國代購 #正品保證 #滿意購物 #代購信賴</div>
-            <div class="post-notes">如有真實客人相片（需獲授權）效果最佳；Instagram Stories 可做「客人話我知」系列；Facebook 可轉載真實評論截圖（已獲客人同意）；Threads 邀請網友分享自己嘅代購經歷。</div>
+            <div class="post-title">💬 顧客真實心聲：「收到貨嗰刻，真係開心到喊！」</div>
+            <div class="post-content">收到好多顧客嘅感謝訊息，係我哋最大嘅動力！有顧客分享：「第一次用 LondonKelly 代購 Dior 手袋，整個過程好透明，收到貨有收據有實物圖，完全放心，下次一定再幫襯！」正品保證、英國直送、全程跟進，係 LondonKelly 對每位顧客嘅承諾。今週 Dior 特價尚餘多款，歡迎 DM 了解詳情，加入我哋的快樂購物大家庭！</div>
+            <div class="post-hashtags">#LondonKelly #客戶見證 #真實好評 #香港代購 #ChristianDior #英國直送 #正品保證 #代購推薦 #奢侈品代購 #購物開心</div>
+            <div class="post-notes">Instagram 建議配上顧客收貨開箱感覺的生活照（需事先取得顧客同意）；Facebook 可貼出顧客截圖（截名）增加信任感；Threads 可邀請舊顧客在留言分享體驗</div>
             <button class="copy-btn" onclick="copyPost(5)">📋 複製</button>
             <div class="copied-msg" id="copied-5" style="display:none">✅ 已複製！</div>
         </div>
         <div class="post-card" id="post-6">
             <div class="post-header">
                 <span class="post-day">週日</span>
-                <span class="post-theme">限時優惠倒數</span>
+                <span class="post-theme">限時優惠倒數 + 穿搭配搭建議</span>
             </div>
-            <div class="post-title">⏰ 最後召集！本週 Dior 特價即將結束！</div>
-            <div class="post-content">本週 LondonKelly Dior 特賣最後一日！仲未入手嘅朋友要把握最後機會，由 -16% 至 -49% 嘅超值折扣今日截止，包括人氣 Oblique 連帽披肩（HK$9,185）、老花短袖連帽上衣（HK$10,540）等多款時裝及手袋均係最後機會。DM 我哋或瀏覽網站立即落單，英國直送到府，下週就可以收到心愛嘅 Dior！</div>
-            <div class="post-hashtags">#LondonKelly #最後機會 #限時優惠 #Dior特賣 #迪奧 #英國代購 #今日截止 #快手入手 #奢侈品優惠 #DiorFashion</div>
-            <div class="post-notes">加入倒數元素製造緊迫感，Instagram Stories 可用倒數貼圖；Facebook 可Pin此 post 至頁面頂部增加曝光；Threads 可直接呼籲用戶Tag想一齊入手嘅朋友，增加互動及分享。</div>
+            <div class="post-title">⏰ 最後一天！Dior 本週特價今日結束，仲有呢些款等緊你</div>
+            <div class="post-content">本週 Dior 特價活動今日最後一天！推薦最後入手組合：Oblique Hooded Sweatshirt Cotton Navy（HK$10,540）配搭 Oblique Hooded Poncho Cotton Navy（HK$9,185），帽衫加披風，同色系 Oblique 印花造型完整又時尚；再加上 30 Montaigne Reversible Belt Calfskin Beige 或 Black（HK$6,100），一 belt 雙面用，百搭到極！英國直送、正品保證，今日 DM 仲趕得切，唔好錯過！</div>
+            <div class="post-hashtags">#LondonKelly #最後機會 #限時優惠 #ChristianDior #Dior穿搭 #香港代購 #英國直送 #正品保證 #DiorOblique #奢侈品優惠</div>
+            <div class="post-notes">Instagram 建議製作穿搭 flat lay 拼圖，展示 Sweatshirt、Poncho 及 Belt 組合；Facebook 可加上倒數提醒及完整本週特價清單作最後推廣；Threads 可輕鬆問讀者本週有無入手，製造互動話題</div>
             <button class="copy-btn" onclick="copyPost(6)">📋 複製</button>
             <div class="copied-msg" id="copied-6" style="display:none">✅ 已複製！</div>
         </div>
-  <div class="footer">由 LondonKelly Agent 啾皮 生成 · 2026-04-21 21:11</div>
+  <div class="footer">由 LondonKelly Agent 啾皮 生成 · 2026-04-25 22:20</div>
 </div>
 <script>
 function copyPost(i) {
