@@ -159,24 +159,24 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 .other:hover{{background:#2a1a40;color:#f0e8c0;}}
 .section-title{{color:#4dd0c4;font-size:13px;font-weight:800;margin:16px 0 8px;}}
 .footer{{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}}
-.products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-.product-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:10px;padding:10px;position:relative;}
-.product-vendor{color:#ffd580;font-size:11px;margin-bottom:4px;font-weight:800;}
-.product-title{color:#d0c8e8;font-size:11px;margin-bottom:6px;line-height:1.5;}
-.product-price{color:#4dd0c4;font-size:14px;font-weight:800;}
-.original{color:#4a3a6a;font-size:11px;text-decoration:line-through;margin-left:6px;}
-.discount-badge{position:absolute;top:8px;right:8px;background:#e74c3c;color:white;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}
-.post-card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:12px;}
-.post-header{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center;}
-.post-day{color:#ffd580;font-size:12px;font-weight:800;}
-.post-theme{color:#8070a0;font-size:11px;font-weight:700;}
-.post-title{color:#ffd580;font-size:15px;font-weight:800;margin-bottom:8px;}
-.post-content{color:#d0c8e8;font-size:13px;line-height:1.8;margin-bottom:10px;}
-.post-hashtags{color:#4a90d9;font-size:11px;margin-bottom:8px;line-height:1.8;}
-.post-notes{color:#6a5a8a;font-size:11px;margin-bottom:10px;font-style:italic;}
-.copy-btn{background:#1a2a3a;border:1.5px solid #2a3a5a;color:#90caf9;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
-.copy-btn:hover{background:#2a3a5a;}
-.copied-msg{color:#81c784;font-size:12px;margin-top:6px;}
+.products{{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}}
+.product-card{{background:#1a1030;border:1.5px solid #2a1a50;border-radius:10px;padding:10px;position:relative;}}
+.product-vendor{{color:#ffd580;font-size:11px;margin-bottom:4px;font-weight:800;}}
+.product-title{{color:#d0c8e8;font-size:11px;margin-bottom:6px;line-height:1.5;}}
+.product-price{{color:#4dd0c4;font-size:14px;font-weight:800;}}
+.original{{color:#4a3a6a;font-size:11px;text-decoration:line-through;margin-left:6px;}}
+.discount-badge{{position:absolute;top:8px;right:8px;background:#e74c3c;color:white;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}}
+.post-card{{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:16px;margin-bottom:12px;}}
+.post-header{{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center;}}
+.post-day{{color:#ffd580;font-size:12px;font-weight:800;}}
+.post-theme{{color:#8070a0;font-size:11px;font-weight:700;}}
+.post-title{{color:#ffd580;font-size:15px;font-weight:800;margin-bottom:8px;}}
+.post-content{{color:#d0c8e8;font-size:13px;line-height:1.8;margin-bottom:10px;}}
+.post-hashtags{{color:#4a90d9;font-size:11px;margin-bottom:8px;line-height:1.8;}}
+.post-notes{{color:#6a5a8a;font-size:11px;margin-bottom:10px;font-style:italic;}}
+.copy-btn{{background:#1a2a3a;border:1.5px solid #2a3a5a;color:#90caf9;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}}
+.copy-btn:hover{{background:#2a3a5a;}}
+.copied-msg{{color:#81c784;font-size:12px;margin-top:6px;}}
 </style>
 </head>
 <body>
