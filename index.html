@@ -35,6 +35,23 @@ canvas#oc{display:block;width:100%;image-rendering:pixelated;}
 .notif-toast{border-radius:12px;padding:10px 16px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;animation:slideIn .4s ease,fadeOut .5s 3.5s forwards;min-width:200px;}
 @keyframes slideIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 @keyframes fadeOut{to{opacity:0;transform:translateY(-8px);}}
+
+#chatbox{background:#07030f;border-top:2px solid #1a0e35;padding:12px 16px;}
+#chat-title{color:#ffd580;font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+#chat-msgs{background:#0a0518;border-radius:10px;padding:10px;min-height:80px;max-height:200px;overflow-y:auto;margin-bottom:10px;font-size:13px;line-height:1.8;}
+.chat-msg-user{color:#ffd580;margin:4px 0;}.chat-msg-user::before{content:'你：';}
+.chat-msg-bot{color:#4dd0c4;margin:4px 0;}.chat-msg-bot::before{content:'🤖 ';}
+.chat-msg-sys{color:#8070a0;font-size:11px;margin:4px 0;}
+#chat-input-row{display:flex;gap:8px;}
+#chat-input{flex:1;background:#1a1030;border:1.5px solid #2a1a50;color:#f0e8c0;padding:9px 14px;border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;}
+#chat-input:focus{border-color:#4dd0c4;}
+#chat-send{background:#4dd0c4;color:#0f0820;border:none;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+#chat-send:hover{background:#6de0d4;}
+#trigger-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+.trigger-btn{background:#1a1030;border:1.5px solid #2a1a50;color:#b0a0d0;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;text-align:center;}
+.trigger-btn:hover{background:#2a1a40;color:#ffd580;border-color:#ffd580;}
+.trigger-btn.running{border-color:#ff9800;color:#ff9800;animation:p 1.2s infinite;}
+.trigger-btn.done{border-color:#4caf50;color:#4caf50;}
 </style>
 </head>
 <body>
@@ -371,6 +388,115 @@ function animate(){
   requestAnimationFrame(animate);
 }
 animate();
+
+
+// ── Chat Box ──────────────────────────────────────────
+const GITHUB_TOKEN = ''; // 可以留空，用無 token 方式 trigger
+const REPO = 'kellykim-dev/londonkelly-agent';
+
+function addMsg(text, type) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'chat-msg-' + type;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function triggerAgent(workflow, label) {
+  const btn = event.target;
+  btn.classList.add('running');
+  btn.textContent = '⏳ 跑緊...';
+  addMsg(`觸發 ${label} agent...`, 'sys');
+  
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${workflow}.yml/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'Authorization': 'token ' + GITHUB_TOKEN
+      },
+      body: JSON.stringify({ref: 'main'})
+    });
+    
+    if (resp.status === 204) {
+      btn.classList.remove('running');
+      btn.classList.add('done');
+      btn.textContent = '✅ 已觸發！';
+      addMsg(`✅ ${label} 已開始跑！約1-2分鐘完成。`, 'bot');
+      setTimeout(() => {
+        btn.classList.remove('done');
+        btn.textContent = {
+          'weekly_report': '📊 跑週報',
+          'content_agent': '🌸 跑內容',
+          'competitor_agent': '🔍 跑競爭',
+          'blog_agent': '✍️ 跑部落格'
+        }[workflow] || label;
+      }, 10000);
+    } else if (resp.status === 401) {
+      addMsg('⚠️ 需要 GitHub Token 先可以手動觸發。請去 GitHub Settings → Personal Access Tokens 建立。', 'bot');
+      btn.classList.remove('running');
+      btn.textContent = '⚠️ 需要Token';
+    } else {
+      addMsg(`❌ 觸發失敗 (${resp.status})`, 'bot');
+      btn.classList.remove('running');
+    }
+  } catch(e) {
+    addMsg('❌ 網絡錯誤：' + e.message, 'bot');
+    btn.classList.remove('running');
+  }
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMsg(msg, 'user');
+  
+  // Check for trigger commands
+  const triggers = {
+    '跑週報': 'weekly_report', '週報': 'weekly_report',
+    '跑內容': 'content_agent', '內容': 'content_agent',
+    '跑競爭': 'competitor_agent', '競爭': 'competitor_agent',
+    '跑部落格': 'blog_agent', '部落格': 'blog_agent',
+  };
+  for (const [keyword, workflow] of Object.entries(triggers)) {
+    if (msg.includes(keyword)) {
+      await triggerAgent(workflow, keyword);
+      return;
+    }
+  }
+  
+  // Send to Claude API
+  addMsg('思考中...', 'sys');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: 'You are LondonKelly AI assistant. LondonKelly is a UK luxury proxy purchasing service targeting HK/Taiwan/Macau. Answer in Traditional Chinese. Be concise.',
+        messages: [{role: 'user', content: msg}]
+      })
+    });
+    const data = await resp.json();
+    const answer = data.content?.[0]?.text || '抱歉，無法回應。';
+    // Remove thinking message
+    const msgs = document.getElementById('chat-msgs');
+    const last = msgs.lastChild;
+    if (last && last.textContent === '思考中...') msgs.removeChild(last);
+    addMsg(answer, 'bot');
+  } catch(e) {
+    const msgs = document.getElementById('chat-msgs');
+    const last = msgs.lastChild;
+    if (last && last.textContent === '思考中...') msgs.removeChild(last);
+    addMsg('提示：輸入「跑週報」、「跑內容」、「跑競爭」或「跑部落格」可手動觸發 agents！', 'bot');
+  }
+}
+
 </script>
 </body>
 </html>
