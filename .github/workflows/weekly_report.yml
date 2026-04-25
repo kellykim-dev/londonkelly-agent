@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install dependencies
-        run: pip install requests anthropic google-analytics-data google-auth
+        run: pip install requests anthropic google-analytics-data google-auth gspread
       - name: Write GA4 key
         run: echo '${{ secrets.GA4_KEY_FILE }}' > ga4_key.json
       - name: Run Weekly Report
