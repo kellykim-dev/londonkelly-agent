@@ -296,6 +296,23 @@ Keywords: {kw_summary if kw_summary else '(데이터 없음)'}
     return message.content[0].text
 
 def md2html(t):
+    # Convert markdown tables to HTML tables
+    import re as re2
+    def convert_table(match):
+        block = match.group(0)
+        lines = [l.strip() for l in block.split('\n') if l.strip().startswith('|')]
+        out = '<table class="data-table">'
+        header_done = False
+        for line in lines:
+            if re2.match(r'^\|[\s\-\|:]+\|$', line): continue
+            cells = [c.strip() for c in line.strip('|').split('|')]
+            if not header_done:
+                out += '<tr>' + ''.join(f'<th>{c}</th>' for c in cells) + '</tr>'
+                header_done = True
+            else:
+                out += '<tr>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>'
+        return out + '</table>'
+    t = re2.sub(r'(\|[^\n]+\n)+\|[^\n]+', convert_table, t)
     t = re.sub(r'##+ (.+)', r'<h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">\1</h3>', t)
     t = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color:#ffd580;">\1</strong>', t)
     t = re.sub(r'^- (.+)', r'<li style="margin:4px 0;">\1</li>', t, flags=re.MULTILINE)
