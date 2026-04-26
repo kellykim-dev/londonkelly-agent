@@ -82,66 +82,25 @@ def get_ga4_data():
             "add_to_carts": ch_carts, "conv_rate": conv_rate
         })
 
-    # 3a. Google Ads Keywords with conversion (from GA4)
-    ads_kw_req = RunReportRequest(
+    # 3. Top organic keywords (from organic search)
+    kw_req = RunReportRequest(
         property=f"properties/{GA4_PROPERTY_ID}",
         date_ranges=[date_range],
         dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
-        metrics=[
-            Metric(name="sessions"),
-            Metric(name="ecommercePurchases"),
-            Metric(name="purchaseRevenue"),
-        ],
-        order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
+        metrics=[Metric(name="sessions"), Metric(name="ecommercePurchases")],
+        order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"), desc=True)],
         limit=20
     )
-    ads_kw = client.run_report(ads_kw_req)
-    ads_keywords = []
-    for r in ads_kw.rows:
+    kw = client.run_report(kw_req)
+    keywords = []
+    for r in kw.rows:
         kw_name = r.dimension_values[0].value
         if kw_name and kw_name != "(not set)" and kw_name != "(not provided)":
-            ads_keywords.append({
+            keywords.append({
                 "keyword": kw_name,
                 "sessions": int(r.metric_values[0].value),
-                "purchases": int(r.metric_values[1].value),
-                "revenue": round(float(r.metric_values[2].value), 0),
+                "purchases": int(r.metric_values[1].value)
             })
-
-    # 3b. Organic Search Keywords with conversion (from GA4)
-    org_kw_req = RunReportRequest(
-        property=f"properties/{GA4_PROPERTY_ID}",
-        date_ranges=[date_range],
-        dimensions=[
-            Dimension(name="sessionSourceMedium"),
-            Dimension(name="sessionGoogleAdsKeyword"),
-        ],
-        metrics=[
-            Metric(name="sessions"),
-            Metric(name="ecommercePurchases"),
-            Metric(name="purchaseRevenue"),
-        ],
-        order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
-        limit=30
-    )
-    org_kw = client.run_report(org_kw_req)
-    org_keywords = []
-    for r in org_kw.rows:
-        src = r.dimension_values[0].value
-        kw_name = r.dimension_values[1].value
-        purchases = int(r.metric_values[1].value)
-        sessions = int(r.metric_values[0].value)
-        revenue = round(float(r.metric_values[2].value), 0)
-        # Only organic (google/organic or bing/organic etc)
-        if "organic" in src.lower() and sessions > 0:
-            org_keywords.append({
-                "source": src,
-                "keyword": kw_name if kw_name and kw_name != "(not set)" else "(not provided)",
-                "sessions": sessions,
-                "purchases": purchases,
-                "revenue": revenue,
-            })
-
-    keywords = ads_keywords  # backward compat
 
     # 4. Top landing pages
     lp_req = RunReportRequest(
@@ -162,8 +121,8 @@ def get_ga4_data():
             "purchases": int(r.metric_values[2].value)
         })
 
-    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords)} | Org KW: {len(org_keywords)}")
-    return overview, channels, keywords, landing_pages, ads_keywords, org_keywords
+    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
+    return overview, channels, keywords, landing_pages
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")
@@ -226,7 +185,7 @@ def get_ads_data_from_sheets():
                 "conversions": 0, "conv_value": 0, "ctr": "0%", "week": "",
                 "ad_groups": [], "keywords": [], "search_terms": []}
 
-def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", ads_keywords=None, org_keywords=None):
+def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh"):
     print(f"  🤖 Claude 分析 ({'繁中' if lang=='zh' else '韓文'})...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
@@ -267,22 +226,6 @@ def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", 
         for p in landing_pages[:5]
     ])
 
-    # Ads keywords from GA4
-    ads_kw_summary = ""
-    if ads_keywords:
-        ads_kw_summary = "\n".join([
-            f"  {k['keyword']}: {k['sessions']} sessions | {k['purchases']} 成交 | HK${k['revenue']:,.0f}"
-            for k in (ads_keywords or [])[:15]
-        ])
-
-    # Organic keywords from GA4
-    org_kw_summary = ""
-    if org_keywords:
-        org_kw_summary = "\n".join([
-            f"  {k['keyword']} ({k['source']}): {k['sessions']} sessions | {k['purchases']} 成交 | HK${k['revenue']:,.0f}"
-            for k in (org_keywords or [])[:15]
-        ])
-
     if lang == "zh":
         prompt = f"""你係 LondonKelly 嘅數據分析師，用繁體中文寫詳細週報。
 LondonKelly 係英國代購，賣歐洲奢侈品，目標客戶香港/台灣/澳門。
@@ -312,12 +255,6 @@ Impressions: {ads.get('impressions',0):,} | CTR: {ads.get('ctr','')} | Conversio
 
 【Top Landing Pages】
 {lp_summary}
-
-【GA4 Google Ads Keywords（有 conversion 排最頂）】
-{ads_kw_summary if ads_kw_summary else '(暫無數據)'}
-
-【GA4 Organic Keywords】
-{org_kw_summary if org_kw_summary else '(大部分 organic keyword 係 not provided，Google 唔俾)'}
 
 請寫完整分析報告，包括：
 ## 📊 本週表現總結
@@ -383,7 +320,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh"):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -441,6 +378,28 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{k.get('Clicks',0)}</td>
               <td>HK${k.get('花費(HKD)',0)}</td>
               <td>{k.get('Conversions',0)}</td>
+            </tr>"""
+
+    # GA4 Ads keywords table
+    ads_kw_rows = ""
+    if ads_keywords:
+        for k in (ads_keywords or [])[:10]:
+            ads_kw_rows += f"""<tr>
+              <td><strong>{k.get('keyword','')}</strong></td>
+              <td>{k.get('sessions',0):,}</td>
+              <td>{k.get('purchases',0)}</td>
+              <td>HK${k.get('revenue',0):,.0f}</td>
+            </tr>"""
+
+    # GA4 Organic keywords table
+    org_kw_rows = ""
+    if org_keywords:
+        for k in (org_keywords or [])[:10]:
+            org_kw_rows += f"""<tr>
+              <td>{k.get('keyword','')}</td>
+              <td><span style="color:#8070a0;font-size:11px">{k.get('source','')}</span></td>
+              <td>{k.get('sessions',0):,}</td>
+              <td>{k.get('purchases',0)}</td>
             </tr>"""
 
     # Search terms table
@@ -513,9 +472,7 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  {'<div class="section-title">🔑 ' + kw_title + '</div><table class="data-table"><tr><th>Keyword (GA4 Ads)</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + ads_kw_rows + '</table>' if ads_kw_rows else ''}
-
-  {'<div class="section-title">🌿 Organic Keywords (GA4)</div><table class="data-table"><tr><th>Keyword</th><th>Source</th><th>Sessions</th><th>成交</th></tr>' + org_kw_rows + '</table>' if org_kw_rows else ''}
+  {'<div class="section-title">🔑 ' + kw_title + '</div><table class="data-table"><tr><th>Keyword</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + kw_rows + '</table>' if kw_rows else ''}
 
   {'<div class="section-title">🔍 ' + st_title + '</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
 
@@ -545,16 +502,16 @@ def update_status(success):
 
 if __name__ == "__main__":
     print("🚀 LondonKelly Weekly Report Agent 啟動...")
-    ga4, channels, kw_ga4, landing_pages, ads_keywords, org_keywords = get_ga4_data()
+    ga4, channels, kw_ga4, landing_pages = get_ga4_data()
     ads = get_ads_data_from_sheets()
 
     print("🤖 Claude 分析緊（繁中）...")
-    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
+    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh")
 
     print("🤖 Claude 분석 중（韓文）...")
-    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
+    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr")
 
     update_status(True)
     print("✅ 完成！")
