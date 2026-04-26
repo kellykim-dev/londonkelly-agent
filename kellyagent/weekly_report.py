@@ -296,6 +296,23 @@ Keywords: {kw_summary if kw_summary else '(데이터 없음)'}
     return message.content[0].text
 
 def md2html(t):
+    # Convert markdown tables to HTML tables
+    import re as re2
+    def convert_table(match):
+        block = match.group(0)
+        lines = [l.strip() for l in block.split('\n') if l.strip().startswith('|')]
+        out = '<table class="data-table">'
+        header_done = False
+        for line in lines:
+            if re2.match(r'^\|[\s\-\|:]+\|$', line): continue
+            cells = [c.strip() for c in line.strip('|').split('|')]
+            if not header_done:
+                out += '<tr>' + ''.join(f'<th>{c}</th>' for c in cells) + '</tr>'
+                header_done = True
+            else:
+                out += '<tr>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>'
+        return out + '</table>'
+    t = re2.sub(r'(\|[^\n]+\n)+\|[^\n]+', convert_table, t)
     t = re.sub(r'##+ (.+)', r'<h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">\1</h3>', t)
     t = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color:#ffd580;">\1</strong>', t)
     t = re.sub(r'^- (.+)', r'<li style="margin:4px 0;">\1</li>', t, flags=re.MULTILINE)
@@ -303,7 +320,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh"):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -361,6 +378,28 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{k.get('Clicks',0)}</td>
               <td>HK${k.get('花費(HKD)',0)}</td>
               <td>{k.get('Conversions',0)}</td>
+            </tr>"""
+
+    # GA4 Ads keywords table
+    ads_kw_rows = ""
+    if ads_keywords:
+        for k in (ads_keywords or [])[:10]:
+            ads_kw_rows += f"""<tr>
+              <td><strong>{k.get('keyword','')}</strong></td>
+              <td>{k.get('sessions',0):,}</td>
+              <td>{k.get('purchases',0)}</td>
+              <td>HK${k.get('revenue',0):,.0f}</td>
+            </tr>"""
+
+    # GA4 Organic keywords table
+    org_kw_rows = ""
+    if org_keywords:
+        for k in (org_keywords or [])[:10]:
+            org_kw_rows += f"""<tr>
+              <td>{k.get('keyword','')}</td>
+              <td><span style="color:#8070a0;font-size:11px">{k.get('source','')}</span></td>
+              <td>{k.get('sessions',0):,}</td>
+              <td>{k.get('purchases',0)}</td>
             </tr>"""
 
     # Search terms table
@@ -468,11 +507,11 @@ if __name__ == "__main__":
 
     print("🤖 Claude 分析緊（繁中）...")
     analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh")
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     print("🤖 Claude 분석 중（韓文）...")
     analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr")
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     update_status(True)
     print("✅ 完成！")
