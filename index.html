@@ -173,359 +173,150 @@ setTimeout(()=>showToast('✅ 咕嚕 Indexing 完成！200 URLs submitted','done
 setTimeout(()=>showToast('↻ 啾皮 社群內容 進行中...','working'),8000);
 setTimeout(()=>showToast('✅ 阿鼻 Hot Items 更新完成！','done'),14000);
 
-
-// ── Asset URLs ───────────────────────────────────────
-const BASE = 'assets/';
-const imgs = {};
-const toLoad = ['Interiors_free_16x16','Room_Builder_free_16x16','Adam_run_16x16','Amelia_run_16x16','Alex_run_16x16','Bob_run_16x16'];
-let loaded = 0;
-toLoad.forEach(name => {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => { loaded++; if(loaded===toLoad.length) animate(); };
-  img.onerror = () => { loaded++; if(loaded===toLoad.length) animate(); };
-  img.src = BASE + name + '.png';
-  imgs[name] = img;
-});
-
-const TW=16,TH=16;
-
-// Room_Builder tilemap - office left (0-37cols), break room right (38-59cols), 34 rows
-// Using actual tileset rows from Interiors_free_16x16.png
-// Row 0-1: walls/floors, Row 2+: furniture
-
-// Tileset positions (sx, sy) = tile coords in Interiors_free_16x16.png
-// Each tile is 16x16
-const T = {
-  // Floor tiles (row 0 in tileset)
-  FLOOR_WOOD: [0, 0],
-  FLOOR_DARK: [1, 0],
-  FLOOR_CARPET: [2, 0],
-  // Wall tiles (row 1)
-  WALL: [0, 1],
-  WALL_WINDOW: [3, 1],
-  // Desk (row 2-3)
-  DESK_TL: [0, 2], DESK_TR: [1, 2],
-  DESK_BL: [0, 3], DESK_BR: [1, 3],
-  // Computer on desk
-  PC_L: [2, 2], PC_R: [3, 2],
-  // Bookshelf
-  SHELF_TL: [4, 2], SHELF_TR: [5, 2],
-  SHELF_BL: [4, 3], SHELF_BR: [5, 3],
-  // Sofa
-  SOFA_TL: [6, 4], SOFA_TM: [7, 4], SOFA_TR: [8, 4],
-  SOFA_BL: [6, 5], SOFA_BM: [7, 5], SOFA_BR: [8, 5],
-  // Plant
-  PLANT: [9, 2],
-  // Coffee table
-  TABLE_L: [10, 4], TABLE_R: [11, 4],
-};
-
 function rr(x,y,w,h,r,fill,stroke,lw){
   cx.beginPath();cx.roundRect(x,y,w,h,r);
   if(fill){cx.fillStyle=fill;cx.fill();}
   if(stroke){cx.strokeStyle=stroke;cx.lineWidth=lw||1;cx.stroke();}
 }
-
-// Draw a single 16x16 tile from tileset at canvas position
-function drawTile(img, sx, sy, dx, dy, scale=1){
-  if(!img || !img.complete || img.naturalWidth===0) {
-    // Fallback colored rect
-    cx.fillStyle = (sx+sy)%2===0 ? '#b8885a' : '#c49a6c';
-    cx.fillRect(dx, dy, TW*scale, TH*scale);
-    return;
-  }
-  cx.drawImage(img, sx*TW, sy*TH, TW, TH, dx, dy, TW*scale, TH*scale);
+function drawLamp(x,y,col){
+  cx.strokeStyle='#555';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,y-4);cx.stroke();
+  rr(x-28,y-4,56,10,3,'#2a2a3a','#3a3a5a',1);
+  cx.fillStyle=col||'#ffe8a0';cx.fillRect(x-24,y+5,48,4);
+  const grd=cx.createRadialGradient(x,y+20,2,x,y+20,70);
+  grd.addColorStop(0,'rgba(255,235,150,0.22)');grd.addColorStop(1,'rgba(255,235,150,0)');
+  cx.fillStyle=grd;cx.beginPath();cx.ellipse(x,y+20,70,40,0,0,Math.PI*2);cx.fill();
 }
-
-// Draw room using Room_Builder tileset
-function drawRoom(){
-  const rb = imgs['Room_Builder_free_16x16'];
-  const int = imgs['Interiors_free_16x16'];
-  
-  // Office floor - wood (rows 1-13, cols 1-37)
-  for(let ty=1; ty<14; ty++){
-    for(let tx=1; tx<38; tx++){
-      // Use floor tile from Room_Builder - row 1, alternating tiles
-      const alt = (tx+ty)%2;
-      if(rb && rb.complete && rb.naturalWidth > 0){
-        cx.drawImage(rb, alt*TW, TH, TW, TH, tx*TW, ty*TH, TW, TH);
-      } else {
-        cx.fillStyle = alt ? '#c49a6c' : '#b8885a';
-        cx.fillRect(tx*TW, ty*TH, TW, TH);
-        cx.strokeStyle='rgba(0,0,0,0.1)';cx.lineWidth=0.3;cx.strokeRect(tx*TW, ty*TH, TW, TH);
-      }
-    }
-  }
-  
-  // Break room floor - dark tiles (rows 1-13, cols 39-59)
-  for(let ty=1; ty<14; ty++){
-    for(let tx=39; tx<60; tx++){
-      if(rb && rb.complete && rb.naturalWidth > 0){
-        cx.drawImage(rb, 2*TW, TH, TW, TH, tx*TW, ty*TH, TW, TH);
-      } else {
-        const alt = (tx+ty)%2;
-        cx.fillStyle = alt ? '#2e2644' : '#261e3a';
-        cx.fillRect(tx*TW, ty*TH, TW, TH);
-      }
-    }
-  }
-
-  // Top wall - office
-  for(let tx=0; tx<38; tx++){
-    if(rb && rb.complete){
-      cx.drawImage(rb, 0, 0, TW, TH, tx*TW, 0, TW, TH);
-    } else {
-      cx.fillStyle='#5c4a7a';cx.fillRect(tx*TW, 0, TW, TH);
-    }
-  }
-  // Top wall - break room  
-  for(let tx=38; tx<60; tx++){
-    if(rb && rb.complete){
-      cx.drawImage(rb, 0, 0, TW, TH, tx*TW, 0, TW, TH);
-    } else {
-      cx.fillStyle='#3a2a5a';cx.fillRect(tx*TW, 0, TW, TH);
-    }
-  }
-  // Bottom wall / shelf area
-  for(let ty=14; ty<17; ty++){
-    for(let tx=0; tx<38; tx++){
-      if(rb && rb.complete){
-        cx.drawImage(rb, 0, 0, TW, TH, tx*TW, ty*TH, TW, TH);
-      } else {
-        cx.fillStyle='#3a2060';cx.fillRect(tx*TW, ty*TH, TW, TH);
-      }
-    }
-  }
-  // Side walls
-  for(let ty=0; ty<17; ty++){
-    [0, 37, 38, 59].forEach(tx => {
-      if(rb && rb.complete){
-        cx.drawImage(rb, 0, 0, TW, TH, tx*TW, ty*TH, TW, TH);
-      } else {
-        cx.fillStyle='#3a2060';cx.fillRect(tx*TW, ty*TH, TW, TH);
-      }
-    });
-  }
+function drawModernDesk(x,y,col){
+  cx.fillStyle='#707080';cx.fillRect(x+6,y+DH-2,4,14);cx.fillRect(x+DW-10,y+DH-2,4,14);cx.fillRect(x+6,y+DH+8,DW-12,3);
+  rr(x,y,DW,DH-4,5,'#f8f5ee','#d8d0c0',1);
+  cx.fillStyle=col||'#aaa';cx.fillRect(x+4,y+DH-10,DW-8,4);
+  rr(x+18,y+6,DW-36,DH-28,4,'#1a1a2a','#2a2a3a',1);
+  rr(x+20,y+8,DW-40,DH-32,3,'#0d2040');
+  cx.fillStyle='#00ff88';cx.font='6px monospace';cx.textAlign='left';
+  cx.fillText('running...',x+24,y+20);cx.fillText('> OK',x+24,y+30);
+  cx.fillStyle='#606070';cx.fillRect(x+DW/2-4,y+DH-6,8,6);cx.fillRect(x+DW/2-10,y+DH-2,20,3);
+  rr(x+10,y+DH-22,DW-20,10,2,'#e8e4dc','#c8c0b0',1);
+  for(let ki=0;ki<5;ki++)rr(x+13+ki*17,y+DH-20,14,6,1,'#d0ccc4');
+  rr(x+DW-16,y+DH-22,10,8,3,'#e8e4dc','#c8c0b0',1);
 }
-
-// Draw furniture using Interiors tileset
-function drawFurniture(){
-  const int = imgs['Interiors_free_16x16'];
-  
-  // Desks - office (4 columns x 3 rows)
-  const deskCols = [3,10,17,24,31];
-  const deskRows = [1,5,9];
-  deskCols.forEach(dc => {
-    deskRows.forEach(dr => {
-      if(int && int.complete && int.naturalWidth > 0){
-        // Draw 2x2 desk from tileset row 6-7, col 0-1
-        cx.drawImage(int, 0*TW, 6*TH, TW*2, TH*2, dc*TW, dr*TH, TW*2, TH*2);
-      } else {
-        cx.fillStyle='#8b6a40';cx.fillRect(dc*TW, dr*TH, TW*2, TH*2);
-        cx.fillStyle='#1a1a2a';cx.fillRect(dc*TW, dr*TH, TW*2, TH);
-        cx.fillStyle='#00ff88';cx.font='4px monospace';cx.textAlign='left';
-        cx.fillText('>OK', dc*TW+2, dr*TH+TH-2);
-      }
-    });
+function drawChair(x,y,col){
+  cx.fillStyle='#444';cx.fillRect(x-16,y+30,32,3);cx.fillRect(x-3,y+20,6,12);
+  [[-14,33],[14,33],[-10,30],[10,30]].forEach(([ox,oy])=>{cx.beginPath();cx.arc(x+ox,y+oy,3,0,Math.PI*2);cx.fillStyle='#333';cx.fill();});
+  cx.fillStyle='#606060';cx.fillRect(x-3,y+10,6,20);
+  rr(x-18,y,36,12,4,col||'#4a90d9','#2a6ab0',1.5);
+  rr(x-14,y-30,28,32,4,col||'#4a90d9','#2a6ab0',1.5);
+  cx.fillStyle='#555';cx.fillRect(x-20,y-10,4,16);cx.fillRect(x+16,y-10,4,16);
+  cx.fillStyle='#333';rr(x-21,y-10,6,5,2,'#333');rr(x+15,y-10,6,5,2,'#333');
+}
+function drawScene(){
+  cx.fillStyle='#ede0c4';cx.fillRect(0,0,640,H);
+  cx.strokeStyle='#d8ccaa';cx.lineWidth=0.8;
+  for(let y=0;y<H;y+=28){cx.beginPath();cx.moveTo(0,y);cx.lineTo(640,y);cx.stroke();}
+  for(let x=0;x<640;x+=80){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke();}
+  cx.fillStyle='#f0ebe0';cx.fillRect(0,0,640,8);cx.fillStyle='#ddd5c0';cx.fillRect(0,6,640,3);
+  cx.fillStyle='#2a2240';cx.fillRect(640,0,320,H);cx.fillStyle='#221a38';cx.fillRect(640,0,3,H);
+  for(let tx=643;tx<960;tx+=38){for(let ty=0;ty<H;ty+=38){
+    cx.fillStyle=(Math.floor((tx-643)/38)+Math.floor(ty/38))%2===0?'#2e2448':'#261e3e';cx.fillRect(tx,ty,38,38);
+  }}
+  const t2=Date.now()/1200;const alpha=0.7+Math.sin(t2)*0.3;
+  cx.fillStyle='rgba(255,100,200,'+alpha+')';cx.font='bold 11px Nunito,sans-serif';cx.textAlign='left';cx.fillText('✦ BREAK ROOM ✦',682,22);
+  drawLamp(110,18,'#fff4cc');drawLamp(295,18,'#fff4cc');drawLamp(490,18,'#fff4cc');drawLamp(800,18,'#cce4ff');
+  drawCoffeeMachine(652,45);drawToiletArea(800,42);drawSofaArea(650,330);drawPlant(596,370);drawPlant(600,470);
+}
+function drawCoffeeMachine(x,y){
+  rr(x,y,85,105,8,'#1e1e2e','#2e2e4e',2);rr(x+8,y+8,69,42,4,'#0d0d1a');
+  cx.fillStyle='#00ff88';cx.font='bold 7px monospace';cx.textAlign='left';cx.fillText('READY',x+14,y+24);
+  const t=Date.now()/800;cx.fillStyle='rgba(0,255,136,'+(0.4+Math.sin(t)*0.3)+')';cx.font='6px monospace';cx.fillText('TEMP 94C',x+14,y+38);
+  rr(x+12,y+56,62,18,10,'#e74c3c','#c0392b',2);cx.fillStyle='white';cx.font='bold 9px Nunito,sans-serif';cx.textAlign='center';cx.fillText('BREW',x+43,y+69);
+  cx.fillStyle='#555';rr(x+28,y+80,30,14,4,'#444','#333',1);rr(x+18,y+96,50,9,3,'#8b6a40');
+  const st=Date.now()/400;cx.strokeStyle='rgba(200,200,255,'+(0.3+Math.sin(st)*0.2)+')';cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(x+43,y+94);cx.bezierCurveTo(x+47+Math.sin(st)*4,y+82,x+39+Math.sin(st+1)*4,y+70,x+43,y+58);cx.stroke();
+  cx.fillStyle='#b0c8e0';cx.font='bold 10px Nunito,sans-serif';cx.textAlign='center';cx.fillText('Coffee',x+43,y+118);
+}
+function drawToiletArea(x,y){
+  rr(x,y,130,185,6,'#1e1a30','#2e2a48',2);rr(x+8,y+82,52,98,3,'#16122a','#2e2a48',2);rr(x+10,y+84,48,94,2,'#252040','#3a3560',1.5);
+  cx.fillStyle='#ffd580';cx.beginPath();cx.arc(x+50,y+134,5,0,Math.PI*2);cx.fill();
+  rr(x+70,y+82,52,46,6,'#1a3a6a','#0d2244',2);cx.fillStyle='#7ec8ff';cx.font='bold 26px sans-serif';cx.textAlign='center';cx.fillText('\u2642',x+96,y+116);
+  rr(x+70,y+134,52,46,6,'#6a1a4a','#440d2a',2);cx.fillStyle='#ffaadd';cx.font='bold 26px sans-serif';cx.fillText('\u2640',x+96,y+165);
+  const occ=Math.floor(Date.now()/6000)%4===0;
+  cx.fillStyle=occ?'#e74c3c':'#2ecc71';cx.beginPath();cx.arc(x+34,y+76,7,0,Math.PI*2);cx.fill();
+  cx.fillStyle='white';cx.font='bold 8px Nunito,sans-serif';cx.textAlign='center';cx.fillText(occ?'占':'空',x+34,y+79);
+  cx.fillStyle='#9090cc';cx.font='bold 10px Nunito,sans-serif';cx.fillText('Toilet',x+65,y+200);
+}
+function drawSofaArea(x,y){
+  rr(x-5,y+15,195,120,8,'#3a2a5a','#2a1a4a',1.5);rr(x+4,y+22,177,106,6,null,'#4a3a6a',1);
+  rr(x,y+20,185,60,10,'#6a4a8a','#4a2a6a',2);rr(x,y,185,30,10,'#7a5a9a','#5a3a7a',2);
+  rr(x-14,y,24,80,8,'#7a5a9a','#5a3a7a',2);rr(x+175,y,24,80,8,'#7a5a9a','#5a3a7a',2);
+  rr(x+8,y+4,52,22,6,'#9a7aba','#7a5a9a',1);rr(x+67,y+4,52,22,6,'#9a7aba','#7a5a9a',1);rr(x+126,y+4,52,22,6,'#9a7aba','#7a5a9a',1);
+  rr(x+28,y+90,130,38,6,'#2a2040','#1a1030',2);rr(x+30,y+86,126,10,4,'#3a3050','#2a2040',1);
+  rr(x+38,y+88,28,14,3,'#1a2a3a','#0d1a2a',1);cx.fillStyle='#4a90d9';cx.font='bold 7px monospace';cx.textAlign='left';cx.fillText('LK',x+44,y+98);
+  cx.fillStyle='#c0392b';cx.beginPath();cx.arc(x+118,y+96,9,0,Math.PI*2);cx.fill();cx.fillStyle='white';cx.font='13px sans-serif';cx.textAlign='center';cx.fillText('\u2615',x+118,y+100);
+  cx.fillStyle='#9090cc';cx.font='bold 10px Nunito,sans-serif';cx.fillText('Break Area',x+93,y+148);
+}
+function drawPlant(x,y){
+  rr(x-10,y,20,18,3,'#7a5a30');
+  [[-8,-22,11,16,Math.PI/5],[-16,-15,9,13,-Math.PI/5],[4,-16,10,15,Math.PI/4],[0,-28,8,12,0]].forEach(([lx,ly,rx,ry,a])=>{
+    cx.fillStyle='#2d8a4a';cx.beginPath();cx.ellipse(x+lx,y+ly,rx,ry,a,0,Math.PI*2);cx.fill();
   });
-  
-  // Bookshelves along bottom
-  for(let tx=1; tx<36; tx+=2){
-    if(int && int.complete && int.naturalWidth > 0){
-      cx.drawImage(int, 4*TW, 2*TH, TW*2, TH*2, tx*TW, 14*TH, TW*2, TH*2);
-    } else {
-      cx.fillStyle='#5a3a1a';cx.fillRect(tx*TW, 14*TH, TW*2, TH*2);
-      const bk=['#e74c3c','#3498db','#2ecc71','#f39c12'];
-      for(let i=0;i<4;i++){cx.fillStyle=bk[i];cx.fillRect(tx*TW+i*4,14*TH+2,3,TH-4);}
-    }
-  }
-  
-  // Plants
-  [[2,4],[2,10],[36,4],[36,10]].forEach(([tx,ty]) => {
-    if(int && int.complete && int.naturalWidth > 0){
-      cx.drawImage(int, 9*TW, 2*TH, TW, TH*2, tx*TW, ty*TH, TW, TH*2);
-    } else {
-      cx.fillStyle='#2d8a4a';cx.beginPath();cx.ellipse(tx*TW+8,ty*TH+8,6,8,0,0,Math.PI*2);cx.fill();
-      cx.fillStyle='#8b5e3c';cx.fillRect(tx*TW+4,ty*TH+14,8,4);
-    }
-  });
-  
-  // Break room - sofa
-  if(int && int.complete && int.naturalWidth > 0){
-    cx.drawImage(int, 6*TW, 4*TH, TW*3, TH*2, 41*TW, 8*TH, TW*3, TH*2);
-  } else {
-    cx.fillStyle='#6a4a8a';cx.fillRect(41*TW, 8*TH, TW*3, TH*2);
-  }
-  
-  // Coffee machine
-  if(int && int.complete && int.naturalWidth > 0){
-    cx.drawImage(int, 0*TW, 10*TH, TW*2, TH*2, 41*TW, 2*TH, TW*2, TH*2);
-    cx.drawImage(int, 0*TW, 10*TH, TW*2, TH*2, 44*TW, 2*TH, TW*2, TH*2);
-  } else {
-    cx.fillStyle='#1e1e2e';cx.fillRect(41*TW, 2*TH, TW*4, TH*2);
-    cx.fillStyle='#00ff88';cx.font='5px monospace';cx.textAlign='left';cx.fillText('READY',41*TW+4,3*TH);
-  }
-  
-  // Rug
-  cx.fillStyle='rgba(139,32,32,0.5)';cx.fillRect(41*TW, 8*TH, TW*8, TH*4);
-  cx.strokeStyle='#ffd700';cx.lineWidth=1.5;cx.strokeRect(41*TW+2, 8*TH+2, TW*8-4, TH*4-4);
-  
-  // Plants break room
-  [[55,4],[55,11],[58,2]].forEach(([tx,ty]) => {
-    if(int && int.complete && int.naturalWidth > 0){
-      cx.drawImage(int, 9*TW, 2*TH, TW, TH*2, tx*TW, ty*TH, TW, TH*2);
-    } else {
-      cx.fillStyle='#2d8a4a';cx.beginPath();cx.ellipse(tx*TW+8,ty*TH+8,6,8,0,0,Math.PI*2);cx.fill();
-    }
-  });
-  
-  // Steam animation on coffee machine
-  const t=Date.now()/500;
-  cx.strokeStyle='rgba(200,200,255,0.3)';cx.lineWidth=1;
-  for(let i=0;i<2;i++){
-    cx.beginPath();cx.moveTo(42*TW+i*TW*2, 2*TH);
-    cx.bezierCurveTo(42*TW+i*TW*2+Math.sin(t+i)*3, TH, 42*TW+i*TW*2, 0, 42*TW+i*TW*2+Math.sin(t+i+1)*2, -TH*0.5);
-    cx.stroke();
-  }
+  cx.fillStyle='#3daa5a';cx.beginPath();cx.ellipse(x,y-20,7,11,0,0,Math.PI*2);cx.fill();
 }
-
-function drawLabels(){
-  // Room divider
-  cx.strokeStyle='rgba(0,0,0,0.5)';cx.lineWidth=2;
-  cx.beginPath();cx.moveTo(38*TW,0);cx.lineTo(38*TW,H);cx.stroke();
-  // Labels
-  cx.fillStyle='rgba(0,0,0,0.5)';cx.fillRect(0,0,38*TW,14);
-  cx.fillStyle='#ffd580';cx.font='bold 10px Nunito,sans-serif';cx.textAlign='left';
-  cx.fillText('✦  OFFICE',5,10);
-  cx.fillStyle='rgba(0,0,0,0.5)';cx.fillRect(39*TW,0,21*TW,14);
-  cx.fillStyle='#ff8fab';cx.fillText('✦  BREAK ROOM',39*TW+5,10);
-}
-
-// Character spritesheet: 384x32 = 24 frames, each 16x16
-// Row 0: walk down, Row 1: walk left, Row 2: walk right, Row 3: walk up
-// Each direction has 6 frames
-function drawCharSprite(charImg, x, y, frame, dir, name, bubble){
-  const px = Math.floor(x-8), py = Math.floor(y-20);
-  
-  // Shadow
-  cx.fillStyle='rgba(0,0,0,0.2)';
-  cx.beginPath();cx.ellipse(x, y+2, 6, 3, 0, 0, Math.PI*2);cx.fill();
-  
-  if(charImg && charImg.complete && charImg.naturalWidth > 0){
-    // Sprite sheet: 24 frames wide, direction rows
-    const dirRow = {down:0, left:1, right:2, up:3}[dir]||0;
-    const f = frame % 6;
-    const sx = f * TW;
-    const sy = dirRow * TH;
-    cx.drawImage(charImg, sx, sy, TW, TH, px, py, TW, TH);
-  } else {
-    // Fallback
-    cx.fillStyle='#4a90d9';cx.fillRect(px+3,py,10,16);
-    cx.fillStyle='#f5c8a0';cx.fillRect(px+3,py,10,8);
-  }
-  
-  // Name tag
-  cx.font='bold 8px Nunito,sans-serif';cx.textAlign='center';
-  const nw = cx.measureText(name).width + 6;
-  cx.fillStyle='rgba(0,0,0,0.7)';cx.fillRect(x-nw/2, y+4, nw, 10);
-  cx.fillStyle='#fff';cx.fillText(name, x, y+12);
-  
-  // Bubble
+const CHAIR_COLORS=['#4a90d9','#d9504a','#4ad990','#d9a04a','#904ad9','#d94a90','#4a9090','#9090d9'];
+function drawCharacter(x,y,skin,shirt,hair,female,wf,dir,name,bubble,ci){
+  if(ci!==undefined)drawChair(x,y+18,CHAIR_COLORS[ci%8]);
+  cx.save();if(dir==='left'){cx.translate(x*2,0);cx.scale(-1,1);}
+  cx.fillStyle=hair;
+  if(female){cx.fillRect(x-6,y-26,12,10);cx.fillRect(x-8,y-22,4,14);cx.fillRect(x+4,y-22,4,14);}
+  else{cx.fillRect(x-5,y-25,10,8);}
+  cx.fillStyle=skin;cx.fillRect(x-5,y-18,10,11);
+  cx.fillStyle='#1a0a00';cx.fillRect(x-3,y-15,2,2);cx.fillRect(x+1,y-15,2,2);
+  if(female){cx.fillStyle='rgba(255,150,150,0.5)';cx.fillRect(x-5,y-13,3,2);cx.fillRect(x+2,y-13,3,2);}
+  cx.fillStyle='#d4607a';cx.fillRect(x-1,y-10,3,1);
+  cx.fillStyle=shirt;cx.fillRect(x-6,y-7,12,12);
+  if(female){cx.beginPath();cx.moveTo(x-6,y+5);cx.lineTo(x-9,y+18);cx.lineTo(x+9,y+18);cx.lineTo(x+6,y+5);cx.closePath();cx.fill();}
+  cx.fillStyle=skin;const arm=wf%2===0?-1:1;cx.fillRect(x-9,y-7+arm,3,9);cx.fillRect(x+6,y-7-arm,3,9);
+  if(female){cx.fillStyle='#f0c0a0';const lg=wf%2===0?2:0;cx.fillRect(x-4,y+18,4,6+lg);cx.fillRect(x+0,y+18,4,6+(2-lg));cx.fillStyle='#c0392b';cx.fillRect(x-5,y+23,4,3);cx.fillRect(x+1,y+23,4,3);}
+  else{cx.fillStyle='#4a3a2a';const lg=wf%2===0?2:0;cx.fillRect(x-4,y+5,4,11+lg);cx.fillRect(x+0,y+5,4,11+(2-lg));cx.fillStyle='#2a1a0a';cx.fillRect(x-5,y+15,4,3);cx.fillRect(x+1,y+15,4,3);}
+  cx.restore();
+  cx.fillStyle='rgba(0,0,0,0.55)';cx.font='bold 10px Nunito,sans-serif';cx.textAlign='center';cx.fillText(name,x+1,y+33);
+  cx.fillStyle='#f8eecc';cx.fillText(name,x,y+32);
   if(bubble){
-    cx.font='bold 7px Nunito,sans-serif';
-    const bw = cx.measureText(bubble).width + 12;
-    const bx = x-bw/2, by = py-16;
-    cx.fillStyle='#fffef0';cx.beginPath();cx.roundRect(bx,by,bw,13,3);cx.fill();
-    cx.strokeStyle='#d4a030';cx.lineWidth=1;cx.beginPath();cx.roundRect(bx,by,bw,13,3);cx.stroke();
-    cx.fillStyle='#5a3a1a';cx.textAlign='center';cx.fillText(bubble,x,by+10);
-    cx.fillStyle='#fffef0';
-    cx.beginPath();cx.moveTo(x-3,by+13);cx.lineTo(x,by+17);cx.lineTo(x+3,by+13);cx.fill();
+    cx.font='bold 9px Nunito,sans-serif';const bw=cx.measureText(bubble).width+16;const bx=x-bw/2,by=y-48;
+    rr(bx,by,bw,17,5,'#fff8ee','#e0a040',1.5);cx.fillStyle='#5a3a1a';cx.textAlign='center';cx.fillText(bubble,x,by+12);
+    cx.beginPath();cx.moveTo(x-4,by+17);cx.lineTo(x,by+23);cx.lineTo(x+4,by+17);
+    cx.fillStyle='#fff8ee';cx.fill();cx.strokeStyle='#e0a040';cx.lineWidth=1;cx.stroke();
   }
 }
-
-// Agent sprites - assign each agent a character
-const CHAR_SPRITES = ['Adam','Amelia','Alex','Bob','Adam','Amelia','Alex','Bob'];
-
-// Desk positions in pixels
-const DESK_PX = [
-  {x:4*TW+TW, y:1*TH+TH}, {x:11*TW+TW, y:1*TH+TH}, {x:18*TW+TW, y:1*TH+TH},
-  {x:4*TW+TW, y:5*TH+TH}, {x:11*TW+TW, y:5*TH+TH}, {x:18*TW+TW, y:5*TH+TH},
-  {x:4*TW+TW, y:9*TH+TH}, {x:11*TW+TW, y:9*TH+TH},
-];
-
-const BREAK_PX = [
-  {x:42*TW, y:4*TH}, {x:46*TW, y:4*TH}, {x:50*TW, y:4*TH},
-  {x:43*TW, y:10*TH}, {x:47*TW, y:10*TH},
-  {x:42*TW, y:12*TH}, {x:46*TW, y:12*TH}, {x:50*TW, y:12*TH},
-];
-
-const agentSt = AGENTS.map((a,i) => {
-  const dp = DESK_PX[i] || DESK_PX[0];
-  return {
-    ...a,
-    deskX: dp.x, deskY: dp.y,
-    x: dp.x, y: dp.y, tx: dp.x, ty: dp.y,
-    frame: Math.floor(Math.random()*6),
-    dir: 'down',
-    walkTimer: Math.floor(Math.random()*100),
-    walkDelay: 120+i*40,
-    breakMode: false, breakTimer: 0,
-    charSprite: CHAR_SPRITES[i % CHAR_SPRITES.length],
-  };
-});
-
-let tick = 0;
+const BREAK_SPOTS=[{x:695,y:180},{x:730,y:390},{x:760,y:440},{x:710,y:140},{x:820,y:300},{x:870,y:190},{x:910,y:380},{x:860,y:460}];
+const agentSt=AGENTS.map((a,i)=>({
+  ...a,deskX:DESK_POS[i].x+55,deskY:DESK_POS[i].y+75,
+  x:DESK_POS[i].x+55,y:DESK_POS[i].y+75,tx:DESK_POS[i].x+55,ty:DESK_POS[i].y+75,
+  wf:Math.floor(Math.random()*4),dir:'right',walkTimer:Math.floor(Math.random()*150),walkDelay:150+i*40,breakMode:false,breakTimer:0,ci:i,
+}));
+let tick=0;
 function animate(){
-  cx.clearRect(0,0,W,H);
-  drawRoom();
-  drawFurniture();
-  drawLabels();
+  cx.clearRect(0,0,W,H);drawScene();
+  DESK_POS.forEach((d,i)=>{drawModernDesk(d.x,d.y,AGENTS[i].shirt);});
   tick++;
-
-  agentSt.forEach((a,i) => {
+  agentSt.forEach((a,i)=>{
     a.walkTimer++;
-    const sp = 1.2;
-    if(a.breakMode){
-      const dx=a.tx-a.x, dy=a.ty-a.y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d > sp){
-        a.x += dx/d*sp; a.y += dy/d*sp;
-        a.dir = Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
-        if(tick%6===0) a.frame++;
-      } else {
-        a.x=a.tx; a.y=a.ty; a.frame=0;
-        a.breakTimer++;
-        if(a.breakTimer > 200){
-          a.breakMode=false; a.breakTimer=0;
-          a.tx=a.deskX; a.ty=a.deskY;
-        }
-      }
-    } else if(a.state==='idle'){
-      if(a.walkTimer > a.walkDelay){
-        const b = BREAK_PX[Math.floor(Math.random()*BREAK_PX.length)];
-        a.tx=b.x; a.ty=b.y; a.breakMode=true; a.breakTimer=0;
-        a.walkTimer=0; a.walkDelay=80+Math.random()*100;
-      }
-    } else {
-      if(a.walkTimer > 220+i*55){
-        const b = BREAK_PX[i%BREAK_PX.length];
-        a.tx=b.x; a.ty=b.y; a.breakMode=true; a.breakTimer=0; a.walkTimer=0;
-      } else {
-        a.x=a.deskX; a.y=a.deskY;
-        a.dir='down'; a.frame=0;
-      }
+    if(a.state==='idle'||a.breakMode){
+      const dx=a.tx-a.x,dy=a.ty-a.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist>2){a.x+=dx/dist*1.5;a.y+=dy/dist*1.5;a.dir=dx>0?'right':'left';if(tick%6===0)a.wf++;}
+      else{a.wf=0;if(a.breakMode){a.breakTimer++;if(a.breakTimer>150){a.breakMode=false;a.breakTimer=0;a.tx=a.deskX;a.ty=a.deskY;}}}
+      if(a.walkTimer>a.walkDelay&&!a.breakMode){const s=BREAK_SPOTS[Math.floor(Math.random()*BREAK_SPOTS.length)];a.tx=s.x;a.ty=s.y;a.walkDelay=120+Math.random()*160;a.walkTimer=0;}
+    }else{
+      if(a.walkTimer>280+i*55&&!a.breakMode){a.breakMode=true;a.breakTimer=0;const s=BREAK_SPOTS[i%BREAK_SPOTS.length];a.tx=s.x;a.ty=s.y;a.walkTimer=0;}
+      else if(!a.breakMode){a.x=a.deskX;a.y=a.deskY;a.wf=0;}
     }
   });
-
-  [...agentSt].sort((a,b) => a.y-b.y).forEach(a => {
-    const atDesk = !a.breakMode && Math.abs(a.x-a.deskX)<3;
-    const bubble = atDesk && a.state==='working' ? a.task : a.breakMode ? '☕' : null;
-    const charImg = imgs[a.charSprite+'_run_16x16'];
-    drawCharSprite(charImg, a.x, a.y, a.frame, a.dir, a.name, bubble);
+  [...agentSt].sort((a,b)=>a.y-b.y).forEach(a=>{
+    const atDesk=!a.breakMode&&a.state!=='idle'&&Math.abs(a.x-a.deskX)<5;
+    const bubble=atDesk&&a.state==='working'?a.task:a.breakMode?'☕ break':null;
+    drawCharacter(a.x,a.y,a.skin,a.shirt,a.hair,a.female,a.wf,a.dir,a.name,bubble,atDesk?a.ci:undefined);
   });
-
   requestAnimationFrame(animate);
 }
+animate();
 
 async function sendChat(){
   const input=document.getElementById('chat-input');
