@@ -122,9 +122,7 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    ads_keywords_local = []
-    org_keywords_local = []
-    return overview, channels, keywords, landing_pages, ads_keywords_local, org_keywords_local
+    return overview, channels, keywords, landing_pages, [], []
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")
@@ -187,7 +185,7 @@ def get_ads_data_from_sheets():
                 "conversions": 0, "conv_value": 0, "ctr": "0%", "week": "",
                 "ad_groups": [], "keywords": [], "search_terms": []}
 
-def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh"):
+def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", ads_keywords=None, org_keywords=None):
     print(f"  🤖 Claude 分析 ({'繁中' if lang=='zh' else '韓文'})...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
@@ -322,7 +320,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh"):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -508,11 +506,11 @@ if __name__ == "__main__":
     ads = get_ads_data_from_sheets()
 
     print("🤖 Claude 分析緊（繁中）...")
-    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh")
+    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
     generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     print("🤖 Claude 분석 중（韓文）...")
-    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr")
+    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
     generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     update_status(True)
