@@ -122,9 +122,9 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    # GA4 Ads Keywords with conversion
-    ads_keywords_result = []
-    org_keywords_result = []
+    # GA4 Ads Keywords with conversion (sorted by purchases)
+    ads_keywords = []
+    org_keywords = []
     try:
         ads_kw_req = RunReportRequest(
             property=f"properties/{GA4_PROPERTY_ID}",
@@ -137,17 +137,17 @@ def get_ga4_data():
         for r in client.run_report(ads_kw_req).rows:
             kw = r.dimension_values[0].value
             if kw and kw not in ["(not set)", "(not provided)"]:
-                ads_keywords_result.append({
+                ads_keywords.append({
                     "keyword": kw,
                     "sessions": int(r.metric_values[0].value),
                     "purchases": int(r.metric_values[1].value),
                     "revenue": round(float(r.metric_values[2].value), 0),
                 })
     except Exception as e:
-        print(f"  ⚠️ Ads KW error: {e}")
+        print(f"  ⚠️ Ads KW: {e}")
 
-    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords_result)}")
-    return overview, channels, keywords, landing_pages, ads_keywords_result, org_keywords_result
+    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords)}")
+    return overview, channels, keywords, landing_pages, ads_keywords, org_keywords
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")
@@ -182,10 +182,15 @@ def get_ads_data_from_sheets():
         except:
             kw_data = []
 
-        # Search Terms sheet
+        # Search Terms sheet - sort by Conv Value DESC
         try:
             st_sheet = sh.worksheet("Search Terms")
-            st_data = st_sheet.get_all_records()[:15]
+            all_st = st_sheet.get_all_records()
+            st_data = sorted(
+                all_st,
+                key=lambda x: float(str(x.get('Conv Value', 0)).replace(',','') or 0),
+                reverse=True
+            )[:15]
         except:
             st_data = []
 
@@ -427,15 +432,36 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{k.get('purchases',0)}</td>
             </tr>"""
 
-    # Search terms table
+    # GA4 Ads keywords rows
+    ads_kw_rows = ""
+    for k in (ads_keywords or [])[:10]:
+        ads_kw_rows += f'''<tr>
+          <td><strong>{k.get("keyword","")}</strong></td>
+          <td>{k.get("sessions",0):,}</td>
+          <td>{k.get("purchases",0)}</td>
+          <td>HK${k.get("revenue",0):,.0f}</td>
+        </tr>'''
+
+    # GA4 Organic keywords rows
+    org_kw_rows = ""
+    for k in (org_keywords or [])[:10]:
+        org_kw_rows += f'''<tr>
+          <td>{k.get("keyword","")}</td>
+          <td><span style="color:#8070a0;font-size:11px">{k.get("source","")}</span></td>
+          <td>{k.get("sessions",0):,}</td>
+          <td>{k.get("purchases",0)}</td>
+        </tr>'''
+
+    # Search terms table (sorted by Conv Value from Sheets)
     st_rows = ""
     if ads.get("search_terms"):
         for s in ads["search_terms"][:10]:
             st_rows += f"""<tr>
-              <td>{s.get('Search Term','')}</td>
+              <td><strong>{s.get('Search Term','')}</strong></td>
               <td>{s.get('Clicks',0)}</td>
               <td>HK${s.get('花費(HKD)',0)}</td>
               <td>{s.get('Conversions',0)}</td>
+              <td style="color:{'#4dd0c4' if float(str(s.get('Conv Value',0)).replace(',','') or 0) > 0 else '#f0e8c0'}">HK${s.get('Conv Value',0):}</td>
             </tr>"""
 
     html = f"""<!DOCTYPE html>
@@ -497,11 +523,11 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  '<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + (ads_kw_rows if ads_kw_rows else '<tr><td colspan=4 style="color:#8070a0;text-align:center">暫無數據 — GA4 keyword tracking 需時</td></tr>') + '</table>'
+  '<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + (ads_kw_rows or '<tr><td colspan=4 style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>') + '</table>'
 
-  '<div class="section-title">🌿 GA4 Organic Keywords</div><table class="data-table"><tr><th>Keyword</th><th>Source</th><th>Sessions</th><th>成交</th></tr>' + (org_kw_rows if org_kw_rows else '<tr><td colspan=4 style="color:#8070a0;text-align:center">大部分 organic keyword 係 (not provided)</td></tr>') + '</table>'
+  ,
 
-  {'<div class="section-title">🔍 Top Search Terms (Ads Script)</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
+  '<div class="section-title">🔍 Top Search Terms（按 Conv Value 排序）</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conversions</th><th>Conv Value</th></tr>' + (st_rows or '<tr><td colspan=5 style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>') + '</table>'
 
   <div class="section-title">🤖 Claude 深度分析</div>
   <div class="analysis">{analysis_html}</div>
