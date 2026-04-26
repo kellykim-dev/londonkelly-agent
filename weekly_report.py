@@ -464,6 +464,16 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td style="color:{'#4dd0c4' if float(str(s.get('Conv Value',0)).replace(',','') or 0) > 0 else '#f0e8c0'}">HK${s.get('Conv Value',0):}</td>
             </tr>"""
 
+    # Build table sections as variables (avoid f-string quote conflicts)
+    no_data_4 = '<tr><td colspan="4" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
+    no_data_5 = '<tr><td colspan="5" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
+    ads_kw_section = f'''<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div>
+  <table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>
+  {ads_kw_rows if ads_kw_rows else no_data_4}</table>'''
+    st_section = f'''<div class="section-title">🔍 Top Search Terms（按 Conv Value 排序）</div>
+  <table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conversions</th><th>Conv Value</th></tr>
+  {st_rows if st_rows else no_data_5}</table>'''
+
     html = f"""<!DOCTYPE html>
 <html lang="{'zh-HK' if lang=='zh' else 'ko'}">
 <head>
@@ -523,11 +533,9 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  '<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + (ads_kw_rows or '<tr><td colspan=4 style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>') + '</table>'
+  {ads_kw_section}
 
-  ,
-
-  '<div class="section-title">🔍 Top Search Terms（按 Conv Value 排序）</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conversions</th><th>Conv Value</th></tr>' + (st_rows or '<tr><td colspan=5 style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>') + '</table>'
+  {st_section}
 
   <div class="section-title">🤖 Claude 深度分析</div>
   <div class="analysis">{analysis_html}</div>
