@@ -320,7 +320,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh"):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -507,11 +507,11 @@ if __name__ == "__main__":
 
     print("🤖 Claude 分析緊（繁中）...")
     analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh")
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     print("🤖 Claude 분석 중（韓文）...")
     analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr")
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr")
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     update_status(True)
     print("✅ 完成！")
