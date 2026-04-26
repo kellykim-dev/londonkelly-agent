@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LondonKelly AI 辦公室</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f0820;margin:0;}
+#wrap{font-family:'Nunito',sans-serif;max-width:960px;margin:0 auto;background:#0f0820;overflow:hidden;}
+#topbar{background:linear-gradient(90deg,#1a0e35,#0d1a35);color:#f8e8c0;font-size:15px;font-weight:800;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2a1a50;}
+.clock{font-size:13px;font-weight:700;color:#ffd580;background:rgba(255,213,128,0.15);padding:4px 14px;border-radius:20px;}
+canvas#oc{display:block;width:100%;image-rendering:pixelated;}
+#bottom{background:#0a0518;padding:12px 16px;display:flex;gap:12px;border-top:2px solid #1a0e35;}
+#logbox{flex:1;min-width:0;}
+#logtitle{color:#ffd580;font-size:13px;font-weight:800;margin-bottom:6px;}
+.logline{font-size:12px;line-height:2;font-family:'Nunito',sans-serif;}
+.log-ok{color:#81c784;}.log-sys{color:#ffd580;}
+#agentlist{min-width:175px;}
+#alisttitle{color:#ffd580;font-size:13px;font-weight:800;margin-bottom:6px;}
+.arow{display:flex;align-items:center;gap:6px;padding:2px 0;}
+.adot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.adot.g{background:#4caf50;}.adot.o{background:#ff9800;animation:p 1.2s infinite;}.adot.gr{background:#666;}
+@keyframes p{0%,100%{opacity:1;}50%{opacity:.3;}}
+.aname{font-size:12px;font-weight:800;color:#f0e8c0;min-width:32px;}
+.atask{font-size:11px;color:#b0a0d0;flex:1;}
+.astatus{font-size:11px;color:#81c784;}.astatus.s{color:#ff9800;}
+#btnrow{background:#07030f;padding:10px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+#btnrow2{background:#07030f;padding:0 16px 10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);color:#f0e8c0;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .2s;text-align:center;}
+.btn:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px);}
+.btn.hi{background:rgba(255,213,128,0.13);border-color:#ffd580;color:#ffd580;}
+#notif{position:fixed;top:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.notif-toast{border-radius:12px;padding:10px 16px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;animation:slideIn .4s ease,fadeOut .5s 3.5s forwards;min-width:200px;}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-8px);}}
+#chatbox{background:#07030f;border-top:2px solid #1a0e35;padding:12px 16px;}
+#chat-title{color:#ffd580;font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+#chat-msgs{background:#0a0518;border-radius:10px;padding:10px;min-height:80px;max-height:200px;overflow-y:auto;margin-bottom:10px;font-size:13px;line-height:1.8;}
+.chat-msg-user{color:#ffd580;margin:4px 0;}.chat-msg-user::before{content:'你：';}
+.chat-msg-bot{color:#4dd0c4;margin:4px 0;}.chat-msg-bot::before{content:'🤖 ';}
+.chat-msg-sys{color:#8070a0;font-size:11px;margin:4px 0;}
+#chat-input-row{display:flex;gap:8px;}
+#chat-input{flex:1;background:#1a1030;border:1.5px solid #2a1a50;color:#f0e8c0;padding:9px 14px;border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none;}
+#chat-input:focus{border-color:#4dd0c4;}
+#chat-send{background:#4dd0c4;color:#0f0820;border:none;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+#chat-send:hover{background:#6de0d4;}
+#trigger-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+.trigger-btn{background:#1a1030;border:1.5px solid #2a1a50;color:#b0a0d0;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;text-align:center;text-decoration:none;display:block;}
+.trigger-btn:hover{background:#2a1a40;color:#ffd580;border-color:#ffd580;}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="topbar">
+  <span>&#10022; LondonKelly AI 辦公室</span>
+  <span class="clock" id="clk">00:00:00 HKT</span>
+</div>
+<canvas id="oc" width="960" height="540"></canvas>
+<div id="bottom">
+  <div id="logbox">
+    <div id="logtitle">&#x203A;_ 實時 log</div>
+    <div id="loglines"></div>
+  </div>
+  <div id="agentlist">
+    <div id="alisttitle">agents</div>
+    <div id="alist"></div>
+  </div>
+</div>
+<div id="btnrow">
+  <a href="report.html" class="btn">週報 中文</a>
+  <a href="content.html" class="btn">本週內容</a>
+  <a href="competitor.html" class="btn">競爭對手</a>
+  <a href="https://londonkelly.myshopify.com/admin/articles" class="btn hi">部落格</a>
+</div>
+<div id="btnrow2">
+  <a href="report_kr.html" class="btn">週報 한국어</a>
+  <a href="competitor_kr.html" class="btn">競爭사 분석</a>
+</div>
+<div id="chatbox">
+  <div id="chat-title">💬 手動觸發 Agents</div>
+  <div id="trigger-row">
+    <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/weekly_report.yml" target="_blank">跑週報</a>
+    <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/content_agent.yml" target="_blank">跑內容</a>
+    <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/competitor_agent.yml" target="_blank">跑競爭</a>
+    <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/blog_agent.yml" target="_blank">跑部落格</a>
+  </div>
+  <div id="chat-msgs">
+    <div class="chat-msg-sys">Click 上面按鈕去 GitHub Actions 手動觸發 agents。</div>
+  </div>
+  <div id="chat-input-row">
+    <input id="chat-input" type="text" placeholder="問我任何問題..." onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button id="chat-send" onclick="sendChat()">發送</button>
+  </div>
+</div>
+</div>
+<div id="notif"></div>
+<script>
+const W=960,H=540;
+const cv=document.getElementById('oc');
+const cx=cv.getContext('2d');
+
+const AC=new (window.AudioContext||window.webkitAudioContext)();
+function playDone(){
+  const t=AC.currentTime;
+  [523,659,784,1047].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    o.frequency.value=f;o.type='sine';
+    g.gain.setValueAtTime(0,t+i*0.12);
+    g.gain.linearRampToValueAtTime(0.18,t+i*0.12+0.05);
+    g.gain.linearRampToValueAtTime(0,t+i*0.12+0.22);
+    o.start(t+i*0.12);o.stop(t+i*0.12+0.25);
+  });
+}
+function playNotif(){
+  const t=AC.currentTime;
+  [880,1100].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    o.frequency.value=f;o.type='triangle';
+    g.gain.setValueAtTime(0,t+i*0.1);
+    g.gain.linearRampToValueAtTime(0.12,t+i*0.1+0.04);
+    g.gain.linearRampToValueAtTime(0,t+i*0.1+0.18);
+    o.start(t+i*0.1);o.stop(t+i*0.1+0.2);
+  });
+}
+document.addEventListener('click',()=>AC.resume(),{once:true});
+
+function showToast(msg,type){
+  const el=document.createElement('div');
+  el.className='notif-toast';
+  const isDone=type==='done';
+  el.style.cssText='border:1.5px solid '+(isDone?'#4caf50':'#ff9800')+';background:'+(isDone?'#0f1f0f':'#1f140a')+';color:'+(isDone?'#c8ffc8':'#ffe0b0')+';';
+  el.textContent=msg;
+  document.getElementById('notif').appendChild(el);
+  if(isDone)playDone(); else playNotif();
+  setTimeout(()=>el.remove(),4200);
+}
+
+const AGENTS=[
+  {name:'花花',task:'Collection 排序',state:'done',shirt:'#ff8fab',hair:'#3d2b1f',skin:'#f5c8a0',female:true},
+  {name:'阿鼻',task:'Hot Items',state:'working',shirt:'#ffb347',hair:'#1a0a00',skin:'#d4956a',female:false},
+  {name:'豆芽',task:'週報',state:'done',shirt:'#4dd0c4',hair:'#2a1808',skin:'#f0d0a8',female:true},
+  {name:'啾皮',task:'社群內容',state:'working',shirt:'#b39ddb',hair:'#1a1a3a',skin:'#e8b080',female:false},
+  {name:'咕嚕',task:'Indexing',state:'working',shirt:'#69d481',hair:'#3d2b1f',skin:'#f5c8a0',female:false},
+  {name:'彩彩',task:'競爭對手',state:'done',shirt:'#f9e04b',hair:'#7a5a30',skin:'#e0a070',female:true},
+  {name:'咕噹',task:'Blog draft',state:'done',shirt:'#f48fb1',hair:'#2d1b0e',skin:'#d8906a',female:false},
+  {name:'蜜醬',task:'待機',state:'idle',shirt:'#90a4ae',hair:'#1a0a00',skin:'#f8dbb0',female:true},
+];
+const DESK_POS=[
+  {x:18,y:75},{x:145,y:75},{x:272,y:75},{x:399,y:75},
+  {x:18,y:225},{x:145,y:225},{x:272,y:225},{x:399,y:225},
+];
+const DW=110,DH=62;
+const LOGS=[
+  {t:'[豆芽] 週報 完成',c:'log-ok'},{t:'[彩彩] 競爭對手 完成',c:'log-ok'},
+  {t:'[花花] Collection 排序 完成',c:'log-ok'},{t:'[咕噹] Blog draft 完成',c:'log-ok'},
+  {t:'[系統] 下次：明日 06:00',c:'log-sys'},
+];
+LOGS.forEach(l=>{const d=document.createElement('div');d.className='logline '+l.c;d.textContent=l.t;document.getElementById('loglines').appendChild(d);});
+AGENTS.forEach(a=>{
+  const r=document.createElement('div');r.className='arow';
+  const dc=a.state==='done'?'g':a.state==='working'?'o':'gr';
+  const sl=a.state==='done'?'✓':a.state==='working'?'↻':'▶';
+  r.innerHTML='<div class="adot '+dc+'"></div><span class="aname">'+a.name+'</span><span class="atask">'+a.task+'</span><span class="astatus '+(a.state==='working'?'s':'')+'">'+sl+'</span>';
+  document.getElementById('alist').appendChild(r);
+});
+function updateClock(){const hk=new Date(Date.now()+8*3600000);document.getElementById('clk').textContent=hk.toISOString().slice(11,19)+' HKT';}
+setInterval(updateClock,1000);updateClock();
+setTimeout(()=>showToast('✅ 咕嚕 Indexing 完成！200 URLs submitted','done'),3000);
+setTimeout(()=>showToast('↻ 啾皮 社群內容 進行中...','working'),8000);
+setTimeout(()=>showToast('✅ 阿鼻 Hot Items 更新完成！','done'),14000);
+
+function rr(x,y,w,h,r,fill,stroke,lw){
+  cx.beginPath();cx.roundRect(x,y,w,h,r);
+  if(fill){cx.fillStyle=fill;cx.fill();}
+  if(stroke){cx.strokeStyle=stroke;cx.lineWidth=lw||1;cx.stroke();}
+}
+function drawLamp(x,y,col){
+  cx.strokeStyle='#555';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,y-4);cx.stroke();
+  rr(x-28,y-4,56,10,3,'#2a2a3a','#3a3a5a',1);
+  cx.fillStyle=col||'#ffe8a0';cx.fillRect(x-24,y+5,48,4);
+  const grd=cx.createRadialGradient(x,y+20,2,x,y+20,70);
+  grd.addColorStop(0,'rgba(255,235,150,0.22)');grd.addColorStop(1,'rgba(255,235,150,0)');
+  cx.fillStyle=grd;cx.beginPath();cx.ellipse(x,y+20,70,40,0,0,Math.PI*2);cx.fill();
+}
+function drawModernDesk(x,y,col){
+  cx.fillStyle='#707080';cx.fillRect(x+6,y+DH-2,4,14);cx.fillRect(x+DW-10,y+DH-2,4,14);cx.fillRect(x+6,y+DH+8,DW-12,3);
+  rr(x,y,DW,DH-4,5,'#f8f5ee','#d8d0c0',1);
+  cx.fillStyle=col||'#aaa';cx.fillRect(x+4,y+DH-10,DW-8,4);
+  rr(x+18,y+6,DW-36,DH-28,4,'#1a1a2a','#2a2a3a',1);
+  rr(x+20,y+8,DW-40,DH-32,3,'#0d2040');
+  cx.fillStyle='#00ff88';cx.font='6px monospace';cx.textAlign='left';
+  cx.fillText('running...',x+24,y+20);cx.fillText('> OK',x+24,y+30);
+  cx.fillStyle='#606070';cx.fillRect(x+DW/2-4,y+DH-6,8,6);cx.fillRect(x+DW/2-10,y+DH-2,20,3);
+  rr(x+10,y+DH-22,DW-20,10,2,'#e8e4dc','#c8c0b0',1);
+  for(let ki=0;ki<5;ki++)rr(x+13+ki*17,y+DH-20,14,6,1,'#d0ccc4');
+  rr(x+DW-16,y+DH-22,10,8,3,'#e8e4dc','#c8c0b0',1);
+}
+function drawChair(x,y,col){
+  cx.fillStyle='#444';cx.fillRect(x-16,y+30,32,3);cx.fillRect(x-3,y+20,6,12);
+  [[-14,33],[14,33],[-10,30],[10,30]].forEach(([ox,oy])=>{cx.beginPath();cx.arc(x+ox,y+oy,3,0,Math.PI*2);cx.fillStyle='#333';cx.fill();});
+  cx.fillStyle='#606060';cx.fillRect(x-3,y+10,6,20);
+  rr(x-18,y,36,12,4,col||'#4a90d9','#2a6ab0',1.5);
+  rr(x-14,y-30,28,32,4,col||'#4a90d9','#2a6ab0',1.5);
+  cx.fillStyle='#555';cx.fillRect(x-20,y-10,4,16);cx.fillRect(x+16,y-10,4,16);
+  cx.fillStyle='#333';rr(x-21,y-10,6,5,2,'#333');rr(x+15,y-10,6,5,2,'#333');
+}
+function drawScene(){
+  cx.fillStyle='#ede0c4';cx.fillRect(0,0,640,H);
+  cx.strokeStyle='#d8ccaa';cx.lineWidth=0.8;
+  for(let y=0;y<H;y+=28){cx.beginPath();cx.moveTo(0,y);cx.lineTo(640,y);cx.stroke();}
+  for(let x=0;x<640;x+=80){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke();}
+  cx.fillStyle='#f0ebe0';cx.fillRect(0,0,640,8);cx.fillStyle='#ddd5c0';cx.fillRect(0,6,640,3);
+  cx.fillStyle='#2a2240';cx.fillRect(640,0,320,H);cx.fillStyle='#221a38';cx.fillRect(640,0,3,H);
+  for(let tx=643;tx<960;tx+=38){for(let ty=0;ty<H;ty+=38){
+    cx.fillStyle=(Math.floor((tx-643)/38)+Math.floor(ty/38))%2===0?'#2e2448':'#261e3e';cx.fillRect(tx,ty,38,38);
+  }}
+  const t2=Date.now()/1200;const alpha=0.7+Math.sin(t2)*0.3;
+  cx.fillStyle='rgba(255,100,200,'+alpha+')';cx.font='bold 11px Nunito,sans-serif';cx.textAlign='left';cx.fillText('✦ BREAK ROOM ✦',682,22);
+  drawLamp(110,18,'#fff4cc');drawLamp(295,18,'#fff4cc');drawLamp(490,18,'#fff4cc');drawLamp(800,18,'#cce4ff');
+  drawCoffeeMachine(652,45);drawToiletArea(800,42);drawSofaArea(650,330);drawPlant(596,370);drawPlant(600,470);
+}
+function drawCoffeeMachine(x,y){
+  rr(x,y,85,105,8,'#1e1e2e','#2e2e4e',2);rr(x+8,y+8,69,42,4,'#0d0d1a');
+  cx.fillStyle='#00ff88';cx.font='bold 7px monospace';cx.textAlign='left';cx.fillText('READY',x+14,y+24);
+  const t=Date.now()/800;cx.fillStyle='rgba(0,255,136,'+(0.4+Math.sin(t)*0.3)+')';cx.font='6px monospace';cx.fillText('TEMP 94C',x+14,y+38);
+  rr(x+12,y+56,62,18,10,'#e74c3c','#c0392b',2);cx.fillStyle='white';cx.font='bold 9px Nunito,sans-serif';cx.textAlign='center';cx.fillText('BREW',x+43,y+69);
+  cx.fillStyle='#555';rr(x+28,y+80,30,14,4,'#444','#333',1);rr(x+18,y+96,50,9,3,'#8b6a40');
+  const st=Date.now()/400;cx.strokeStyle='rgba(200,200,255,'+(0.3+Math.sin(st)*0.2)+')';cx.lineWidth=1.5;
+  cx.beginPath();cx.moveTo(x+43,y+94);cx.bezierCurveTo(x+47+Math.sin(st)*4,y+82,x+39+Math.sin(st+1)*4,y+70,x+43,y+58);cx.stroke();
+  cx.fillStyle='#b0c8e0';cx.font='bold 10px Nunito,sans-serif';cx.textAlign='center';cx.fillText('Coffee',x+43,y+118);
+}
+function drawToiletArea(x,y){
+  rr(x,y,130,185,6,'#1e1a30','#2e2a48',2);rr(x+8,y+82,52,98,3,'#16122a','#2e2a48',2);rr(x+10,y+84,48,94,2,'#252040','#3a3560',1.5);
+  cx.fillStyle='#ffd580';cx.beginPath();cx.arc(x+50,y+134,5,0,Math.PI*2);cx.fill();
+  rr(x+70,y+82,52,46,6,'#1a3a6a','#0d2244',2);cx.fillStyle='#7ec8ff';cx.font='bold 26px sans-serif';cx.textAlign='center';cx.fillText('\u2642',x+96,y+116);
+  rr(x+70,y+134,52,46,6,'#6a1a4a','#440d2a',2);cx.fillStyle='#ffaadd';cx.font='bold 26px sans-serif';cx.fillText('\u2640',x+96,y+165);
+  const occ=Math.floor(Date.now()/6000)%4===0;
+  cx.fillStyle=occ?'#e74c3c':'#2ecc71';cx.beginPath();cx.arc(x+34,y+76,7,0,Math.PI*2);cx.fill();
+  cx.fillStyle='white';cx.font='bold 8px Nunito,sans-serif';cx.textAlign='center';cx.fillText(occ?'占':'空',x+34,y+79);
+  cx.fillStyle='#9090cc';cx.font='bold 10px Nunito,sans-serif';cx.fillText('Toilet',x+65,y+200);
+}
+function drawSofaArea(x,y){
+  rr(x-5,y+15,195,120,8,'#3a2a5a','#2a1a4a',1.5);rr(x+4,y+22,177,106,6,null,'#4a3a6a',1);
+  rr(x,y+20,185,60,10,'#6a4a8a','#4a2a6a',2);rr(x,y,185,30,10,'#7a5a9a','#5a3a7a',2);
+  rr(x-14,y,24,80,8,'#7a5a9a','#5a3a7a',2);rr(x+175,y,24,80,8,'#7a5a9a','#5a3a7a',2);
+  rr(x+8,y+4,52,22,6,'#9a7aba','#7a5a9a',1);rr(x+67,y+4,52,22,6,'#9a7aba','#7a5a9a',1);rr(x+126,y+4,52,22,6,'#9a7aba','#7a5a9a',1);
+  rr(x+28,y+90,130,38,6,'#2a2040','#1a1030',2);rr(x+30,y+86,126,10,4,'#3a3050','#2a2040',1);
+  rr(x+38,y+88,28,14,3,'#1a2a3a','#0d1a2a',1);cx.fillStyle='#4a90d9';cx.font='bold 7px monospace';cx.textAlign='left';cx.fillText('LK',x+44,y+98);
+  cx.fillStyle='#c0392b';cx.beginPath();cx.arc(x+118,y+96,9,0,Math.PI*2);cx.fill();cx.fillStyle='white';cx.font='13px sans-serif';cx.textAlign='center';cx.fillText('\u2615',x+118,y+100);
+  cx.fillStyle='#9090cc';cx.font='bold 10px Nunito,sans-serif';cx.fillText('Break Area',x+93,y+148);
+}
+function drawPlant(x,y){
+  rr(x-10,y,20,18,3,'#7a5a30');
+  [[-8,-22,11,16,Math.PI/5],[-16,-15,9,13,-Math.PI/5],[4,-16,10,15,Math.PI/4],[0,-28,8,12,0]].forEach(([lx,ly,rx,ry,a])=>{
+    cx.fillStyle='#2d8a4a';cx.beginPath();cx.ellipse(x+lx,y+ly,rx,ry,a,0,Math.PI*2);cx.fill();
+  });
+  cx.fillStyle='#3daa5a';cx.beginPath();cx.ellipse(x,y-20,7,11,0,0,Math.PI*2);cx.fill();
+}
+const CHAIR_COLORS=['#4a90d9','#d9504a','#4ad990','#d9a04a','#904ad9','#d94a90','#4a9090','#9090d9'];
+function drawCharacter(x,y,skin,shirt,hair,female,wf,dir,name,bubble,ci){
+  if(ci!==undefined)drawChair(x,y+18,CHAIR_COLORS[ci%8]);
+  cx.save();if(dir==='left'){cx.translate(x*2,0);cx.scale(-1,1);}
+  cx.fillStyle=hair;
+  if(female){cx.fillRect(x-6,y-26,12,10);cx.fillRect(x-8,y-22,4,14);cx.fillRect(x+4,y-22,4,14);}
+  else{cx.fillRect(x-5,y-25,10,8);}
+  cx.fillStyle=skin;cx.fillRect(x-5,y-18,10,11);
+  cx.fillStyle='#1a0a00';cx.fillRect(x-3,y-15,2,2);cx.fillRect(x+1,y-15,2,2);
+  if(female){cx.fillStyle='rgba(255,150,150,0.5)';cx.fillRect(x-5,y-13,3,2);cx.fillRect(x+2,y-13,3,2);}
+  cx.fillStyle='#d4607a';cx.fillRect(x-1,y-10,3,1);
+  cx.fillStyle=shirt;cx.fillRect(x-6,y-7,12,12);
+  if(female){cx.beginPath();cx.moveTo(x-6,y+5);cx.lineTo(x-9,y+18);cx.lineTo(x+9,y+18);cx.lineTo(x+6,y+5);cx.closePath();cx.fill();}
+  cx.fillStyle=skin;const arm=wf%2===0?-1:1;cx.fillRect(x-9,y-7+arm,3,9);cx.fillRect(x+6,y-7-arm,3,9);
+  if(female){cx.fillStyle='#f0c0a0';const lg=wf%2===0?2:0;cx.fillRect(x-4,y+18,4,6+lg);cx.fillRect(x+0,y+18,4,6+(2-lg));cx.fillStyle='#c0392b';cx.fillRect(x-5,y+23,4,3);cx.fillRect(x+1,y+23,4,3);}
+  else{cx.fillStyle='#4a3a2a';const lg=wf%2===0?2:0;cx.fillRect(x-4,y+5,4,11+lg);cx.fillRect(x+0,y+5,4,11+(2-lg));cx.fillStyle='#2a1a0a';cx.fillRect(x-5,y+15,4,3);cx.fillRect(x+1,y+15,4,3);}
+  cx.restore();
+  cx.fillStyle='rgba(0,0,0,0.55)';cx.font='bold 10px Nunito,sans-serif';cx.textAlign='center';cx.fillText(name,x+1,y+33);
+  cx.fillStyle='#f8eecc';cx.fillText(name,x,y+32);
+  if(bubble){
+    cx.font='bold 9px Nunito,sans-serif';const bw=cx.measureText(bubble).width+16;const bx=x-bw/2,by=y-48;
+    rr(bx,by,bw,17,5,'#fff8ee','#e0a040',1.5);cx.fillStyle='#5a3a1a';cx.textAlign='center';cx.fillText(bubble,x,by+12);
+    cx.beginPath();cx.moveTo(x-4,by+17);cx.lineTo(x,by+23);cx.lineTo(x+4,by+17);
+    cx.fillStyle='#fff8ee';cx.fill();cx.strokeStyle='#e0a040';cx.lineWidth=1;cx.stroke();
+  }
+}
+const BREAK_SPOTS=[{x:695,y:180},{x:730,y:390},{x:760,y:440},{x:710,y:140},{x:820,y:300},{x:870,y:190},{x:910,y:380},{x:860,y:460}];
+const agentSt=AGENTS.map((a,i)=>({
+  ...a,deskX:DESK_POS[i].x+55,deskY:DESK_POS[i].y+75,
+  x:DESK_POS[i].x+55,y:DESK_POS[i].y+75,tx:DESK_POS[i].x+55,ty:DESK_POS[i].y+75,
+  wf:Math.floor(Math.random()*4),dir:'right',walkTimer:Math.floor(Math.random()*150),walkDelay:150+i*40,breakMode:false,breakTimer:0,ci:i,
+}));
+let tick=0;
+function animate(){
+  cx.clearRect(0,0,W,H);drawScene();
+  DESK_POS.forEach((d,i)=>{drawModernDesk(d.x,d.y,AGENTS[i].shirt);});
+  tick++;
+  agentSt.forEach((a,i)=>{
+    a.walkTimer++;
+    if(a.state==='idle'||a.breakMode){
+      const dx=a.tx-a.x,dy=a.ty-a.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist>2){a.x+=dx/dist*1.5;a.y+=dy/dist*1.5;a.dir=dx>0?'right':'left';if(tick%6===0)a.wf++;}
+      else{a.wf=0;if(a.breakMode){a.breakTimer++;if(a.breakTimer>150){a.breakMode=false;a.breakTimer=0;a.tx=a.deskX;a.ty=a.deskY;}}}
+      if(a.walkTimer>a.walkDelay&&!a.breakMode){const s=BREAK_SPOTS[Math.floor(Math.random()*BREAK_SPOTS.length)];a.tx=s.x;a.ty=s.y;a.walkDelay=120+Math.random()*160;a.walkTimer=0;}
+    }else{
+      if(a.walkTimer>280+i*55&&!a.breakMode){a.breakMode=true;a.breakTimer=0;const s=BREAK_SPOTS[i%BREAK_SPOTS.length];a.tx=s.x;a.ty=s.y;a.walkTimer=0;}
+      else if(!a.breakMode){a.x=a.deskX;a.y=a.deskY;a.wf=0;}
+    }
+  });
+  [...agentSt].sort((a,b)=>a.y-b.y).forEach(a=>{
+    const atDesk=!a.breakMode&&a.state!=='idle'&&Math.abs(a.x-a.deskX)<5;
+    const bubble=atDesk&&a.state==='working'?a.task:a.breakMode?'☕ break':null;
+    drawCharacter(a.x,a.y,a.skin,a.shirt,a.hair,a.female,a.wf,a.dir,a.name,bubble,atDesk?a.ci:undefined);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+async function sendChat(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';
+  addMsg(msg,'user');
+  addMsg('思考中...','sys');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,
+        system:'You are LondonKelly AI assistant. Answer in Traditional Chinese. Be concise.',
+        messages:[{role:'user',content:msg}]})
+    });
+    const data=await resp.json();
+    const answer=data.content?.[0]?.text||'抱歉，無法回應。';
+    const msgs=document.getElementById('chat-msgs');
+    const last=msgs.lastChild;if(last&&last.textContent==='思考中...')msgs.removeChild(last);
+    addMsg(answer,'bot');
+  }catch(e){
+    const msgs=document.getElementById('chat-msgs');
+    const last=msgs.lastChild;if(last&&last.textContent==='思考中...')msgs.removeChild(last);
+    addMsg('提示：Click 上面按鈕可手動觸發 agents！','bot');
+  }
+}
+function addMsg(text,type){
+  const msgs=document.getElementById('chat-msgs');
+  const div=document.createElement('div');div.className='chat-msg-'+type;div.textContent=text;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+</script>
+</body>
+</html>
