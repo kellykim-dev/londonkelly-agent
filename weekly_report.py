@@ -480,7 +480,7 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{s.get('Conversions',0)}</td>
             </tr>"""
 
-    # Build ads_kw_section variable
+    # Build ads_kw_section
     _no_kw = '<tr><td colspan="4" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
     ads_kw_section = (
         '<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div>'
@@ -488,8 +488,7 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
         + (ads_kw_rows if ads_kw_rows else _no_kw) +
         '</table>'
     )
-
-    html = f"""<!DOCTYPE html>
+        html = f"""<!DOCTYPE html>
 <html lang="{'zh-HK' if lang=='zh' else 'ko'}">
 <head>
 <meta charset="UTF-8">
