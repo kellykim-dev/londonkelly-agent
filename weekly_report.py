@@ -530,7 +530,7 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
     <div class="card"><div class="card-label">{labels[4]}</div><div class="card-value gold">HK${ads.get('cost',0):,.0f}</div></div>
     <div class="card"><div class="card-label">{labels[5]}</div><div class="card-value gold">{ads.get('roas',0)}x</div></div>
     <div class="card"><div class="card-label">Shopify 成交</div><div class="card-value" style="color:#ff8fab">{shopify.get('orders',0) if shopify else 'N/A'}</div></div>
-    <div class="card"><div class="card-label">Shopify 收入</div><div class="card-value gold">HK${shopify.get('revenue',0):,.0f if shopify else 0}</div></div>
+    <div class="card"><div class="card-label">Shopify 收入</div><div class="card-value gold">HK${shopify.get('revenue',0) if shopify else 0:,.0f}</div></div>
     <div class="card"><div class="card-label">GA4 vs Shopify</div><div class="card-value" style="color:{'#f48fb1' if shopify and abs(shopify.get('orders',0)-ga4.get('purchases',0))>3 else '#4dd0c4'}">{shopify.get('orders',0)-ga4.get('purchases',0) if shopify else 0:+d} 單</div></div>
   </div>
 
