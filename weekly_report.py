@@ -125,8 +125,35 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
+    # GA4 Ads Keywords with conversion
     ads_keywords = []
     org_keywords = []
+    try:
+        ads_kw_req = RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            date_ranges=[date_range],
+            dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
+            metrics=[
+                Metric(name="sessions"),
+                Metric(name="ecommercePurchases"),
+                Metric(name="purchaseRevenue"),
+            ],
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
+            limit=20
+        )
+        for r in client.run_report(ads_kw_req).rows:
+            kw = r.dimension_values[0].value
+            if kw and kw not in ["(not set)", "(not provided)"]:
+                ads_keywords.append({
+                    "keyword": kw,
+                    "sessions": int(r.metric_values[0].value),
+                    "purchases": int(r.metric_values[1].value),
+                    "revenue": round(float(r.metric_values[2].value), 0),
+                })
+        print(f"  ✅ Ads KW: {len(ads_keywords)}")
+    except Exception as e:
+        print(f"  ⚠️ Ads KW error: {e}")
+
     return overview, channels, keywords, landing_pages, ads_keywords, org_keywords
 
 def get_ads_data_from_sheets():
@@ -293,6 +320,15 @@ def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", 
         for p in landing_pages[:5]
     ])
 
+    # Shopify summary for Claude
+    shopify_summary = ""
+    if shopify:
+        diff_orders = shopify.get('orders',0) - ga4.get('purchases',0)
+        diff_rev = shopify.get('revenue',0) - ga4.get('revenue',0)
+        shopify_summary = f"""Shopify 成交: {shopify.get('orders',0)} 單 | 收入: HK${shopify.get('revenue',0):,.0f} | 平均客單: HK${shopify.get('avg_order_value',0):,.0f}
+GA4 成交: {ga4.get('purchases',0)} 單 | 收入: HK${ga4.get('revenue',0):,.0f}
+差距: {diff_orders:+d} 單 / HK${diff_rev:+,.0f}"""
+
     if lang == "zh":
         prompt = f"""你係 LondonKelly 嘅數據分析師，用繁體中文寫詳細週報。
 LondonKelly 係英國代購，賣歐洲奢侈品，目標客戶香港/台灣/澳門。
@@ -322,6 +358,9 @@ Impressions: {ads.get('impressions',0):,} | CTR: {ads.get('ctr','')} | Conversio
 
 【Top Landing Pages】
 {lp_summary}
+
+【Shopify vs GA4 對比】
+{shopify_summary if shopify_summary else '(Shopify 數據未取得)'}
 
 請寫完整分析報告，包括：
 ## 📊 本週表現總結
