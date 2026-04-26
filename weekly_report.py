@@ -122,7 +122,32 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    return overview, channels, keywords, landing_pages, [], []
+    # GA4 Ads Keywords with conversion
+    ads_keywords_result = []
+    org_keywords_result = []
+    try:
+        ads_kw_req = RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            date_ranges=[date_range],
+            dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
+            metrics=[Metric(name="sessions"), Metric(name="ecommercePurchases"), Metric(name="purchaseRevenue")],
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
+            limit=20
+        )
+        for r in client.run_report(ads_kw_req).rows:
+            kw = r.dimension_values[0].value
+            if kw and kw not in ["(not set)", "(not provided)"]:
+                ads_keywords_result.append({
+                    "keyword": kw,
+                    "sessions": int(r.metric_values[0].value),
+                    "purchases": int(r.metric_values[1].value),
+                    "revenue": round(float(r.metric_values[2].value), 0),
+                })
+    except Exception as e:
+        print(f"  ⚠️ Ads KW error: {e}")
+
+    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords_result)}")
+    return overview, channels, keywords, landing_pages, ads_keywords_result, org_keywords_result
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")

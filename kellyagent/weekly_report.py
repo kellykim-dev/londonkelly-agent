@@ -122,7 +122,32 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    return overview, channels, keywords, landing_pages
+    # GA4 Ads Keywords with conversion
+    ads_keywords_result = []
+    org_keywords_result = []
+    try:
+        ads_kw_req = RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            date_ranges=[date_range],
+            dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
+            metrics=[Metric(name="sessions"), Metric(name="ecommercePurchases"), Metric(name="purchaseRevenue")],
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
+            limit=20
+        )
+        for r in client.run_report(ads_kw_req).rows:
+            kw = r.dimension_values[0].value
+            if kw and kw not in ["(not set)", "(not provided)"]:
+                ads_keywords_result.append({
+                    "keyword": kw,
+                    "sessions": int(r.metric_values[0].value),
+                    "purchases": int(r.metric_values[1].value),
+                    "revenue": round(float(r.metric_values[2].value), 0),
+                })
+    except Exception as e:
+        print(f"  ⚠️ Ads KW error: {e}")
+
+    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords_result)}")
+    return overview, channels, keywords, landing_pages, ads_keywords_result, org_keywords_result
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")
@@ -185,7 +210,7 @@ def get_ads_data_from_sheets():
                 "conversions": 0, "conv_value": 0, "ctr": "0%", "week": "",
                 "ad_groups": [], "keywords": [], "search_terms": []}
 
-def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh"):
+def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", ads_keywords=None, org_keywords=None):
     print(f"  🤖 Claude 分析 ({'繁中' if lang=='zh' else '韓文'})...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
@@ -472,9 +497,11 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  {'<div class="section-title">🔑 ' + kw_title + '</div><table class="data-table"><tr><th>Keyword</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + kw_rows + '</table>' if kw_rows else ''}
+  {'<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + ads_kw_rows + '</table>' if ads_kw_rows else ''}
 
-  {'<div class="section-title">🔍 ' + st_title + '</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
+  {'<div class="section-title">🌿 GA4 Organic Keywords</div><table class="data-table"><tr><th>Keyword</th><th>Source</th><th>Sessions</th><th>成交</th></tr>' + org_kw_rows + '</table>' if org_kw_rows else ''}
+
+  {'<div class="section-title">🔍 Top Search Terms (Ads Script)</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
 
   <div class="section-title">🤖 Claude 深度分析</div>
   <div class="analysis">{analysis_html}</div>
@@ -502,15 +529,15 @@ def update_status(success):
 
 if __name__ == "__main__":
     print("🚀 LondonKelly Weekly Report Agent 啟動...")
-    ga4, channels, kw_ga4, landing_pages = get_ga4_data()
+    ga4, channels, kw_ga4, landing_pages, ads_keywords, org_keywords = get_ga4_data()
     ads = get_ads_data_from_sheets()
 
     print("🤖 Claude 分析緊（繁中）...")
-    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh")
+    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
     generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     print("🤖 Claude 분석 중（韓文）...")
-    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr")
+    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
     generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
 
     update_status(True)
