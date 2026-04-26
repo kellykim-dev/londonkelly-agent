@@ -472,9 +472,11 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  {'<div class="section-title">🔑 ' + kw_title + '</div><table class="data-table"><tr><th>Keyword</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + kw_rows + '</table>' if kw_rows else ''}
+  {'<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + ads_kw_rows + '</table>' if ads_kw_rows else ''}
 
-  {'<div class="section-title">🔍 ' + st_title + '</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
+  {'<div class="section-title">🌿 GA4 Organic Keywords</div><table class="data-table"><tr><th>Keyword</th><th>Source</th><th>Sessions</th><th>成交</th></tr>' + org_kw_rows + '</table>' if org_kw_rows else ''}
+
+  {'<div class="section-title">🔍 Top Search Terms (Ads Script)</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
 
   <div class="section-title">🤖 Claude 深度分析</div>
   <div class="analysis">{analysis_html}</div>
