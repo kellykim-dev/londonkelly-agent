@@ -125,8 +125,31 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
+    # GA4 Ads Keywords with conversion
     ads_keywords = []
     org_keywords = []
+    try:
+        ads_kw_req = RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            date_ranges=[date_range],
+            dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
+            metrics=[Metric(name="sessions"), Metric(name="ecommercePurchases"), Metric(name="purchaseRevenue")],
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
+            limit=20
+        )
+        for r in client.run_report(ads_kw_req).rows:
+            kw = r.dimension_values[0].value
+            if kw and kw not in ["(not set)", "(not provided)"]:
+                ads_keywords.append({
+                    "keyword": kw,
+                    "sessions": int(r.metric_values[0].value),
+                    "purchases": int(r.metric_values[1].value),
+                    "revenue": round(float(r.metric_values[2].value), 0),
+                })
+        print(f"  ✅ Ads KW: {len(ads_keywords)}")
+    except Exception as e:
+        print(f"  ⚠️ Ads KW error: {e}")
+
     return overview, channels, keywords, landing_pages, ads_keywords, org_keywords
 
 def get_ads_data_from_sheets():
@@ -480,8 +503,6 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{s.get('Conversions',0)}</td>
             </tr>"""
 
-    _no_kw = '<tr><td colspan="4" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
-    ads_kw_section = ('<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>' + (ads_kw_rows if ads_kw_rows else _no_kw) + '</table>')
     html = f"""<!DOCTYPE html>
 <html lang="{'zh-HK' if lang=='zh' else 'ko'}">
 <head>
