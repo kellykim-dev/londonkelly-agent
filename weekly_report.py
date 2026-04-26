@@ -122,7 +122,9 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    return overview, channels, keywords, landing_pages
+    ads_keywords_local = []
+    org_keywords_local = []
+    return overview, channels, keywords, landing_pages, ads_keywords_local, org_keywords_local
 
 def get_ads_data_from_sheets():
     print("📈 拉 Google Ads 數據 (from Sheets)...")
@@ -320,7 +322,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh"):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -502,7 +504,7 @@ def update_status(success):
 
 if __name__ == "__main__":
     print("🚀 LondonKelly Weekly Report Agent 啟動...")
-    ga4, channels, kw_ga4, landing_pages = get_ga4_data()
+    ga4, channels, kw_ga4, landing_pages, ads_keywords, org_keywords = get_ga4_data()
     ads = get_ads_data_from_sheets()
 
     print("🤖 Claude 分析緊（繁中）...")
