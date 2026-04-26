@@ -1,3 +1,4 @@
+import requests
 import os
 import re
 import json
@@ -13,6 +14,8 @@ from google.oauth2 import service_account
 GA4_PROPERTY_ID  = os.environ.get("GA4_PROPERTY_ID", "")
 GA4_KEY_FILE     = os.environ.get("GA4_KEY_FILE", "ga4_key.json")
 ANTHROPIC_KEY    = os.environ.get("ANTHROPIC_API_KEY", "")
+SHOPIFY_STORE    = os.environ.get("SHOPIFY_STORE", "londonkelly.myshopify.com")
+SHOPIFY_TOKEN    = os.environ.get("SHOPIFY_TOKEN", "")
 SHEETS_URL       = "https://docs.google.com/spreadsheets/d/1Ef5whhbOuUh-hQn8N1GGKKzSJ8UrjinXigZmkS0RiyE/edit"
 
 def get_date_range():
@@ -122,31 +125,8 @@ def get_ga4_data():
         })
 
     print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)}")
-    # GA4 Ads Keywords with conversion (sorted by purchases)
     ads_keywords = []
     org_keywords = []
-    try:
-        ads_kw_req = RunReportRequest(
-            property=f"properties/{GA4_PROPERTY_ID}",
-            date_ranges=[date_range],
-            dimensions=[Dimension(name="sessionGoogleAdsKeyword")],
-            metrics=[Metric(name="sessions"), Metric(name="ecommercePurchases"), Metric(name="purchaseRevenue")],
-            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="ecommercePurchases"), desc=True)],
-            limit=20
-        )
-        for r in client.run_report(ads_kw_req).rows:
-            kw = r.dimension_values[0].value
-            if kw and kw not in ["(not set)", "(not provided)"]:
-                ads_keywords.append({
-                    "keyword": kw,
-                    "sessions": int(r.metric_values[0].value),
-                    "purchases": int(r.metric_values[1].value),
-                    "revenue": round(float(r.metric_values[2].value), 0),
-                })
-    except Exception as e:
-        print(f"  ⚠️ Ads KW: {e}")
-
-    print(f"  ✅ Sessions: {overview.get('sessions',0):,} | Channels: {len(channels)} | Ads KW: {len(ads_keywords)}")
     return overview, channels, keywords, landing_pages, ads_keywords, org_keywords
 
 def get_ads_data_from_sheets():
@@ -182,15 +162,10 @@ def get_ads_data_from_sheets():
         except:
             kw_data = []
 
-        # Search Terms sheet - sort by Conv Value DESC
+        # Search Terms sheet
         try:
             st_sheet = sh.worksheet("Search Terms")
-            all_st = st_sheet.get_all_records()
-            st_data = sorted(
-                all_st,
-                key=lambda x: float(str(x.get('Conv Value', 0)).replace(',','') or 0),
-                reverse=True
-            )[:15]
+            st_data = st_sheet.get_all_records()[:15]
         except:
             st_data = []
 
@@ -215,7 +190,69 @@ def get_ads_data_from_sheets():
                 "conversions": 0, "conv_value": 0, "ctr": "0%", "week": "",
                 "ad_groups": [], "keywords": [], "search_terms": []}
 
-def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", ads_keywords=None, org_keywords=None):
+
+def get_shopify_data():
+    """Get real order data from Shopify API"""
+    print("🛍️ 拉 Shopify 訂單數據...")
+    try:
+        last_monday, last_sunday = get_date_range()
+        start = last_monday.strftime("%Y-%m-%dT00:00:00+08:00")
+        end = (last_sunday + timedelta(days=1)).strftime("%Y-%m-%dT00:00:00+08:00")
+        
+        headers = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
+        url = f"https://{SHOPIFY_STORE}/admin/api/2024-01/orders.json"
+        params = {
+            "status": "any",
+            "created_at_min": start,
+            "created_at_max": end,
+            "limit": 250,
+            "fields": "id,created_at,total_price,subtotal_price,financial_status,line_items,cancel_reason"
+        }
+        
+        all_orders = []
+        while url:
+            resp = requests.get(url, headers=headers, params=params)
+            resp.raise_for_status()
+            orders = resp.json().get("orders", [])
+            all_orders.extend(orders)
+            # Pagination
+            link = resp.headers.get("Link", "")
+            url = None
+            params = None
+            if 'rel="next"' in link:
+                for part in link.split(","):
+                    if 'rel="next"' in part:
+                        url = part.split(";")[0].strip().strip("<>")
+                        break
+        
+        # Calculate metrics
+        paid_orders = [o for o in all_orders if o.get("financial_status") in ["paid", "partially_paid"]]
+        cancelled = [o for o in all_orders if o.get("cancel_reason")]
+        
+        total_revenue = sum(float(o.get("total_price", 0)) for o in paid_orders)
+        total_orders = len(paid_orders)
+        avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+        
+        # Add to cart estimate (from line items of all orders including abandoned)
+        # We use total orders including pending as proxy
+        all_total = len(all_orders)
+        
+        print(f"  ✅ Shopify 成交: {total_orders} 單 | 收入: HK${total_revenue:,.0f} | 平均客單: HK${avg_order_value:,.0f}")
+        
+        return {
+            "orders": total_orders,
+            "revenue": round(total_revenue, 0),
+            "avg_order_value": round(avg_order_value, 0),
+            "cancelled": len(cancelled),
+            "all_orders": all_total,
+            "week_start": last_monday.strftime("%Y-%m-%d"),
+            "week_end": last_sunday.strftime("%Y-%m-%d"),
+        }
+    except Exception as e:
+        print(f"  ⚠️ Shopify 拉取失敗: {e}")
+        return {"orders": 0, "revenue": 0, "avg_order_value": 0, "cancelled": 0, "all_orders": 0}
+
+def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", ads_keywords=None, org_keywords=None, shopify=None):
     print(f"  🤖 Claude 分析 ({'繁中' if lang=='zh' else '韓文'})...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
@@ -350,7 +387,7 @@ def md2html(t):
     t = t.replace('\n', '<br>')
     return t
 
-def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None):
+def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lang="zh", ads_keywords=None, org_keywords=None, shopify=None):
     week = f"{ga4.get('week_start','')} ~ {ga4.get('week_end','')}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     analysis_html = md2html(analysis)
@@ -432,47 +469,16 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
               <td>{k.get('purchases',0)}</td>
             </tr>"""
 
-    # GA4 Ads keywords rows
-    ads_kw_rows = ""
-    for k in (ads_keywords or [])[:10]:
-        ads_kw_rows += f'''<tr>
-          <td><strong>{k.get("keyword","")}</strong></td>
-          <td>{k.get("sessions",0):,}</td>
-          <td>{k.get("purchases",0)}</td>
-          <td>HK${k.get("revenue",0):,.0f}</td>
-        </tr>'''
-
-    # GA4 Organic keywords rows
-    org_kw_rows = ""
-    for k in (org_keywords or [])[:10]:
-        org_kw_rows += f'''<tr>
-          <td>{k.get("keyword","")}</td>
-          <td><span style="color:#8070a0;font-size:11px">{k.get("source","")}</span></td>
-          <td>{k.get("sessions",0):,}</td>
-          <td>{k.get("purchases",0)}</td>
-        </tr>'''
-
-    # Search terms table (sorted by Conv Value from Sheets)
+    # Search terms table
     st_rows = ""
     if ads.get("search_terms"):
         for s in ads["search_terms"][:10]:
             st_rows += f"""<tr>
-              <td><strong>{s.get('Search Term','')}</strong></td>
+              <td>{s.get('Search Term','')}</td>
               <td>{s.get('Clicks',0)}</td>
               <td>HK${s.get('花費(HKD)',0)}</td>
               <td>{s.get('Conversions',0)}</td>
-              <td style="color:{'#4dd0c4' if float(str(s.get('Conv Value',0)).replace(',','') or 0) > 0 else '#f0e8c0'}">HK${s.get('Conv Value',0):}</td>
             </tr>"""
-
-    # Build table sections as variables (avoid f-string quote conflicts)
-    no_data_4 = '<tr><td colspan="4" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
-    no_data_5 = '<tr><td colspan="5" style="color:#8070a0;text-align:center;padding:12px">暫無數據</td></tr>'
-    ads_kw_section = f'''<div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div>
-  <table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr>
-  {ads_kw_rows if ads_kw_rows else no_data_4}</table>'''
-    st_section = f'''<div class="section-title">🔍 Top Search Terms（按 Conv Value 排序）</div>
-  <table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conversions</th><th>Conv Value</th></tr>
-  {st_rows if st_rows else no_data_5}</table>'''
 
     html = f"""<!DOCTYPE html>
 <html lang="{'zh-HK' if lang=='zh' else 'ko'}">
@@ -523,6 +529,9 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
     <div class="card"><div class="card-label">{labels[3]}</div><div class="card-value">{ga4.get('purchases',0):,}</div></div>
     <div class="card"><div class="card-label">{labels[4]}</div><div class="card-value gold">HK${ads.get('cost',0):,.0f}</div></div>
     <div class="card"><div class="card-label">{labels[5]}</div><div class="card-value gold">{ads.get('roas',0)}x</div></div>
+    <div class="card"><div class="card-label">Shopify 成交</div><div class="card-value" style="color:#ff8fab">{shopify.get('orders',0) if shopify else 'N/A'}</div></div>
+    <div class="card"><div class="card-label">Shopify 收入</div><div class="card-value gold">HK${shopify.get('revenue',0):,.0f if shopify else 0}</div></div>
+    <div class="card"><div class="card-label">GA4 vs Shopify</div><div class="card-value" style="color:{'#f48fb1' if shopify and abs(shopify.get('orders',0)-ga4.get('purchases',0))>3 else '#4dd0c4'}">{shopify.get('orders',0)-ga4.get('purchases',0) if shopify else 0:+d} 單</div></div>
   </div>
 
   <div class="section-title">📡 {ch_title}</div>
@@ -533,9 +542,9 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
 
   {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
-  {ads_kw_section}
+  {'<div class="section-title">🔑 ' + kw_title + '</div><table class="data-table"><tr><th>Keyword</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + kw_rows + '</table>' if kw_rows else ''}
 
-  {st_section}
+  {'<div class="section-title">🔍 ' + st_title + '</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr>' + st_rows + '</table>' if st_rows else ''}
 
   <div class="section-title">🤖 Claude 深度分析</div>
   <div class="analysis">{analysis_html}</div>
@@ -565,14 +574,15 @@ if __name__ == "__main__":
     print("🚀 LondonKelly Weekly Report Agent 啟動...")
     ga4, channels, kw_ga4, landing_pages, ads_keywords, org_keywords = get_ga4_data()
     ads = get_ads_data_from_sheets()
+    shopify = get_shopify_data()
 
     print("🤖 Claude 分析緊（繁中）...")
-    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords)
+    analysis_zh = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords, shopify=shopify)
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_zh, lang="zh", ads_keywords=ads_keywords, org_keywords=org_keywords, shopify=shopify)
 
     print("🤖 Claude 분석 중（韓文）...")
-    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
-    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords)
+    analysis_kr = analyze_with_claude(ga4, channels, kw_ga4, landing_pages, ads, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords, shopify=shopify)
+    generate_html(ga4, channels, kw_ga4, landing_pages, ads, analysis_kr, lang="kr", ads_keywords=ads_keywords, org_keywords=org_keywords, shopify=shopify)
 
     update_status(True)
     print("✅ 完成！")
