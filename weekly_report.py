@@ -567,7 +567,7 @@ def generate_html_v2(ga4, channels, ads, shopify,
     st_rows = ""
     if ads.get("search_terms"):
         for s in ads["search_terms"][:15]:
-            conv = int(str(s.get('Conversions', 0)).replace(',', '') or 0)
+            conv = int(float(str(s.get('Conversions', 0)).replace(',', '') or 0))
             conv_color = '#4dd0c4' if conv > 0 else ('#ffe08a' if int(str(s.get('Clicks',0)).replace(',','') or 0) >= 3 else '#d0c8e8')
             st_rows += f"<tr><td>{s.get('Search Term','')[:40]}</td><td>{s.get('Clicks',0)}</td><td>HK${s.get('花費(HKD)',0)}</td><td style='color:{conv_color}'>{conv}</td></tr>"
 
