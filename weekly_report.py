@@ -748,6 +748,7 @@ def generate_actions_html(ga4, ads, shopify, analysis_ad_groups, analysis_keywor
     # Keyword suggestion rows from AI analysis — parse from text
     # We'll show raw AI output in styled sections
     ag_html   = md2html(analysis_ad_groups)
+    ag_table  = ('<table><tr>' + tbl_ag_heads + '</tr>' + ag_rows + '</table>') if ag_rows else ('<p style="color:#8070a0;padding:4px">' + no_ag + '</p>')
     kw_html   = md2html(analysis_keywords)
     st_html   = md2html(analysis_search_terms)
     plan_html = md2html(analysis_action_plan)
@@ -829,7 +830,7 @@ li{{margin:4px 0;padding-left:4px}}
   <details open>
     <summary>{sec_ag}</summary>
     <div class="sec-body">
-      {{'<table><tr>' + tbl_ag_heads + '</tr>' + ag_rows + '</table>' if ag_rows else '<p style="color:#8070a0;padding:4px">' + no_ag + '</p>'}}
+      {ag_table}
       {ag_html}
     </div>
   </details>
