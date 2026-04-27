@@ -294,7 +294,7 @@ def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", 
     if ads.get("ad_groups"):
         top_ag = sorted(ads["ad_groups"], key=lambda x: float(str(x.get("花費(HKD)",0)).replace(",","")), reverse=True)[:8]
         ag_summary = "\n".join([
-            f"  {a.get('Ad Group','')}: 花費 HK${a.get('花費(HKD)',0)} | {a.get('Clicks',0)} clicks | ROAS {a.get('ROAS','0x')}"
+            f"  {a.get('Ad Group','')}: 花費 HK${a.get('花費(HKD)',0)} | {a.get('Clicks',0)} clicks | Conv {a.get('Conversions',0)} | Conv Value HK${a.get('Conv Value', a.get('conv_value',0))} | ROAS {a.get('ROAS','0x')}"
             for a in top_ag
         ])
 
@@ -302,7 +302,7 @@ def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", 
     kw_summary = ""
     if ads.get("keywords"):
         kw_summary = "\n".join([
-            f"  {k.get('Keyword','')}: {k.get('Clicks',0)} clicks | 花費 HK${k.get('花費(HKD)',0)}"
+            f"  {k.get('Keyword','')}: {k.get('Clicks',0)} clicks | 花費 HK${k.get('花費(HKD)',0)} | Conv {k.get('Conversions',0)} | Conv Value HK${k.get('Conv Value', k.get('conv_value',0))} | CPC HK${k.get('CPC', k.get('Avg CPC','N/A'))}"
             for k in ads["keywords"][:10]
         ])
 
@@ -310,7 +310,7 @@ def analyze_with_claude(ga4, channels, keywords, landing_pages, ads, lang="zh", 
     st_summary = ""
     if ads.get("search_terms"):
         st_summary = "\n".join([
-            f"  '{s.get('Search Term','')}': {s.get('Clicks',0)} clicks"
+            f"  '{s.get('Search Term','')}': {s.get('Clicks',0)} clicks | Conv {s.get('Conversions',0)} | 花費 HK${s.get('花費(HKD)',0)}"
             for s in ads["search_terms"][:10]
         ])
 
@@ -362,15 +362,39 @@ Impressions: {ads.get('impressions',0):,} | CTR: {ads.get('ctr','')} | Conversio
 【Shopify vs GA4 對比】
 {shopify_summary if shopify_summary else '(Shopify 數據未取得)'}
 
-請寫完整分析報告，包括：
-## 📊 本週表現總結
-## 🔍 流量來源分析（每個 channel 點表現，哪個 channel 最值得投資）
-## 💰 Google Ads 深度分析（哪個 ad group ROAS 最高/最低，哪些 keyword 最值錢，search terms 有冇機會）
-## 🎯 Top Landing Pages 分析（哪個頁面帶最多轉化，哪個頁面 bounce rate 高需要改善）
-## ⚠️ 需要關注問題
-## 🚀 下週5個具體行動建議（越具體越好，例如暫停邊個 ad group、加邊個 keyword）
+請寫以下完整分析報告，所有建議必須有具體數字支持：
 
-用 emoji，清晰，適合手機睇。"""
+## 📊 本週表現總結
+整體健康度評分（1-10分），最重要亮點3點＋問題3點，每點附數字。
+
+## 🔍 流量來源深度分析
+逐個 channel：sessions、成交、revenue、conv rate，解釋原因，下週具體行動。
+
+## 💰 Google Ads — 逐個 Ad Group 評估
+每個 ad group 格式：
+▸ [名稱] ROAS [X]x | 花費 HK$[X] | Conv Value HK$[X]
+  診斷：[問題原因]
+  建議：[具體操作，例如 pause / 降 bid X% / 加 budget X%]
+
+## 🔑 Keywords 深度分析 + 新 Keywords 建議
+- 高效 keywords（建議加 bid）
+- 低效 keywords（建議 pause 或降 bid）
+- 根據 Search Terms，建議新增 keywords：
+  列出：keyword | match type | 建議 bid | 原因
+- 建議新增 Negative Keywords（防止浪費）
+
+## 📦 Shopify vs GA4 差異解釋
+差距數字，原因分析（draft orders / attribution / 退款），判斷係正常定有問題。
+
+## 🎯 Landing Pages 分析
+轉化好/差嘅頁面，bounce rate 高嘅具體改善方案。
+
+## ⚠️ 需要關注問題（附數字）
+
+## 🚀 下週行動計劃（最少8個，按優先級）
+格式：🔴/🟡/🟢【優先級】操作 — 原因（數字）— 預期效果
+
+用繁體中文，emoji，清晰，適合手機睇。"""
     else:
         prompt = f"""당신은 LondonKelly의 데이터 분석가입니다. 한국어로 상세한 주간 보고서를 작성해주세요.
 
@@ -396,7 +420,7 @@ Keywords: {kw_summary if kw_summary else '(데이터 없음)'}
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=2000,
+        max_tokens=4000,
         messages=[{"role": "user", "content": prompt}]
     )
     return message.content[0].text
@@ -467,11 +491,17 @@ def generate_html(ga4, channels, keywords_ga4, landing_pages, ads, analysis, lan
                 roas_color = '#4dd0c4' if roas_float >= 3 else '#f48fb1'
             except:
                 roas_color = '#b0a0d0'
+            try:
+                cv = float(str(a.get('Conv Value', a.get('conv_value', 0))).replace(',',''))
+                cv_fmt = f"HK${cv:,.0f}"
+            except:
+                cv_fmt = "HK$0"
             ag_rows += f"""<tr>
               <td><strong>{a.get('Ad Group','')[:30]}</strong></td>
               <td>{a.get('Clicks',0)}</td>
               <td>HK${a.get('花費(HKD)',0)}</td>
               <td>{a.get('Conversions',0)}</td>
+              <td style="color:#ffe08a">{cv_fmt}</td>
               <td style="color:{roas_color}">{a.get('ROAS','0x')}</td>
             </tr>"""
 
@@ -585,7 +615,7 @@ body{{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:1
     {ch_rows}
   </table>
 
-  {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
+  {'<div class="section-title">📣 ' + ad_title + '</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>Conv Value</th><th>ROAS</th></tr>' + ag_rows + '</table>' if ag_rows else ''}
 
   {ads_kw_section}
 
