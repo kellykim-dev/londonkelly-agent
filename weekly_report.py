@@ -354,9 +354,12 @@ def analyze_keywords(keywords, search_terms):
     if not keywords and not search_terms:
         return "<p style='color:#8070a0'>暫無Keywords數據</p>"
 
+    # Filter out zero-data keywords, show top 15 with actual data
+    active_kw = [k for k in keywords if int(str(k.get('Clicks',0)).replace(',','') or 0) > 0 or float(str(k.get('花費(HKD)',0)).replace(',','') or 0) > 0]
+    kw_display = active_kw[:15] if active_kw else keywords[:15]
     kw_lines = "\n".join([
         f"  [{k.get('Keyword','')[:40]}] ({k.get('Match Type', k.get('match_type','?'))}): Clicks:{k.get('Clicks',0)} | 花費:HK${k.get('花費(HKD)',0)} | Conv:{k.get('Conversions',0)} | ConvValue:HK${k.get('Conv Value', k.get('conv_value',0))} | CPC:HK${k.get('CPC', k.get('Avg CPC','?'))} | QS:{k.get('Quality Score','?')}"
-        for k in keywords[:15]
+        for k in kw_display
     ])
 
     st_lines = "\n".join([
@@ -556,7 +559,7 @@ def generate_html_v2(ga4, channels, ads, shopify,
     kw_rows = ""
     if ads.get("keywords"):
         for k in ads["keywords"][:10]:
-            conv = int(str(k.get('Conversions', 0)).replace(',', '') or 0)
+            conv = int(float(str(k.get('Conversions', 0)).replace(',', '') or 0))
             conv_color = '#4dd0c4' if conv > 0 else '#f48fb1'
             kw_rows += f"<tr><td>{k.get('Keyword','')[:35]}</td><td style='font-size:11px;color:#8070a0'>{k.get('Match Type', k.get('match_type','?'))}</td><td>{k.get('Clicks',0)}</td><td>HK${k.get('花費(HKD)',0)}</td><td style='color:{conv_color}'>{conv}</td><td>HK${k.get('Conv Value', k.get('conv_value',0))}</td><td>HK${k.get('CPC', k.get('Avg CPC','?'))}</td></tr>"
 
