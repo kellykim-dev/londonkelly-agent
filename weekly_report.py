@@ -801,10 +801,10 @@ li{{margin:4px 0;padding-left:4px}}
   <div class="top-nav">
     <a href="index.html" class="back">{back_text}</a>
     <a href="{other_link}" class="report-link">{other_label}</a>
-    <a href="{report_link}" class="report-link">{{report_text}}</a>
+    <a href="{report_link}" class="report-link">{report_text}</a>
   </div>
   <div class="title">{title_text}</div>
-  <div class="week">{{gen_txt}} {now}</div>
+  <div class="week">{gen_txt} {now}</div>
 
   <!-- Snapshot cards -->
   <div class="cards">

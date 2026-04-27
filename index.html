@@ -2,6 +2,19 @@
 <html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
+<script>
+(function(){
+  var pwd = localStorage.getItem('lk_auth');
+  if(pwd !== 'lkagent2024'){
+    var entered = prompt('🔐 LondonKelly Agent\nEnter password:');
+    if(entered !== 'lkagent2024'){
+      document.body.innerHTML = '<div style="background:#0f0820;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#f48fb1;font-size:18px;">⛔ Access denied</div>';
+      return;
+    }
+    localStorage.setItem('lk_auth','lkagent2024');
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LondonKelly AI 辦公室</title>
 <style>
