@@ -1,7 +1,7 @@
 name: LondonKelly Weekly Report
 on:
   schedule:
-    - cron: '0 22 * * 0'
+    - cron: '0 22 */4 * *'
   workflow_dispatch:
 jobs:
   report:
