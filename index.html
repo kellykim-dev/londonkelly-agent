@@ -46,7 +46,7 @@ canvas#oc{display:block;width:100%;image-rendering:pixelated;}
 #chat-input:focus{border-color:#4dd0c4;}
 #chat-send{background:#4dd0c4;color:#0f0820;border:none;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
 #chat-send:hover{background:#6de0d4;}
-#trigger-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+#trigger-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
 .trigger-btn{background:#1a1030;border:1.5px solid #2a1a50;color:#b0a0d0;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;text-align:center;text-decoration:none;display:block;}
 .trigger-btn:hover{background:#2a1a40;color:#ffd580;border-color:#ffd580;}
 </style>
@@ -69,14 +69,16 @@ canvas#oc{display:block;width:100%;image-rendering:pixelated;}
   </div>
 </div>
 <div id="btnrow">
-  <a href="report.html" class="btn">週報 中文</a>
+  <a href="report.html" class="btn">📊 週報 中文</a>
+  <a href="actions.html" class="btn" style="background:rgba(255,213,128,0.18);border-color:#ffd580;color:#ffd580;">📋 行動清單</a>
   <a href="content.html" class="btn">本週內容</a>
   <a href="competitor.html" class="btn">競爭對手</a>
-  <a href="https://londonkelly.myshopify.com/admin/articles" class="btn hi">部落格</a>
 </div>
-<div id="btnrow2">
+<div id="btnrow2" style="grid-template-columns:1fr 1fr 1fr 1fr;">
   <a href="report_kr.html" class="btn">週報 한국어</a>
-  <a href="competitor_kr.html" class="btn">競爭사 분석</a>
+  <a href="actions_kr.html" class="btn" style="background:rgba(255,213,128,0.18);border-color:#ffd580;color:#ffd580;">📋 액션 리스트</a>
+  <a href="competitor_kr.html" class="btn">競爭사 분析</a>
+  <a href="https://londonkelly.myshopify.com/admin/articles" class="btn hi">部落格</a>
 </div>
 <div id="chatbox">
   <div id="chat-title">💬 手動觸發 Agents</div>
@@ -85,6 +87,7 @@ canvas#oc{display:block;width:100%;image-rendering:pixelated;}
     <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/content_agent.yml" target="_blank">跑內容</a>
     <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/competitor_agent.yml" target="_blank">跑競爭</a>
     <a class="trigger-btn" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/blog_agent.yml" target="_blank">跑部落格</a>
+    <a class="trigger-btn" style="border-color:#ffd580;color:#ffd580;" href="https://github.com/kellykim-dev/londonkelly-agent/actions/workflows/weekly_report.yml" target="_blank">跑行動清單</a>
   </div>
   <div id="chat-msgs">
     <div class="chat-msg-sys">Click 上面按鈕去 GitHub Actions 手動觸發 agents。</div>
