@@ -20,9 +20,9 @@ SHEETS_URL       = "https://docs.google.com/spreadsheets/d/1Ef5whhbOuUh-hQn8N1GG
 
 def get_date_range():
     today = datetime.now()
-    last_monday = today - timedelta(days=today.weekday() + 7)
-    last_sunday = last_monday + timedelta(days=6)
-    return last_monday, last_sunday
+    start = today - timedelta(days=7)  # last 7 days from today
+    end = today - timedelta(days=1)    # up to yesterday
+    return start, end
 
 def get_ga4_data():
     print("📊 拉 GA4 數據...")
@@ -31,10 +31,10 @@ def get_ga4_data():
         scopes=["https://www.googleapis.com/auth/analytics.readonly"]
     )
     client = BetaAnalyticsDataClient(credentials=creds)
-    last_monday, last_sunday = get_date_range()
+    date_start, date_end = get_date_range()
     date_range = DateRange(
-        start_date=last_monday.strftime("%Y-%m-%d"),
-        end_date=last_sunday.strftime("%Y-%m-%d")
+        start_date=date_start.strftime("%Y-%m-%d"),
+        end_date=date_end.strftime("%Y-%m-%d")
     )
 
     # 1. 總覽數據
@@ -55,8 +55,8 @@ def get_ga4_data():
             "sessions": int(row[0].value), "users": int(row[1].value),
             "pageviews": int(row[2].value), "add_to_carts": int(row[3].value),
             "purchases": int(row[4].value), "revenue": float(row[5].value),
-            "week_start": last_monday.strftime("%Y-%m-%d"),
-            "week_end": last_sunday.strftime("%Y-%m-%d"),
+            "week_start": date_start.strftime("%Y-%m-%d"),
+            "week_end": date_end.strftime("%Y-%m-%d"),
         }
 
     # 2. Channel breakdown (sessions + purchases by channel)
@@ -222,9 +222,9 @@ def get_shopify_data():
     """Get real order data from Shopify API"""
     print("🛍️ 拉 Shopify 訂單數據...")
     try:
-        last_monday, last_sunday = get_date_range()
-        start = last_monday.strftime("%Y-%m-%dT00:00:00+08:00")
-        end = (last_sunday + timedelta(days=1)).strftime("%Y-%m-%dT00:00:00+08:00")
+        date_start, date_end = get_date_range()
+        start = date_start.strftime("%Y-%m-%dT00:00:00+08:00")
+        end = (date_end + timedelta(days=1)).strftime("%Y-%m-%dT00:00:00+08:00")
         
         headers = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
         url = f"https://{SHOPIFY_STORE}/admin/api/2024-01/orders.json"
@@ -272,8 +272,8 @@ def get_shopify_data():
             "avg_order_value": round(avg_order_value, 0),
             "cancelled": len(cancelled),
             "all_orders": all_total,
-            "week_start": last_monday.strftime("%Y-%m-%d"),
-            "week_end": last_sunday.strftime("%Y-%m-%d"),
+            "week_start": date_start.strftime("%Y-%m-%d"),
+            "week_end": date_end.strftime("%Y-%m-%d"),
         }
     except Exception as e:
         print(f"  ⚠️ Shopify 拉取失敗: {e}")
