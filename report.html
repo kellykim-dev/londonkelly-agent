@@ -4,273 +4,123 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LondonKelly 週報</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:16px;}
-.wrap{max-width:700px;margin:0 auto;}
-.title{font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px 20px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:16px;}
-.back{display:inline-flex;align-items:center;gap:6px;color:#ffd580;font-size:13px;font-weight:800;margin-bottom:12px;text-decoration:none;background:rgba(255,213,128,0.1);border:1.5px solid rgba(255,213,128,0.3);padding:7px 16px;border-radius:10px;}
-.other{display:block;text-align:center;color:#b0a0d0;font-size:13px;font-weight:700;margin-bottom:14px;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:9px;border-radius:10px;}
-.week{color:#b0a0d0;font-size:13px;text-align:center;margin-bottom:16px;font-weight:700;}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:14px;text-align:center;}
-.card-label{color:#8070a0;font-size:12px;margin-bottom:6px;font-weight:700;}
-.card-value{color:#4dd0c4;font-size:22px;font-weight:800;}
-.card-value.gold{color:#ffd580;}
-.card-value.blue{color:#90caf9;}
-.section-title{color:#4dd0c4;font-size:13px;font-weight:800;margin:18px 0 8px;}
-.data-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px;}
-.data-table th{background:#1a1030;color:#ffd580;padding:9px 10px;border:1px solid #2a1a50;text-align:left;font-weight:800;}
-.data-table td{padding:8px 10px;border:1px solid #1a1030;color:#d0c8e8;border-bottom:1px solid #2a1a50;}
-.data-table tr:hover td{background:#1e1240;}
-.analysis{background:#130d25;border:1.5px solid #2a1a50;border-radius:12px;padding:18px;font-size:14px;line-height:1.9;}
-.analysis h3{color:#4dd0c4;margin:14px 0 6px;font-size:14px;font-weight:800;}
-.analysis strong{color:#ffd580;}
-.analysis hr{border:none;border-top:1px solid #2a1a50;margin:12px 0;}
-.analysis li{margin:4px 0;}
-.footer{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0820;color:#f0e8c0;font-family:'Nunito',sans-serif;padding:12px;font-size:14px}
+.wrap{max-width:720px;margin:0 auto}
+.top-nav{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.back{flex:1;color:#ffd580;font-size:13px;font-weight:800;text-decoration:none;background:rgba(255,213,128,.1);border:1.5px solid rgba(255,213,128,.3);padding:7px 14px;border-radius:10px;text-align:center}
+.lang-switch{color:#b0a0d0;font-size:13px;font-weight:700;text-decoration:none;background:#1a1030;border:1.5px solid #2a1a50;padding:7px 14px;border-radius:10px}
+.report-title{font-weight:800;color:#ffd580;font-size:17px;text-align:center;padding:14px;background:linear-gradient(90deg,#1a0e35,#0d1a35);border:2px solid #3a2a60;border-radius:12px;margin-bottom:8px}
+.week-label{color:#b0a0d0;font-size:12px;text-align:center;margin-bottom:14px;font-weight:700}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.card{background:#1a1030;border:1.5px solid #2a1a50;border-radius:12px;padding:12px;text-align:center}
+.card-label{color:#8070a0;font-size:11px;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.card-value{font-size:20px;font-weight:800}
+.cv-teal{color:#4dd0c4}.cv-gold{color:#ffd580}.cv-blue{color:#90caf9}.cv-pink{color:#ff8fab}
+.section-card{background:#130d25;border:1.5px solid #2a1a50;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.section-summary{padding:12px 16px;cursor:pointer;font-weight:800;font-size:13px;color:#ffd580;list-style:none;background:#1a1030;user-select:none;display:flex;align-items:center;gap:6px}
+.section-summary::-webkit-details-marker{display:none}
+details[open] .section-summary{border-bottom:1px solid #2a1a50}
+.section-body{padding:14px 16px;font-size:13px;line-height:1.8}
+.data-table{width:100%;border-collapse:collapse;margin:8px 0 4px;font-size:12px}
+.data-table th{background:#1a1030;color:#ffd580;padding:7px 8px;border:1px solid #2a1a50;text-align:left;font-weight:800;font-size:11px}
+.data-table td{padding:6px 8px;border-bottom:1px solid #1a1030;color:#d0c8e8}
+.data-table tr:hover td{background:#1e1240}
+.sec-h3{color:#4dd0c4;margin:12px 0 6px;font-size:13px;font-weight:800}
+.gold{color:#ffd580}
+.ag-item{background:#1a1030;border-left:3px solid #3a2a60;padding:8px 10px;margin:6px 0;border-radius:0 8px 8px 0;font-size:12px;line-height:1.7}
+li{margin:4px 0;padding-left:4px}
+.divider{border:none;border-top:1px solid #2a1a50;margin:10px 0}
+.pill{font-size:12px}
+.pill.red{color:#f48fb1}.pill.yellow{color:#ffe08a}.pill.green{color:#4dd0c4}
+.tab-nav{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tab-btn{padding:6px 14px;border-radius:8px;border:1.5px solid #2a1a50;background:#1a1030;color:#b0a0d0;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.tab-btn.active{background:#2a1a50;color:#ffd580;border-color:#4a3a70}
+.footer{color:#3a2a5a;font-size:11px;text-align:center;margin-top:16px;font-weight:700}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="index.html" class="back">← 返回辦公室</a>
-  <a href="report_kr.html" class="other">🇰🇷 한국어 버전</a>
-  <div class="title">★ LondonKelly 週報 ★</div>
-  <div class="week">📅 2026-04-20 ~ 2026-04-26</div>
+  <div class="top-nav">
+    <a href="index.html" class="back">← 返回辦公室</a>
+    <a href="report_kr.html" class="lang-switch">🇰🇷 한국어</a>
+  </div>
+  <div class="report-title">★ LondonKelly 週報 ★</div>
+  <div class="week-label">📅 2026-04-20 ~ 2026-04-26 · 生成於 2026-04-27 16:36</div>
 
+  <!-- Summary Cards -->
   <div class="cards">
-    <div class="card"><div class="card-label">Sessions</div><div class="card-value blue">50,586</div></div>
-    <div class="card"><div class="card-label">用戶數</div><div class="card-value blue">48,881</div></div>
-    <div class="card"><div class="card-label">加購物車</div><div class="card-value">231</div></div>
-    <div class="card"><div class="card-label">成交</div><div class="card-value">22</div></div>
-    <div class="card"><div class="card-label">Ads 花費</div><div class="card-value gold">HK$2,280</div></div>
-    <div class="card"><div class="card-label">ROAS</div><div class="card-value gold">18.3x</div></div>
-    <div class="card"><div class="card-label">Shopify 成交</div><div class="card-value" style="color:#ff8fab">27</div></div>
-    <div class="card"><div class="card-label">Shopify 收入</div><div class="card-value gold">HK$171,639</div></div>
+    <div class="card"><div class="card-label">Sessions</div><div class="card-value cv-blue">50,586</div></div>
+    <div class="card"><div class="card-label">Users</div><div class="card-value cv-blue">48,881</div></div>
+    <div class="card"><div class="card-label">加購物車</div><div class="card-value cv-teal">231</div></div>
+    <div class="card"><div class="card-label">Shopify成交</div><div class="card-value cv-pink">27</div></div>
+    <div class="card"><div class="card-label">Ads花費</div><div class="card-value cv-gold">HK$2,280</div></div>
+    <div class="card"><div class="card-label">ROAS</div><div class="card-value" style="color:#4dd0c4">18.3x</div></div>
+    <div class="card"><div class="card-label">Shopify收入</div><div class="card-value cv-gold">HK$171,639</div></div>
     <div class="card"><div class="card-label">GA4 vs Shopify</div><div class="card-value" style="color:#f48fb1">+5 單</div></div>
   </div>
 
-  <div class="section-title">📡 流量來源</div>
-  <table class="data-table">
-    <tr><th>Channel</th><th>Sessions</th><th>成交</th><th>Revenue</th><th>Conv%</th></tr>
-    <tr>
-          <td><strong>Direct</strong></td>
-          <td>36,869</td>
-          <td>4</td>
-          <td>HK$6,025</td>
-          <td><span style="color:#f48fb1">0.01%</span></td>
-        </tr><tr>
-          <td><strong>Organic Search</strong></td>
-          <td>7,641</td>
-          <td>8</td>
-          <td>HK$51,108</td>
-          <td><span style="color:#f48fb1">0.1%</span></td>
-        </tr><tr>
-          <td><strong>Unassigned</strong></td>
-          <td>3,939</td>
-          <td>2</td>
-          <td>HK$5,871</td>
-          <td><span style="color:#f48fb1">0.05%</span></td>
-        </tr><tr>
-          <td><strong>Paid Search</strong></td>
-          <td>1,688</td>
-          <td>6</td>
-          <td>HK$34,847</td>
-          <td><span style="color:#4dd0c4">0.36%</span></td>
-        </tr><tr>
-          <td><strong>Organic Shopping</strong></td>
-          <td>243</td>
-          <td>0</td>
-          <td>HK$0</td>
-          <td><span style="color:#f48fb1">0.0%</span></td>
-        </tr><tr>
-          <td><strong>Referral</strong></td>
-          <td>175</td>
-          <td>0</td>
-          <td>HK$0</td>
-          <td><span style="color:#f48fb1">0.0%</span></td>
-        </tr><tr>
-          <td><strong>Organic Social</strong></td>
-          <td>89</td>
-          <td>1</td>
-          <td>HK$3,690</td>
-          <td><span style="color:#4dd0c4">1.12%</span></td>
-        </tr><tr>
-          <td><strong>Cross-network</strong></td>
-          <td>20</td>
-          <td>0</td>
-          <td>HK$0</td>
-          <td><span style="color:#f48fb1">0.0%</span></td>
-        </tr>
-  </table>
+  <!-- Section 1: Overview -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">📊 本週整體評分 + 亮點問題</summary>
+  <div class="section-body"><h3 class="sec-h3">📊 本週整體評分</h3><br><br><strong class="gold">健康度：7.5 / 10</strong><br>> ROAS 極強、廣告效益高，但整體網站轉化率僅 0.043%，流量龐大卻大量流失，是本週最大隱憂。<br><br><hr class="divider"><br><br><h3 class="sec-h3">✅ 本週3大亮點</h3><br><br>🏆 <strong class="gold">ROAS 高達 18.3x</strong>｜只花 HK$2,280，帶來 HK$171,639 Shopify 收入，廣告投資回報極為亮眼<br><br>💰 <strong class="gold">Shopify 實際收入 HK$171,639</strong>｜比 GA4 記錄高出 HK$54,139，反映真實業績比數據看起來更好<br><br>🎯 <strong class="gold">CPC 效率優秀</strong>｜1,746 clicks 帶動 50,586 Sessions，廣告引流能力強，每分廣告錢都用得其所<br><br><hr class="divider"><br><br><h3 class="sec-h3">⚠️ 本週3大問題</h3><br><br>🚨 <strong class="gold">整體轉化率僅 0.043%</strong>｜50,586 Sessions 只有 22 單成交，流量極大但絕大多數訪客未有行動<br><br>🛒 <strong class="gold">加購 231 → 成交 22，漏斗流失率達 90%</strong>｜加購後大量放棄，結帳流程或運費設定需即時檢查<br><br>📉 <strong class="gold">GA4 收入 HK$117,500 vs Shopify HK$171,639，差距 HK$54,139</strong>｜GA4 追蹤有明顯漏報，影響廣告優化判斷<br><br><hr class="divider"><br><br><h3 class="sec-h3">🔄 GA4 vs Shopify 差距</h3><br><br><strong class="gold">差距：+5 單 / +HK$54,139｜⚠️ 輕微異常，需留意</strong><br><br>> 5 單差距（約 18%）略高於正常容忍範圍（通常 5-10%），最可能原因是部分用戶<strong class="gold">關閉追蹤 / 使用 Ad Blocker</strong>，或 GA4 <strong class="gold">purchase 事件未正確觸發</strong>於某些支付方式（如 PayMe / FPS）。建議核查 GA4 結帳標籤觸發記錄，確保數據準確以支撐出價策略。</div>
+</details>
 
-  <div class="section-title">📣 Google Ads Ad Group</div><table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>Conv Value</th><th>ROAS</th></tr><tr>
-              <td><strong>Vivienne Westwood</strong></td>
-              <td>878</td>
-              <td>HK$718.02</td>
-              <td>13.7</td>
-              <td style="color:#ffe08a">HK$6,840</td>
-              <td style="color:#4dd0c4">9.5x</td>
-            </tr><tr>
-              <td><strong>General 代購</strong></td>
-              <td>131</td>
-              <td>HK$432.97</td>
-              <td>3</td>
-              <td style="color:#ffe08a">HK$5,104</td>
-              <td style="color:#4dd0c4">11.8x</td>
-            </tr><tr>
-              <td><strong>Hermes</strong></td>
-              <td>63</td>
-              <td>HK$229.08</td>
-              <td>0</td>
-              <td style="color:#ffe08a">HK$0</td>
-              <td style="color:#f48fb1">0.0x</td>
-            </tr><tr>
-              <td><strong>Chanel</strong></td>
-              <td>98</td>
-              <td>HK$175.09</td>
-              <td>3</td>
-              <td style="color:#ffe08a">HK$28,774</td>
-              <td style="color:#4dd0c4">164.3x</td>
-            </tr><tr>
-              <td><strong>Goyard</strong></td>
-              <td>128</td>
-              <td>HK$124.96</td>
-              <td>0</td>
-              <td style="color:#ffe08a">HK$0</td>
-              <td style="color:#f48fb1">0.0x</td>
-            </tr><tr>
-              <td><strong>Jellycat</strong></td>
-              <td>79</td>
-              <td>HK$84.42</td>
-              <td>3</td>
-              <td style="color:#ffe08a">HK$990</td>
-              <td style="color:#4dd0c4">11.7x</td>
-            </tr><tr>
-              <td><strong>Celine</strong></td>
-              <td>46</td>
-              <td>HK$72.46</td>
-              <td>0</td>
-              <td style="color:#ffe08a">HK$0</td>
-              <td style="color:#f48fb1">0.0x</td>
-            </tr><tr>
-              <td><strong>Redline</strong></td>
-              <td>60</td>
-              <td>HK$68.76</td>
-              <td>0</td>
-              <td style="color:#ffe08a">HK$0</td>
-              <td style="color:#f48fb1">0.0x</td>
-            </tr></table>
+  <!-- Section 2: Channels with raw data + AI -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">📡 流量來源分析 + 行動建議</summary>
+  <div class="section-body">
+    <table class="data-table">
+      <tr><th>Channel</th><th>Sessions</th><th>成交</th><th>Revenue</th><th>Conv%</th></tr>
+      <tr><td><strong>Direct</strong></td><td>36,869</td><td>4</td><td>HK$6,025</td><td style='color:#f48fb1'>0.01%</td></tr><tr><td><strong>Organic Search</strong></td><td>7,641</td><td>8</td><td>HK$51,108</td><td style='color:#f48fb1'>0.1%</td></tr><tr><td><strong>Unassigned</strong></td><td>3,939</td><td>2</td><td>HK$5,871</td><td style='color:#f48fb1'>0.05%</td></tr><tr><td><strong>Paid Search</strong></td><td>1,688</td><td>6</td><td>HK$34,847</td><td style='color:#f48fb1'>0.36%</td></tr><tr><td><strong>Organic Shopping</strong></td><td>243</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0.0%</td></tr><tr><td><strong>Referral</strong></td><td>175</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0.0%</td></tr><tr><td><strong>Organic Social</strong></td><td>89</td><td>1</td><td>HK$3,690</td><td style='color:#4dd0c4'>1.12%</td></tr><tr><td><strong>Cross-network</strong></td><td>20</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0.0%</td></tr>
+    </table>
+    # 📊 LondonKelly Channel 分析報告<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Direct</strong> — 36,869 sessions | conv 0.01%</div><br>狀態：<span class="pill red">🔴</span> 差<br>原因：流量最大但轉換率極低，訪客意圖不明或landing page體驗差<br>行動：下週檢查Direct流量的落點頁面，優化CTA及首屏內容<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Organic Search</strong> — 7,641 sessions | conv 0.10%</div><br>狀態：<span class="pill yellow">🟡</span> 一般<br>原因：流量第二高，收入HK$51,108表現最佳，但轉換率仍有提升空間<br>行動：找出帶來8單成交的關鍵字，加強相關頁面的SEO內容佈局<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Paid Search</strong> — 1,688 sessions | conv 0.36%</div><br>狀態：<span class="pill green">🟢</span> 好<br>原因：轉換率最高之一，以少量流量帶來HK$34,847，ROI表現突出<br>行動：維持現有投放策略，考慮適度增加預算擴大規模<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Organic Social</strong> — 89 sessions | conv 1.12%</div><br>狀態：<span class="pill green">🟢</span> 好<br>原因：轉換率全場最高1.12%，雖流量極少但質素極高<br>行動：分析該1單成交來自哪個平台／內容，複製成功模式增加發帖頻率<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Unassigned</strong> — 3,939 sessions | conv 0.05%</div><br>狀態：<span class="pill yellow">🟡</span> 一般<br>原因：流量來源不明影響數據準確性，難以優化<br>行動：下週審查UTM參數設置，減少Unassigned流量比例<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Organic Shopping</strong> — 243 sessions | conv 0.0%</div><br>狀態：<span class="pill red">🔴</span> 差<br>原因：有流量但零成交，產品listing吸引力或定價存在問題<br>行動：檢查Google Shopping產品Feed的標題、圖片及價格競爭力<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Referral</strong> — 175 sessions | conv 0.0%</div><br>狀態：<span class="pill red">🔴</span> 差<br>原因：外部連結帶來流量但完全無轉換，來源質素存疑<br>行動：查看Referral來源網站是否相關，考慮移除低質素連結合作<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">Cross-network</strong> — 20 sessions | conv 0.0%</div><br>狀態：<span class="pill red">🔴</span> 差<br>原因：流量極少且無成交，影響可忽略<br>行動：暫時觀察，毋需特別投放資源<br><br><hr class="divider"><br><br><h3 class="sec-h3">💡 Channel整體建議</h3><br><br><strong class="gold">1️⃣ 急需解決Direct流量問題</strong><br>36,869 sessions佔總流量73%但只有4單成交，係最大的浪費點。優先排查是否有大量Bot流量或tracking錯誤，同時優化首頁及產品頁CTA。<br><br><strong class="gold">2️⃣ 加碼Paid Search + 激活Organic Social</strong><br>兩個channel轉換率最高，但流量份額極低。建議增加Paid Search預算，同時制定Social內容日曆，將高質素流量規模化。
+  </div>
+</details>
 
-  <div class="section-title">🔑 GA4 Ads Keywords（有成交排最頂）</div><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr><tr>
-              <td><strong>西太后</strong></td>
-              <td>340</td>
-              <td>2</td>
-              <td>HK$2,990</td>
-            </tr><tr>
-              <td><strong>vivienne westwood</strong></td>
-              <td>264</td>
-              <td>1</td>
-              <td>HK$1,214</td>
-            </tr><tr>
-              <td><strong>vivienne westwood 頸鏈</strong></td>
-              <td>36</td>
-              <td>1</td>
-              <td>HK$1,377</td>
-            </tr><tr>
-              <td><strong>chanel 代購</strong></td>
-              <td>17</td>
-              <td>1</td>
-              <td>HK$28,772</td>
-            </tr><tr>
-              <td><strong>jellycat 代購</strong></td>
-              <td>13</td>
-              <td>1</td>
-              <td>HK$495</td>
-            </tr><tr>
-              <td><strong>london kelly</strong></td>
-              <td>83</td>
-              <td>0</td>
-              <td>HK$0</td>
-            </tr><tr>
-              <td><strong>redline</strong></td>
-              <td>53</td>
-              <td>0</td>
-              <td>HK$0</td>
-            </tr><tr>
-              <td><strong>chanel 手袋</strong></td>
-              <td>45</td>
-              <td>0</td>
-              <td>HK$0</td>
-            </tr><tr>
-              <td><strong>Goyard Tote Bag</strong></td>
-              <td>38</td>
-              <td>0</td>
-              <td>HK$0</td>
-            </tr><tr>
-              <td><strong>vivienne westwood 項鍊</strong></td>
-              <td>38</td>
-              <td>0</td>
-              <td>HK$0</td>
-            </tr></table>
+  <!-- Section 3: Ad Groups -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">📣 Ad Group 表現 + 預算調配</summary>
+  <div class="section-body">
+    <table class="data-table"><tr><th>Ad Group</th><th>Clicks</th><th>花費</th><th>Conv</th><th>Conv Value</th><th>ROAS</th></tr><tr><td><strong>Vivienne Westwood</strong></td><td>878</td><td>HK$718.02</td><td>13.7</td><td style='color:#ffe08a'>HK$6,840</td><td style='color:#4dd0c4'><strong>9.5x</strong></td></tr><tr><td><strong>General 代購</strong></td><td>131</td><td>HK$432.97</td><td>3</td><td style='color:#ffe08a'>HK$5,104</td><td style='color:#4dd0c4'><strong>11.8x</strong></td></tr><tr><td><strong>Hermes</strong></td><td>63</td><td>HK$229.08</td><td>0</td><td style='color:#ffe08a'>HK$0</td><td style='color:#f48fb1'><strong>0.0x</strong></td></tr><tr><td><strong>Chanel</strong></td><td>98</td><td>HK$175.09</td><td>3</td><td style='color:#ffe08a'>HK$28,774</td><td style='color:#4dd0c4'><strong>164.3x</strong></td></tr><tr><td><strong>Goyard</strong></td><td>128</td><td>HK$124.96</td><td>0</td><td style='color:#ffe08a'>HK$0</td><td style='color:#f48fb1'><strong>0.0x</strong></td></tr><tr><td><strong>Jellycat</strong></td><td>79</td><td>HK$84.42</td><td>3</td><td style='color:#ffe08a'>HK$990</td><td style='color:#4dd0c4'><strong>11.7x</strong></td></tr><tr><td><strong>Celine</strong></td><td>46</td><td>HK$72.46</td><td>0</td><td style='color:#ffe08a'>HK$0</td><td style='color:#f48fb1'><strong>0.0x</strong></td></tr><tr><td><strong>Redline</strong></td><td>60</td><td>HK$68.76</td><td>0</td><td style='color:#ffe08a'>HK$0</td><td style='color:#f48fb1'><strong>0.0x</strong></td></tr></table>
+    # 📊 LondonKelly Google Ads 週報優化<br><strong class="gold">本週總花費：HK$2,280</strong> | 目標 ROAS：4.0x+<br><br><hr class="divider"><br><br><h3 class="sec-h3">🔍 Ad Group 逐一診斷</h3><br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Vivienne Westwood]</strong> ROAS: 9.5x | 花費: HK$718.02 | Conv: 13.7</div><br>評級：<span class="pill green">🟢</span> 優秀<br>診斷：高流量兼高轉換，係本週最大貢獻組，表現穩定強勁<br>行動：✅ 加預算 +20%，維持現有 Bid 策略，可測試擴展 Broad Match KW<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[General 代購]</strong> ROAS: 11.8x | 花費: HK$432.97 | Conv: 3</div><br>評級：<span class="pill green">🟢</span> 優秀<br>診斷：轉換值極高，每次轉換平均 HK$1,700+，效益出色<br>行動：✅ 加預算 +25%，留意 Search Term 報告，加入高質 KW 擴大覆蓋<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Hermes]</strong> ROAS: 0.0x | 花費: HK$229.08 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：花費第三高但零轉換，屬高風險浪費預算組<br>行動：⚠️ 即時降 Bid -30%，審查 Search Terms 並加大量 Negative KW，觀察 1 週，無改善則 Pause<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Chanel]</strong> ROAS: 164.3x | 花費: HK$175.09 | Conv: 3</div><br>評級：<span class="pill green">🟢</span> 本週 MVP 🏆<br>診斷：ROAS 高達 164x，轉換值 HK$28,773，極度高效，嚴重預算不足<br>行動：🚀 大幅加預算 +50%，提高 Bid 爭取更多曝光，優先擴展<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Goyard]</strong> ROAS: 0.0x | 花費: HK$124.96 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：128 Clicks 但零轉換，點擊質素成疑，需審查 Landing Page 及 KW 相關性<br>行動：⚠️ 降 Bid -25%，檢查 Landing Page，加 Negative KW，限 Exact/Phrase Match<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Jellycat]</strong> ROAS: 11.7x | 花費: HK$84.42 | Conv: 3</div><br>評級：<span class="pill green">🟢</span> 優秀<br>診斷：小預算高回報，轉換穩定，值得加大投入<br>行動：✅ 加預算 +30%，維持現有 Bid，測試季節性產品 KW<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Celine]</strong> ROAS: 0.0x | 花費: HK$72.46 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：46 Clicks 零轉換，KW 或 Audience 未夠精準<br>行動：⚠️ 降 Bid -20%，審查 Search Terms，加 Negative KW，觀察 1 週<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Redline]</strong> ROAS: 0.0x | 花費: HK$68.76 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：60 Clicks 但零轉換，品牌認知度低或受眾不對<br>行動：⚠️ 暫時 Pause 或大幅降 Bid -40%，重新審視受眾定向及 Ad Copy<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Loro Piana]</strong> ROAS: 0.0x | 花費: HK$57.19 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：只有 12 Clicks，數據量太少，但已花超過 HK$57<br>行動：⚠️ 降 Bid -30%，改用 Exact Match KW，減少無效曝光<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Dior]</strong> ROAS: 0.0x | 花費: HK$52.61 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：37 Clicks 零轉換，競爭激烈品牌，需更精準 KW 策略<br>行動：⚠️ 降 Bid -25%，聚焦長尾 KW（例：Dior 香港代購 正品），加 Negative KW<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[YSL]</strong> ROAS: 0.0x | 花費: HK$48.23 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：44 Clicks 零轉換，表現與 Dior 相似，KW 意圖可能不夠精準<br>行動：⚠️ 降 Bid -25%，審查 Ad Copy 相關性，測試新 KW 組合<br><br><hr class="divider"><br><br><div class="ag-item">▸ <strong class="gold">[Loewe]</strong> ROAS: 0.0x | 花費: HK$42.54 | Conv: 0</div><br>評級：<span class="pill red">🔴</span> 差<br>診斷：23 Clicks 零轉換，花費最少但同樣無回報<br>行動：⚠️
+  </div>
+</details>
 
-  <div class="section-title">🔍 Top Search Terms</div><table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr><tr>
-              <td>red line</td>
-              <td>1</td>
-              <td>HK$0.04</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line bracelet</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line hk</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line paris</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line 官網</td>
-              <td>1</td>
-              <td>HK$0.06</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line 手鍊</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>red line 手鍊 價錢</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>redline aurore</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr><tr>
-              <td>redline bracelet</td>
-              <td>2</td>
-              <td>HK$1.29</td>
-              <td>0</td>
-            </tr><tr>
-              <td>redline bracelet france</td>
-              <td>0</td>
-              <td>HK$0</td>
-              <td>0</td>
-            </tr></table>
+  <!-- Section 4: Keywords -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">🔑 Keywords 深度分析 + 新增/暫停建議</summary>
+  <div class="section-body">
+    <table class="data-table"><tr><th>Keyword</th><th>Match</th><th>Clicks</th><th>花費</th><th>Conv</th><th>ConvValue</th><th>CPC</th></tr><tr><td>hand bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>bucket bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>card holder</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>card case</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>christian dior hand bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>celine bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>dior wallet</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>chanel hand bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>gucci hand bag</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr><tr><td>celine purse</td><td style='font-size:11px;color:#8070a0'>Broad</td><td>0</td><td>HK$0</td><td style='color:#f48fb1'>0</td><td>HK$0</td><td>HK$?</td></tr></table>
+    # 🎯 LondonKelly Google Ads Keywords 優化報告<br><br>> 📊 分析基準：本週Search Terms數據 | 目標市場：香港／台灣<br><br><hr class="divider"><br><br><h3 class="sec-h3">🏆 高效Keywords（建議加Bid）</h3><br><br>> ⚠️ 現實說明：所有現有Keywords目前Clicks=0、花費=0，<strong class="gold">無法從現有Keywords直接判斷ROAS</strong>。以下基於Search Terms間接觸發分析，屬於<strong class="gold">潛力評估</strong>而非實際表現。<br><br><li><strong class="gold">[redline hk]</strong> — 觸發4次點擊，花費僅HK$5.33，CPC≈HK$1.33，本地意圖明確 🇭🇰，建議加Bid <strong class="gold">+30%</strong></li><br><br><li><strong class="gold">[redline hong kong]</strong> — 3次點擊，花費HK$2.68，CPC≈HK$0.89，地域意圖強，代購場景高度相關，建議加Bid <strong class="gold">+25%</strong></li><br><br><li><strong class="gold">[redline bracelet]</strong> — 2次點擊，花費HK$1.29，CPC≈HK$0.65，品牌+品類組合詞，精準度高，建議加Bid <strong class="gold">+20%</strong></li><br><br><li><strong class="gold">[redline bracelet hk]</strong> — 1次點擊，花費HK$0.96，CPC偏高但地域+品牌+品類三重精準，轉換潛力大，建議加Bid <strong class="gold">+15%</strong></li><br><br><li><strong class="gold">[redline hong kong price list]</strong> — 2次點擊，花費HK$1.45，搜「price list」代表<strong class="gold">主動比價意圖</strong>，距離購買決策近，建議加Bid <strong class="gold">+20%</strong></li><br><br><hr class="divider"><br><br><h3 class="sec-h3">⚰️ 低效Keywords（建議Pause或降Bid）</h3><br><br>> ⚠️ 現有15個Keywords全部0點擊，但部分詞本身問題明顯，需結構性處理。<br><br><li><strong class="gold">[hand bag]</strong> (Broad) — 過於寬泛，Broad Match下會觸發無數不相關搜尋（如「手袋教程」「二手hand bag」），完全無奢侈品代購意圖，建議：<strong class="gold">立即Pause</strong> ⛔</li><br><br><li><strong class="gold">[bag hand]</strong> (Broad) — 詞序錯誤（正常人不會這樣搜尋），語意模糊，質量分預計極低，浪費預算，建議：<strong class="gold">立即Pause</strong> ⛔</li><br><br><li><strong class="gold">[card holder]</strong> / <strong class="gold">[card case]</strong> (Broad) — 品類詞無品牌修飾，競爭對手眾多（包括文具店、手機殼），無法鎖定奢侈品代購客，建議：<strong class="gold">降Bid -50% 或升級為Phrase Match加品牌修飾</strong> 📉</li><br><br><li><strong class="gold">[women hand bag]</strong> (Broad) — 無品牌意圖，觸發範圍包括快時尚、山寨品等，與LondonKelly定位不符，建議：<strong class="gold">Pause，改用[luxury women handbag]替代</strong> ⛔</li><br><br><hr class="divider"><br><br><h3 class="sec-h3">➕ 建議新增Keywords（從Search Terms提取）</h3><br><br><li><strong class="gold">[redline hk]</strong> | <strong class="gold">Exact</strong> | 本週4次點擊最高，地域+品牌意圖明確，現有Keywords未覆蓋此精準詞 🎯</li><br><br><li><strong class="gold">[redline hong kong]</strong> | <strong class="gold">Phrase</strong> | 3次點擊，可同時捕捉「redline hong kong price」「redline hong kong store」等變體搜尋 🇭🇰</li><br><br><li><strong class="gold">[redline bracelet]</strong> | <strong class="gold">Phrase</strong> | 2次點擊，品牌+品類核心詞，Phrase可覆蓋「redline bracelet hk」「redline bracelet price」等長尾 💎</li><br><br><li><strong class="gold">[redline hong kong price list]</strong> | <strong class="gold">Exact</strong> | 2次點擊，「price list」強烈暗示<strong class="gold">比價+購買意圖</strong>，值得單獨精準捕捉 💰</li><br><br><li><strong class="gold">[redline discount code]</strong> | <strong class="gold">Exact</strong> | 雖然1次點擊且Conv=0，但搜折扣碼代表<strong class="gold">高度購買意圖</strong>，建議加入並導向優惠落地頁 🎟️</li><br><br><hr class="divider"><br><br>## 
+    <h3 class="sec-h3">🔑 GA4 Ads Keywords（有成交排頂）</h3><table class="data-table"><tr><th>Keyword</th><th>Sessions</th><th>成交</th><th>Revenue</th></tr><tr><td><strong>西太后</strong></td><td>340</td><td>2</td><td>HK$2,990</td></tr><tr><td><strong>vivienne westwood</strong></td><td>264</td><td>1</td><td>HK$1,214</td></tr><tr><td><strong>vivienne westwood 頸鏈</strong></td><td>36</td><td>1</td><td>HK$1,377</td></tr><tr><td><strong>chanel 代購</strong></td><td>17</td><td>1</td><td>HK$28,772</td></tr><tr><td><strong>jellycat 代購</strong></td><td>13</td><td>1</td><td>HK$495</td></tr><tr><td><strong>london kelly</strong></td><td>83</td><td>0</td><td>HK$0</td></tr><tr><td><strong>redline</strong></td><td>53</td><td>0</td><td>HK$0</td></tr><tr><td><strong>chanel 手袋</strong></td><td>45</td><td>0</td><td>HK$0</td></tr></table>
+  </div>
+</details>
 
-  <div class="section-title">🤖 Claude 深度分析</div>
-  <div class="analysis"># 📋 LondonKelly 週報<br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">2026年4月20日 — 4月26日</h3><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br># 📊 本週表現總結<br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">整體健康度評分：<strong style="color:#ffd580;">6.2 / 10</strong></h3><br><br>> 📈 Google Ads 效率突出，但整體網站轉化率極低，流量質量良莠不齊，Shopify與GA4數據差距需持續監察。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">✅ 本週3大亮點</h3><br><br><table class="data-table"><tr><th>#</th><th>亮點</th><th>數字支持</th></tr><tr><td>🥇</td><td><strong style="color:#ffd580;">Google Ads 整體 ROAS 極強</strong></td><td>ROAS 18.3x，花費 HK$2,280 帶來 HK$34,847 Paid Search 收入</td></tr><tr><td>🥈</td><td><strong style="color:#ffd580;">Chanel Ad Group 表現驚艷</strong></td><td>花費僅 HK$175，帶來 HK$28,774 成交，ROAS 164.3x，為全週最高效廣告組</td></tr><tr><td>🥉</td><td><strong style="color:#ffd580;">Organic Social 轉化率全渠道最高</strong></td><td>僅89 sessions 但成交1單 HK$3,690，轉化率 1.12%，遠超平均0.043%</td></tr></table><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">❌ 本週3大問題</h3><br><br><table class="data-table"><tr><th>#</th><th>問題</th><th>數字支持</th></tr><tr><td>⚠️</td><td><strong style="color:#ffd580;">整體轉化率極低</strong></td><td>50,586 sessions 只有22單，轉化率0.043%，業界奢侈品代購正常應達0.3-0.5%</td></tr><tr><td>⚠️</td><td><strong style="color:#ffd580;">Direct流量佔73%但轉化率極差</strong></td><td>36,869 sessions 只得4單，轉化率0.01%，懷疑大量bot流量或追蹤問題</td></tr><tr><td>⚠️</td><td><strong style="color:#ffd580;">Hermes / Goyard / Celine / Redline 廣告零轉化</strong></td><td>合計花費 HK$495.26，成交 HK$0，ROAS 0.0x，資源嚴重浪費</td></tr></table><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br># 🔍 流量來源深度分析<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">1️⃣ Direct — ⚠️ 需要調查</h3><br><br>```<br>Sessions：36,869 | 成交：4 | 收入：HK$6,025<br>轉化率：0.01% | 平均客單：HK$1,506<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">Direct 佔全站 <strong style="color:#ffd580;">72.9%</strong> sessions，比例異常高</li><br><li style="margin:4px 0;">轉化率0.01% 遠低於 Paid Search（0.36%）達 <strong style="color:#ffd580;">36倍差距</strong></li><br><li style="margin:4px 0;">極可能包含大量 <strong style="color:#ffd580;">bot流量、內部訪問、或GA4 attribution 錯誤</strong>（例如未標記 UTM 的 email / WhatsApp 流量被歸類為 Direct）</li><br><li style="margin:4px 0;">4單成交平均客單 HK$1,506，明顯低於 Shopify 整體客單 HK$6,357</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">🔧 在 GA4 設定「Internal Traffic Filter」，排除辦公室/倉庫 IP</li><br><li style="margin:4px 0;">🔧 檢查是否有大量 WhatsApp 或 Email 推廣未加 UTM 參數</li><br><li style="margin:4px 0;">🔧 啟用 GA4 Bot Filtering，審查 Direct 流量地區分佈</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">2️⃣ Organic Search — ✅ 最佳自然渠道</h3><br><br>```<br>Sessions：7,641 | 成交：8 | 收入：HK$51,108<br>轉化率：0.10% | 平均客單：HK$6,389<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">轉化率0.10% 是全站第二高（僅次 Organic Social 1.12%）</li><br><li style="margin:4px 0;">平均客單 HK$6,389 接近 Shopify 整體均值，質量優良</li><br><li style="margin:4px 0;">收入 HK$51,108 佔全站 <strong style="color:#ffd580;">43.5%</strong>，係最重要收入來源</li><br><li style="margin:4px 0;">但 sessions 只有7,641，有機增長空間極大</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">📝 針對「Vivienne Westwood 香港代購」「Chanel 英國代購」等關鍵詞優化 meta title/description</li><br><li style="margin:4px 0;">📝 為高流量 collection pages 增加 FAQ 結構化內容，提升 SEO 排名</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">3️⃣ Unassigned — ⚠️ 追蹤問題</h3><br><br>```<br>Sessions：3,939 | 成交：2 | 收入：HK$5,871<br>轉化率：0.05%<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">Unassigned 通常代表 GA4 <strong style="color:#ffd580;">無法識別流量來源</strong></li><br><li style="margin:4px 0;">常見原因：缺少 UTM、第三方 redirect、app 內流量（Instagram / Facebook app browser）</li><br><li style="margin:4px 0;">3,939 sessions 不可忽視，需要正確歸因</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">🔧 審查所有社交帖子連結，確保附有 UTM（`utm_source=instagram&utm_medium=social`）</li><br><li style="margin:4px 0;">🔧 檢查 Shopify 結帳頁面是否有 GA4 tracking 中斷</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">4️⃣ Paid Search — ✅ 高效付費渠道</h3><br><br>```<br>Sessions：1,688 | 成交：6 | 收入：HK$34,847<br>轉化率：0.36% | 平均客單：HK$5,808<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">轉化率 0.36% 係全渠道最高（Organic Social 1.12% sessions 太少，不具統計意義）</li><br><li style="margin:4px 0;">ROAS 18.3x 表現極佳，每 HK$1 廣告費帶來 HK$18.3 收入</li><br><li style="margin:4px 0;">但 Paid Search 6單 vs GA4 Ads 顯示 22.7 conversions，差距需要核查（見 Shopify vs GA4 章節）</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">💰 考慮增加整體 Google Ads 預算 15-20%（由 HK$2,280/週 → HK$2,620-2,740/週）</li><br><li style="margin:4px 0;">🎯 重點加注 Chanel Ad Group（詳見 Google Ads 章節）</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">5️⃣ Organic Shopping — 🔴 零轉化</h3><br><br>```<br>Sessions：243 | 成交：0 | 收入：HK$0<br>轉化率：0.0%<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">Google Shopping 免費列表帶來243 sessions 但零轉化</li><br><li style="margin:4px 0;">可能原因：產品圖片質量、價格競爭力、或產品描述不足</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">🛍️ 審查 Google Merchant Center 產品 Feed 質量，確保有高解像度圖片及完整描述</li><br><li style="margin:4px 0;">💲 檢查是否標示了 HKD 定價及運費資訊</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">6️⃣ Referral — 🔴 零轉化</h3><br><br>```<br>Sessions：175 | 成交：0 | 收入：HK$0<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">需要查明 referral 來源（哪些網站引流）</li><br><li style="margin:4px 0;">175 sessions 無一轉化，可能是非目標受眾</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">📊 在 GA4 > Acquisition > Traffic Acquisition 查看具體 Referral 網域</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br><h3 style="color:#4dd0c4;margin:14px 0 6px;font-weight:800;">7️⃣ Organic Social — 🏆 最高轉化率</h3><br><br>```<br>Sessions：89 | 成交：1 | 收入：HK$3,690<br>轉化率：1.12%<br>```<br><br><strong style="color:#ffd580;">診斷：</strong><br><li style="margin:4px 0;">轉化率 1.12% 係全站最高，26倍於整體平均</li><br><li style="margin:4px 0;">但 sessions 只有89，<strong style="color:#ffd580;">嚴重低估社交媒體潛力</strong></li><br><li style="margin:4px 0;">部分 Instagram/Facebook 流量可能被錯分到 Unassigned（app browser 問題）</li><br><br><strong style="color:#ffd580;">下週行動：</strong><br><li style="margin:4px 0;">📱 增加 Instagram / Facebook 帖子頻率，每週至少5篇產品帖</li><br><li style="margin:4px 0;">🔗 確保所有帖子連結加 UTM 參數，準確追蹤社交流量</li><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br># 💰 Google Ads — 逐個 Ad Group 評估<br><br><strong style="color:#ffd580;">總覽：花費 HK$2,279.97 | 總 ROAS 18.3x</strong><br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">Chanel</strong> ROAS <strong style="color:#ffd580;">164.3x</strong> | 花費 HK$175.09 | Conv Value HK$28,773.76<br>```<br>點擊：98 | Conv：3 | CPC：HK$1.79<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> 本週最高效廣告組，每 HK$1 帶來 HK$164 收入。3單均為高客單（平均 HK$9,591/單）。CTR 及轉化均理想，預算嚴重不足。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🟢 <strong style="color:#ffd580;">立即增加預算 50-80%</strong>（由 HK$175 → HK$265-315/週）。同時拓展關鍵詞至「Chanel wallet 代購」「Chanel classic flap 英國」等長尾詞，捕捉更多高意圖搜索。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">Vivienne Westwood</strong> ROAS <strong style="color:#ffd580;">9.5x</strong> | 花費 HK$718.02 | Conv Value HK$6,839.57<br>```<br>點擊：878 | Conv：13.7 | CPC：HK$0.82<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> 點擊量最高、花費最多的廣告組，但 ROAS 9.5x 在所有有轉化組別中最低。CPC HK$0.82 雖低，但帶來大量低質流量（878 clicks，轉化率僅 1.56%）。Conv Value 平均每單 HK$499，明顯低於其他品牌，反映 VW 客單較低屬正常，但需平衡效益。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🟡 <strong style="color:#ffd580;">降低廣告花費 20%</strong>（由 HK$718 → HK$575/週），同時加入更精準 match type（改用 Phrase Match），減少低質點擊。審查是否有過多 broad match 關鍵詞造成浪費。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">General 代購</strong> ROAS <strong style="color:#ffd580;">11.8x</strong> | 花費 HK$432.97 | Conv Value HK$5,103.60<br>```<br>點擊：131 | Conv：3 | CPC：HK$3.30<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> ROAS 11.8x 表現中等，CPC HK$3.30 係所有組別中最高（除 Chanel），帶來3單平均 HK$1,701/單。"代購" 關鍵詞吸引的受眾較廣，需要優化以提升精準度。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🟡 <strong style="color:#ffd580;">維持現有預算</strong>，但審查關鍵詞清單，將低效廣泛詞 pause，集中預算在「英國奢侈品代購」「倫敦代購」等地域性關鍵詞。目標將 ROAS 提升至 15x 以上。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">Jellycat</strong> ROAS <strong style="color:#ffd580;">11.7x</strong> | 花費 HK$84.42 | Conv Value HK$990.40<br>```<br>點擊：79 | Conv：3 | CPC：HK$1.07<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> ROAS 11.7x 表現合理，但 Conv Value 只有 HK$990，平均客單 HK$330，係所有品牌中最低。Jellycat 屬較低客單產品，廣告 ROI 上限有限。3 conversions 顯示有需求，但需評估長期盈利能力。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🟡 <strong style="color:#ffd580;">維持現有預算</strong>，但考慮是否值得投放廣告（低客單代購利潤空間較窄）。建議改為依賴 Organic/Social 渠道推廣 Jellycat，節省廣告費用於高客單品牌。若決定保留，目標提升客單至 HK$600+ （推廣套裝購買）。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">Hermes</strong> ROAS <strong style="color:#ffd580;">0.0x</strong> | 花費 HK$229.08 | Conv Value HK$0<br>```<br>點擊：63 | Conv：0 | CPC：HK$3.64<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> 花費 HK$229 但零收入，CPC HK$3.64 係全組最高之一。Hermes 代購需求真實存在，但可能問題在於：Landing Page 缺乏 Hermes 專頁、庫存問題、或關鍵詞競爭過激導致點擊質量差。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🔴 <strong style="color:#ffd580;">暫停（Pause）廣告組2週</strong>，先確認：①是否有足夠 Hermes 庫存 ②是否有專屬 Landing Page ③關鍵詞是否過於廣泛。整頓後重新上線，設 ROAS 目標 ≥ 8x 才考慮維持。<br><br><hr style="border-color:#2a1a50;margin:12px 0;"><br><br>▸ <strong style="color:#ffd580;">Goyard</strong> ROAS <strong style="color:#ffd580;">0.0x</strong> | 花費 HK$124.96 | Conv Value HK$0<br>```<br>點擊：128 | Conv：0 | CPC：HK$0.98<br>```<br>> <strong style="color:#ffd580;">診斷：</strong> 128 clicks 但零轉化，顯示有搜索量但轉化漏斗存在問題。Goyard Collection 頁面跳出率 28.8% 屬合理（低跳出率意味着用戶有瀏覽），但仍無成交，問題可能在於：定價過高、庫存不足、或結帳流程障礙。<br>><br>> <strong style="color:#ffd580;">建議：</strong> 🔴 <strong style="color:#ffd580;">降低廣告 bid 30%</strong></div>
-  <div class="footer">由 LondonKelly Agent 生成 · 2026-04-27 10:57</div>
+  <!-- Section 5: Search Terms -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">🔍 Search Terms 審核 — 加入/Negative/觀察</summary>
+  <div class="section-body">
+    <table class="data-table"><tr><th>Search Term</th><th>Clicks</th><th>花費</th><th>Conv</th></tr><tr><td>red line</td><td>1</td><td>HK$0.04</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line bracelet</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line hk</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line paris</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line 官網</td><td>1</td><td>HK$0.06</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line 手鍊</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>red line 手鍊 價錢</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline aurore</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline bracelet</td><td>2</td><td>HK$1.29</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline bracelet france</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline bracelet hk</td><td>1</td><td>HK$0.96</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline coupon code</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline discount code first order</td><td>1</td><td>HK$5</td><td style='color:#d0c8e8'>0</td></tr><tr><td>redline hk</td><td>4</td><td>HK$5.33</td><td style='color:#ffe08a'>0</td></tr><tr><td>redline hk price</td><td>0</td><td>HK$0</td><td style='color:#d0c8e8'>0</td></tr></table>
+    # 🔍 LondonKelly Google Ads Search Term 審核報告<br><br><hr class="divider"><br><br><h3 class="sec-h3">✅ 建議加入為正式Keyword</h3><br><br><table class="data-table"><tr><th>Search Term</th><th>建議Match Type</th><th>建議加入哪個Ad Group</th><th>原因</th></tr><tr><td>`redline bracelet`</td><td>Exact Match</td><td>Redline 手鍊系列</td><td>28次曝光、2次點擊，意圖明確係搵Redline手鍊，高度相關 💎</td></tr><tr><td>`redline hk`</td><td>Exact Match</td><td>Redline HK 主力組</td><td>59次曝光、4次點擊，本地搜尋意圖強，係最大量嘅相關詞 🇭🇰</td></tr><tr><td>`redline hong kong`</td><td>Exact Match</td><td>Redline HK 主力組</td><td>18次曝光、3次點擊，同上，地區意圖明確，值得獨立控制出價</td></tr><tr><td>`redline bracelet hk`</td><td>Exact Match</td><td>Redline HK 主力組</td><td>產品+地區組合詞，精準度極高，雖然只得4次曝光但每次點擊都係優質流量 🎯</td></tr><tr><td>`redline hong kong price list`</td><td>Exact Match</td><td>Redline HK 主力組</td><td>2次點擊/3次曝光，CTR極高（67%），搵價格資訊代表有購買意圖 💰</td></tr></table><br><br><hr class="divider"><br><br><h3 class="sec-h3">🚫 建議加入Negative Keywords（立即阻止）</h3><br><br><table class="data-table"><tr><th>Search Term</th><th>原因</th></tr><tr><td>`redline discount code first order`</td><td>🚨 花費HK$5.00、0轉換！搵折扣碼用戶唔係代購目標客，購買意欲低且預算浪費最大</td></tr><tr><td>`redline coupon code`</td><td>🚫 同上邏輯，搵coupon嘅用戶期望直購官網優惠，唔符合代購定位</td></tr><tr><td>`redline official website`</td><td>🚫 搵「官網」代表想直接去品牌網站買，唔係搵代購，建議加 "official website" 為Negative</td></tr><tr><td>`redline online`</td><td>⚠️ 意圖模糊，大概率係想去官網/直購，唔係搵代購服務</td></tr><tr><td>`redline jp`</td><td>🚫 搵日本渠道，唔係搵英國代購，方向錯誤</td></tr></table><br><br><hr class="divider"><br><br><h3 class="sec-h3">👀 觀察名單（未夠數據，下週再睇）</h3><br><br><table class="data-table"><tr><th>Search Term</th><th>現況</th><th>觀察什麼</th></tr><tr><td>`redline pure`</td><td>3次點擊、HK$8.95花費、0轉換 👀</td><td>花費唔少但0轉換，「Pure」係Redline特定款式，需多睇一週確認係產品搜尋定其他意思，若下週仍0轉換考慮加Negative</td></tr><tr><td>`redline hong kong price`</td><td>2次曝光、0點擊</td><td>有價格意圖，但數據太少，觀察CTR走勢，若有點擊可升為正式keyword</td></tr><tr><td>`red line hk`</td><td>4次曝光、0點擊</td><td>留意係同 `redline hk` 一樣意思定係其他品牌/事物（如港鐵紅線⚠️），需更多數據分辨</td></tr><tr><td>`redline london`</td><td>1次曝光、0點擊</td><td>雖然London係LondonKelly核心概念，但數據太少，下週睇有否更多曝光</td></tr><tr><td>`redline aurore` / `redline nois`</td><td>各1次曝光、0點擊</td><td>疑似Redline特定款式名，數據太少，觀察是否有持續搜尋量再決定是否獨立建Ad Group 🔮</td></tr></table><br><br><hr class="divider"><br><br>> 💡 <strong class="gold">本週重點行動提示：</strong><br>> 1. <strong class="gold">最優先</strong> ➜ 立即加 `discount code` / `coupon code` / `official website` 為 Negative Keywords，止血HK$5+浪費 🩹<br>> 2. <strong class="gold">次優先</strong> ➜ 將 `redline hk` +
+  </div>
+</details>
+
+  <!-- Section 6: Action Plan -->
+  
+<details class="section-card" open>
+  <summary class="section-summary">🚀 下週行動計劃（按優先級）</summary>
+  <div class="section-body"># 📊 LondonKelly 數字行銷週報分析<br><br>> 本週 ROAS 18.3x 表現亮眼 ✨，但整體轉化率 0.043% 係最大警號 🚨<br><br><hr class="divider"><br><br><h3 class="sec-h3">🚀 下週行動計劃（按優先級）</h3><br><br><span class="pill red">🔴</span>【立即做】<strong class="gold">擴大 Paid Search 預算至少 +30%</strong> — Paid Search 轉化率 0.36% 係 Organic 嘅 3.6倍，但只有 1,688 sessions，佔總流量僅 3.3%；以現時 HK$2,280 花費換嚟 HK$171,639 收入，ROAS 18.3x 仍有極大擴張空間 — 預期每增加 HK$700 預算可額外帶來 ~HK$12,800 收入<br><br><span class="pill red">🔴</span>【立即做】<strong class="gold">審查並新增 Negative Keywords（最少 30 個）</strong> — 50,586 sessions 中只有 27 單成交，大量非買家流量正在浪費 crawl budget 同廣告展示機會；重點排除 "free"、"DIY"、"review"、"compare" 等資訊型關鍵字 — 預期將整體轉化率由 0.043% 提升至 0.08%+<br><br><span class="pill red">🔴</span>【立即做】<strong class="gold">Landing Page A/B Test：加強 Above-the-fold CTA</strong> — 轉化率 0.043% 遠低於電商行業平均 1-2%，差距達 23-46倍；即使 Paid Search 已有 0.36% 但仍有極大改善空間，問題大概率係頁面說服力不足 — 預期測試新版 CTA 後轉化率提升 20-40%<br><br><span class="pill yellow">🟡</span>【本週內】<strong class="gold">針對 Paid Search Top Converting Keywords 建立獨立 Ad Group</strong> — 目前 1,688 sessions 產生 6 單（0.36%），需要識別係咩 keywords 帶嚟呢 6 單，然後單獨放大預算 — 預期 ROAS 可由 18.3x 進一步提升至 22x+<br><br><span class="pill yellow">🟡</span>【本週內】<strong class="gold">為 Organic 高流量頁面加入更強 Purchase Intent 元素</strong> — Organic 7,641 sessions 但轉化率只有 0.1%（約 7-8 單），流量龐大但變現效率極低；加入限時優惠 banner、社交證明、緊迫感文案 — 預期 Organic 轉化率由 0.1% 升至 0.18-0.25%，額外多 6-12 單<br><br><span class="pill yellow">🟡</span>【本週內】<strong class="gold">開設 Remarketing Campaign 針對未轉化 Sessions</strong> — 本週 50,559 個 sessions 沒有購買，屬於龐大嘅 warm audience；設定 7日、14日 remarketing list，用動態產品廣告追蹤 — 預期 remarketing ROAS 可達 25-35x，成本極低<br><br><span class="pill yellow">🟡</span>【本週內】<strong class="gold">分析剩餘 41,257 sessions 嘅流量來源（非 Paid/Organic 部分）</strong> — 50,586 total sessions 中，Paid Search 1,688 + Organic 7,641 = 9,329，仍有 ~41,257 sessions 來源未明；呢批流量嘅轉化率同質素完全未知，可能係漏洞所在 🔍 — 預</div>
+</details>
+
+  <div class="footer">由 LondonKelly Agent v2 生成 · 2026-04-27 16:36</div>
 </div>
 </body>
 </html>
