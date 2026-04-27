@@ -631,8 +631,8 @@ li{{margin:4px 0;padding-left:4px}}
     <div class="card"><div class="card-label">Users</div><div class="card-value cv-blue">{ga4.get('users',0):,}</div></div>
     <div class="card"><div class="card-label">加購物車</div><div class="card-value cv-teal">{ga4.get('add_to_carts',0):,}</div></div>
     <div class="card"><div class="card-label">Shopify成交</div><div class="card-value cv-pink">{shopify.get('orders',0) if shopify else 'N/A'}</div></div>
-    <div class="card"><div class="card-label">{lbl_cost}</div><div class="card-value cv-gold">HK${ads.get('cost',0):,.0f}</div></div>
-    <div class="card"><div class="card-label">{lbl_roas}</div><div class="card-value" style="color:{roas_color}">{ads.get('roas',0)}x</div></div>
+    <div class="card"><div class="card-label">Ads花費</div><div class="card-value cv-gold">HK${ads.get('cost',0):,.0f}</div></div>
+    <div class="card"><div class="card-label">ROAS</div><div class="card-value" style="color:{roas_color}">{ads.get('roas',0)}x</div></div>
     <div class="card"><div class="card-label">Shopify收入</div><div class="card-value cv-gold">HK${shopify.get('revenue',0) if shopify else 0:,.0f}</div></div>
     <div class="card"><div class="card-label">GA4 vs Shopify</div><div class="card-value" style="color:{'#f48fb1' if abs(diff_orders)>3 else '#4dd0c4'}">{diff_orders:+d} 單</div></div>
   </div>
